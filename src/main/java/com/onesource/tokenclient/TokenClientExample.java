@@ -27,10 +27,10 @@ public class TokenClientExample {
 
 		Map<String, String> formData = new HashMap<>();
 		formData.put("client_id", "IntegrationTestClient");
-		formData.put("client_secret", "9f452b99-2c14-4ec5-a92b-db6d9d52ee5f");
+		formData.put("client_secret", "a14ca593-81e9-4a44-9e0d-b54994250bdc");
 		formData.put("grant_type", "password");
-		formData.put("username", "bnyuser1");
-		formData.put("password", "s5hsZZnPh0G9");
+		formData.put("username", "user1");
+		formData.put("password", "1234XYZ");
 
 		HttpRequest request = HttpRequest
 				.newBuilder(new URI("https://stageauth.equilend.com/auth/realms/1Source/protocol/openid-connect/token"))
