@@ -24,10 +24,10 @@ public class ReplayJob {
 		return new JobBuilder("replay", jobRepository)
 //				.start(day0LedgerAInit(jobRepository, transactionManager))
 //				.next(day0LedgerBInit(jobRepository, transactionManager))
-//				.start(day1LedgerAAuth(jobRepository, transactionManager))
-//				.next(day1LedgerA(jobRepository, transactionManager))
-				.start(day1LedgerBAuth(jobRepository, transactionManager))
-				.next(day1LedgerB(jobRepository, transactionManager))
+				.start(day1LedgerAAuth(jobRepository, transactionManager))
+				.next(day1LedgerA(jobRepository, transactionManager))
+//				.next(day1LedgerBAuth(jobRepository, transactionManager))
+//				.next(day1LedgerB(jobRepository, transactionManager))
 				.build();
 	}
 
