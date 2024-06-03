@@ -95,7 +95,7 @@ public class Day0LedgerAInitTask extends RecordReader implements Tasklet, StepEx
 					Thread.sleep(5000); //need to avoid open figi rate limits
 				}
 				
-				dao.insert(record, figiCache.getFigi(record.getSedol()), ledgerAName, "LENDER", "TLEN-US", "TBORR-US");
+				dao.insert(record, figiCache.getFigi(record.getSedol()), ledgerAName, "LENDER", "USPRIMELEND", "BORROWER-X");
 				
 			}
 

@@ -48,7 +48,7 @@ public class Day0LedgerBInitTask extends RecordReader implements Tasklet, StepEx
 			HarvestedRecord record = mapper.mapRow(lineParts, 0);
 			
 			if (record.getFileDate().equals(ledgerBStartDate) && "NEW".equals(record.getRowtype())) {
-				dao.insert(record, figiCache.getFigi(record.getSedol()), ledgerBName, "BORROWER", "TBORR-US", "TLEN-US");
+				dao.insert(record, figiCache.getFigi(record.getSedol()), ledgerBName, "BORROWER", "MY_BORROWER", "LENDER-ABC");
 				
 				logger.debug(record.toString());
 			}
