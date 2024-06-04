@@ -1,0 +1,7 @@
+{
+    "code": 201,
+    "type": "Contract Proposal",
+    "message": "Contract Proposal created in the ledger",
+    "resourceUri": "/v1/ledger/contracts/4e7e8cc1-3fb3-4aa7-8335-51e416345b47",
+    "responseDateTime": "2024-06-04T18:14:52.721Z"
+}

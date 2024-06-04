@@ -1,0 +1,91 @@
+{
+    "trade": {
+        "venues": [
+            {
+                "type": "OFFPLATFORM",
+                "venueName": "Bloomberg",
+                "venueRefKey": "5905447784"
+            }
+        ],
+        "instrument": {
+            "ticker": "AAPL",
+            "cusip": "037833100",
+            "isin": "US0378331005",
+            "sedol": "2046251",
+            "figi": "BBG000B9XRY4",
+            "description": "APPLE INC COM ",
+            "marketCd": "US"
+        },
+        "rate": {
+            "rebate": {
+                "floating": {
+                    "benchmark": "OBFR",
+                    "baseRate": 0.61,
+                    "spread": 8.72,
+                    "isAutoRerate": false,
+                    "effectiveDate": "2024-06-04",
+                    "effectiveRate": 9.33,
+                    "cutoffTime": "23:00:00"
+                }
+            }
+        },
+        "quantity": 4463292,
+        "openQuantity": 4463292,
+        "billingCurrency": "USD",
+        "dividendRatePct": 14,
+        "tradeDate": "2024-06-04",
+        "termType": "OPEN",
+        "settlementDate": "2024-09-22",
+        "settlementType": "DVP",
+        "collateral": {
+            "type": "CASH",
+            "contractPrice": 7502.2657,
+            "contractValue": 7087.22,
+            "collateralValue": 4663.7,
+            "currency": "USD",
+            "roundingRule": 25,
+            "roundingMode": "EXACT",
+            "margin": 979
+        },
+        "transactingParties": [
+            {
+                "partyRole": "BORROWER",
+                "party": {
+                    "partyId": "TBORR-US",
+                    "partyName": "QABorrower1",
+                    "gleifLei": "KTB500SKZSDI75VSFU40"
+                }
+            },
+            {
+                "partyRole": "LENDER",
+                "party": {
+                    "partyId": "TLEN-US",
+                    "partyName": "QALender1",
+                    "gleifLei": "KTB500SKZSDI75VSFU40"
+                },
+                "internalRef": {
+                    "brokerCd": "brokerCd_3268522",
+                    "accountId": "accountId_1921748",
+                    "internalRefId": "L_1176760"
+                }
+            }
+        ]
+    },
+    "settlement": [
+        {
+            "partyRole": "LENDER",
+            "settlementStatus": "SETTLED",
+            "internalAcctCd": "ABCD-evfom",
+            "instruction": {
+                "settlementBic": "DTCYUS33",
+                "localAgentBic": "sBkSUGEqMU",
+                "localAgentName": "Zemlak, Schmeler and Turner",
+                "localAgentAcct": "24002878",
+                "custodianBic": "WtHYMJ0pNN",
+                "custodianName": "Rowe - Murray",
+                "custodianAcct": "36031721",
+                "dtcParticipantNumber": "3980"
+            }
+        }
+    ]
+}
