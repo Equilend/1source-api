@@ -17,20 +17,20 @@ public class ContractProposalJob {
 	@Bean
 	public Job contractProposal(JobRepository jobRepository, ResourcelessTransactionManager transactionManager) {
 		return new JobBuilder("contractProposal", jobRepository)
-				.start(ledgerAuthStep(jobRepository, transactionManager))
-				.next(contractProposeStep(jobRepository, transactionManager))
+				.start(contractProposalAuthStep(jobRepository, transactionManager))
+				.next(contractProposalStep(jobRepository, transactionManager))
 				.build();
 	}
 
 	@Bean
-	public AuthTask ledgerAuthTask() {
+	public AuthTask contractProposalAuthTask() {
 		return new AuthTask();
 	}
 
 	@Bean
-	public Step ledgerAuthStep(JobRepository jobRepository, ResourcelessTransactionManager transactionManager) {
-		return new StepBuilder("ledgerAuthStep", jobRepository).allowStartIfComplete(true)
-				.tasklet(ledgerAuthTask(), transactionManager).build();
+	public Step contractProposalAuthStep(JobRepository jobRepository, ResourcelessTransactionManager transactionManager) {
+		return new StepBuilder("contractProposalAuthStep", jobRepository).allowStartIfComplete(true)
+				.tasklet(contractProposalAuthTask(), transactionManager).build();
 	}
 
 	@Bean
@@ -39,8 +39,8 @@ public class ContractProposalJob {
 	}
 
 	@Bean
-	public Step contractProposeStep(JobRepository jobRepository, ResourcelessTransactionManager transactionManager) {
-		return new StepBuilder("contractProposeStep", jobRepository).allowStartIfComplete(true)
+	public Step contractProposalStep(JobRepository jobRepository, ResourcelessTransactionManager transactionManager) {
+		return new StepBuilder("contractProposalStep", jobRepository).allowStartIfComplete(true)
 				.tasklet(contractProposalTask(), transactionManager).build();
 	}
 
