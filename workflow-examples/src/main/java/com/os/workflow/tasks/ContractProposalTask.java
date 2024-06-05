@@ -24,6 +24,7 @@ import com.google.gson.GsonBuilder;
 import com.os.workflow.AuthToken;
 import com.os.workflow.ContractProposalUtil;
 import com.os.workflow.LedgerRecord;
+import com.os.workflow.WorkflowConfig;
 
 import io.swagger.v1_0_5_20240428.client.model.ContractProposal;
 import io.swagger.v1_0_5_20240428.client.model.CurrencyCd;
@@ -41,6 +42,9 @@ public class ContractProposalTask implements Tasklet, StepExecutionListener {
 
 	@Autowired
 	WebClient restWebClient;
+
+	@Autowired
+	WorkflowConfig workflowConfig;
 
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
@@ -80,7 +84,7 @@ public class ContractProposalTask implements Tasklet, StepExecutionListener {
 		ledgerRecord.setInternalRefId(UUID.randomUUID().toString());
 		ledgerRecord.setTradeDate(LocalDate.now());
 		
-		ledgerRecord.setBorrowLoan(PartyRole.LENDER.getValue());
+		ledgerRecord.setBorrowLoan(workflowConfig.getActing_as());
 		ledgerRecord.setFigi("BBG000B9XRY4");
 		ledgerRecord.setQuantity(Long.valueOf((((random.nextInt(100000 - 10000) + 10000))+99)/100)*100);
 		ledgerRecord.setCurrencyCd(CurrencyCd.USD.getValue());

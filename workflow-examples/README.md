@@ -31,6 +31,8 @@ com.os.auth.contract_id=02009e4c-bdf3-47b8-96e1-937043850382
 spring.batch.job.name=returnNotification  
 /#############################  
 
+Check application.properties for other job configurations.
+
 ## maven execution
 
 clean spring-boot:run -Dspring-boot.run.jvmArguments="-Xms12288m -Xmx12288m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8000"

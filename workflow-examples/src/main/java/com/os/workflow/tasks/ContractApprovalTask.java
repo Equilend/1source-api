@@ -17,7 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.os.workflow.AuthConfig;
+import com.os.workflow.WorkflowConfig;
 import com.os.workflow.AuthToken;
 
 import io.swagger.v1_0_5_20240428.client.model.ContractProposalApproval;
@@ -39,7 +39,7 @@ public class ContractApprovalTask implements Tasklet, StepExecutionListener {
 	WebClient restWebClient;
 
 	@Autowired
-	AuthConfig authConfig;
+	WorkflowConfig workflowConfig;
 
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
@@ -54,7 +54,7 @@ public class ContractApprovalTask implements Tasklet, StepExecutionListener {
 		proposal.setInternalRefId("b_int_ref_z0001");
 		
 		PartySettlementInstruction partySettlementInstruction = new PartySettlementInstruction();
-		partySettlementInstruction.setPartyRole(PartyRole.BORROWER);
+		partySettlementInstruction.setPartyRole(PartyRole.fromValue(workflowConfig.getActing_as()));
 		partySettlementInstruction.setInternalAcctCd("stl_b_12345");
 
 		SettlementInstruction instruction = new SettlementInstruction();
@@ -72,7 +72,7 @@ public class ContractApprovalTask implements Tasklet, StepExecutionListener {
 
 		logger.debug(gson.toJson(proposal));
 
-		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts/" + authConfig.getContract_id() + "/approve").contentType(MediaType.APPLICATION_JSON)
+		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts/" + workflowConfig.getContract_id() + "/approve").contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(proposal).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					return Mono.empty();
