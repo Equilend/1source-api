@@ -16,7 +16,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.workflow.AuthConfig;
+import com.os.workflow.WorkflowConfig;
 import com.os.workflow.AuthToken;
 
 public class AuthTask implements Tasklet, StepExecutionListener {
@@ -26,17 +26,17 @@ public class AuthTask implements Tasklet, StepExecutionListener {
 	private AuthToken ledgerToken;
 	
 	@Autowired
-	AuthConfig authConfig;
+	WorkflowConfig workflowConfig;
 	
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		
 		MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
-		formData.add("grant_type", authConfig.getGrant_type());
-		formData.add("client_id", authConfig.getClient_id());
-		formData.add("username", authConfig.getUsername());
-		formData.add("password", authConfig.getPassword());
-		formData.add("client_secret", authConfig.getClient_secret());
+		formData.add("grant_type", workflowConfig.getAuth_grant_type());
+		formData.add("client_id", workflowConfig.getAuth_client_id());
+		formData.add("username", workflowConfig.getAuth_username());
+		formData.add("password", workflowConfig.getAuth_password());
+		formData.add("client_secret", workflowConfig.getAuth_client_secret());
 
 		WebClient authClient = WebClient.create("https://stageauth.equilend.com");
 		
