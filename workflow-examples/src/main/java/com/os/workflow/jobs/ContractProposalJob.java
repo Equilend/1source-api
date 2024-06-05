@@ -8,15 +8,17 @@ import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
 import com.os.workflow.tasks.AuthTask;
+import com.os.workflow.tasks.ContractProposalTask;
 
 @Configuration
 public class ContractProposalJob {
 
 	@Bean
 	public Job contractProposal(JobRepository jobRepository, ResourcelessTransactionManager transactionManager) {
-		return new JobBuilder("contractProposal", jobRepository).start(ledgerAuth(jobRepository, transactionManager))
+		return new JobBuilder("contractProposal", jobRepository)
+				.start(ledgerAuthStep(jobRepository, transactionManager))
+				.next(contractProposeStep(jobRepository, transactionManager))
 				.build();
 	}
 
@@ -26,9 +28,20 @@ public class ContractProposalJob {
 	}
 
 	@Bean
-	public Step ledgerAuth(JobRepository jobRepository, ResourcelessTransactionManager transactionManager) {
-		return new StepBuilder("ledgerAuth", jobRepository).allowStartIfComplete(true)
+	public Step ledgerAuthStep(JobRepository jobRepository, ResourcelessTransactionManager transactionManager) {
+		return new StepBuilder("ledgerAuthStep", jobRepository).allowStartIfComplete(true)
 				.tasklet(ledgerAuthTask(), transactionManager).build();
+	}
+
+	@Bean
+	public ContractProposalTask contractProposalTask() {
+		return new ContractProposalTask();
+	}
+
+	@Bean
+	public Step contractProposeStep(JobRepository jobRepository, ResourcelessTransactionManager transactionManager) {
+		return new StepBuilder("contractProposeStep", jobRepository).allowStartIfComplete(true)
+				.tasklet(contractProposalTask(), transactionManager).build();
 	}
 
 }
