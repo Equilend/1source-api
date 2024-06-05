@@ -74,29 +74,29 @@ public class JsonGenerator {
     }
     public static JSONObject generateReturnProposalJson(String contractId) {
         JSONObject jsonObj = new JSONObject();
-//        jsonObj.put("collateralValue", 0);
 
-//        JSONObject executionVenue = new JSONObject();
+        JSONObject executionVenue = new JSONObject();
 //        JSONArray localVenueFields = new JSONArray();
 //        JSONObject localVenueField = new JSONObject();
 //        localVenueField.put("localFieldName", "string");
 //        localVenueField.put("localFieldValue", "string");
 //        localVenueFields.put(localVenueField);
 //        executionVenue.put("localVenueFields", localVenueFields);
-//        executionVenue.put("partyId", "string");
-//        executionVenue.put("transactionDatetime", "2024-05-31T13:25:52.693Z");
-//        executionVenue.put("type", "ONPLATFORM");
-//        executionVenue.put("venueName", "string");
+        executionVenue.put("partyId", "TBORR-US");  // "partyName", "TestBorrower1"
 
-//        JSONArray venueParties = new JSONArray();
-//        JSONObject venueParty = new JSONObject();
-//        venueParty.put("partyRole", "BORROWER");
+//        executionVenue.put("transactionDatetime", LocalDate.now().format(DateTimeFormatter.ISO_INSTANT)); // "2024-05-31T13:25:52.693Z"
+        executionVenue.put("type", "ONPLATFORM");
+        executionVenue.put("venueName", "EXTERNAL");
+
+        JSONArray venueParties = new JSONArray();
+        JSONObject venueParty = new JSONObject();
+        venueParty.put("partyRole", "BORROWER");
 //        venueParty.put("venuePartyRefKey", "string");
-//        venueParties.put(venueParty);
-//        executionVenue.put("venueParties", venueParties);
+        venueParties.put(venueParty);
+        executionVenue.put("venueParties", venueParties);
 //        executionVenue.put("venueRefKey", "string");
+        jsonObj.put("executionVenue", executionVenue);
 
-//        jsonObj.put("executionVenue", executionVenue);
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String currentDate = LocalDate.now().format(formatter);
 
@@ -104,7 +104,12 @@ public class JsonGenerator {
         jsonObj.put("returnDate", currentDate);
         jsonObj.put("returnSettlementDate", currentDate);
 
+        JSONArray settlements = new JSONArray();
         JSONObject settlement = new JSONObject();
+        settlement.put("partyRole", "BORROWER");
+        settlement.put("internalAcctCd", "ABCD-DEF0");
+//        settlement.put("settlementStatus", "NONE");
+
         JSONObject instruction = new JSONObject();
         instruction.put("settlementBic", "DTCYUS33");
 //        instruction.put("cdsCustomerUnitId", "string");
@@ -112,16 +117,17 @@ public class JsonGenerator {
 //        instruction.put("custodianBic", "string");
 //        instruction.put("custodianName", "string");
 //        instruction.put("dtcParticipantNumber", "string");
-        instruction.put("localAgentAcct", "483fad97725");
-//        instruction.put("localAgentBic", "string");
+//        instruction.put("localAgentAcct", "IRVTBEBBXXX");
+        instruction.put("dtcParticipantNumber", "0901");
+        instruction.put("localAgentBic", "IRVTBEBBXXX");
 //        instruction.put("localAgentName", "string");
         settlement.put("instruction", instruction);
-//        settlement.put("internalAcctCd", "string");
-//        settlement.put("partyRole", "BORROWER");
-//        settlement.put("settlementStatus", "NONE");
+        settlements.put(settlement);
+        jsonObj.put("settlement", settlements);
+//        jsonObj.put("settlement", settlement);
 
-        jsonObj.put("settlement", settlement);
-//        jsonObj.put("settlementType", "DVP");
+        jsonObj.put("settlementType", "DVP");
+        jsonObj.put("collateralValue", 5000);
 
         return jsonObj;
     }
@@ -137,7 +143,7 @@ public class JsonGenerator {
         JSONArray settlementArray = new JSONArray();
         JSONObject settlementObj = new JSONObject();
         settlementObj.put("partyRole", "LENDER");
-        settlementObj.put("settlementStatus", "NONE");
+        settlementObj.put("settlementStatus", "SETTLED");
         settlementObj.put("internalAcctCd", "ABCD-DEF0");
 
         JSONObject instructionObj = new JSONObject();
@@ -415,5 +421,11 @@ public class JsonGenerator {
         tradeObj.put("transactingParties", transactingPartiesArray);
         jsonObj.put("trade", tradeObj);
         return jsonObj;
+    }
+
+    public static JSONObject generateSettlementStatusUpdateJson(String status) {
+        JSONObject settlement = new JSONObject();
+        settlement.put("settlementStatus", status);
+        return settlement;
     }
 }
