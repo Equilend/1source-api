@@ -39,12 +39,10 @@ public class ApiHelper {
     public ApiHelper() {
         restTemplate = new RestTemplate();
 
-        // This allows us to read the response more than once - Necessary for debugging.
+        // Buffering allows us to read the response more than once - Necessary for debugging.
         HttpComponentsClientHttpRequestFactory httpComponentsFactory = new HttpComponentsClientHttpRequestFactory();
         BufferingClientHttpRequestFactory bufferingFactory = new BufferingClientHttpRequestFactory(httpComponentsFactory);
         restTemplate.setRequestFactory(bufferingFactory);
-//        restTemplate.setRequestFactory(new BufferingClientHttpRequestFactory(restTemplate.getRequestFactory()));
-
         restTemplate.getInterceptors().add(new RequestLoggingInterceptor());
     }
 
@@ -135,8 +133,7 @@ public class ApiHelper {
     }
 
     public ResponseEntity<LedgerResponseDTO> patchContract(String token, /*ContractsContractIdBodyDTO*/ String body, String contractId) {
-        return postToApi(HttpMethod.PATCH, token, body, contractId, null, null, null, null);
-//        return submitPatch(token, contractId, body);
+        return postToApi(HttpMethod.PATCH, token, body, contractId, null, null, null, null); // Patch a contract (SettlementStatusUpdate, etc)
     }
 
     public ResponseEntity<LedgerResponseDTO> postReturnRecallProposal(String token, String body, String contractId, String entity) {
