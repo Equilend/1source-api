@@ -31,7 +31,6 @@ import io.swagger.v1_0_5_20240428.client.model.CurrencyCd;
 import io.swagger.v1_0_5_20240428.client.model.LedgerResponse;
 import io.swagger.v1_0_5_20240428.client.model.LocalDateTypeAdapter;
 import io.swagger.v1_0_5_20240428.client.model.OffsetDateTimeTypeAdapter;
-import io.swagger.v1_0_5_20240428.client.model.PartyRole;
 import reactor.core.publisher.Mono;
 
 public class ContractProposalTask implements Tasklet, StepExecutionListener {
