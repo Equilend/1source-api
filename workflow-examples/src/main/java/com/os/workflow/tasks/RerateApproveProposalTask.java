@@ -16,7 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.os.workflow.AuthToken;
 import com.os.workflow.WorkflowConfig;
 
-import io.swagger.v1_0_5_20240611.client.model.LedgerResponse;
+import com.os.client.model.LedgerResponse;
 import reactor.core.publisher.Mono;
 
 public class RerateApproveProposalTask implements Tasklet, StepExecutionListener {

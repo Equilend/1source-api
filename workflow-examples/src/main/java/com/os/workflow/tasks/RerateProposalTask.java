@@ -23,13 +23,13 @@ import com.os.workflow.AuthToken;
 import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.WorkflowConfig;
 
-import io.swagger.v1_0_5_20240611.client.model.Contract;
-import io.swagger.v1_0_5_20240611.client.model.FeeRate;
-import io.swagger.v1_0_5_20240611.client.model.FixedRate;
-import io.swagger.v1_0_5_20240611.client.model.FloatingRate;
-import io.swagger.v1_0_5_20240611.client.model.LedgerResponse;
-import io.swagger.v1_0_5_20240611.client.model.RebateRate;
-import io.swagger.v1_0_5_20240611.client.model.RerateProposal;
+import com.os.client.model.Contract;
+import com.os.client.model.FeeRate;
+import com.os.client.model.FixedRate;
+import com.os.client.model.FloatingRate;
+import com.os.client.model.LedgerResponse;
+import com.os.client.model.RebateRate;
+import com.os.client.model.RerateProposal;
 import reactor.core.publisher.Mono;
 
 public class RerateProposalTask implements Tasklet, StepExecutionListener {

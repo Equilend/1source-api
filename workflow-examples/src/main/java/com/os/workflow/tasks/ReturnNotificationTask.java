@@ -22,9 +22,9 @@ import com.os.workflow.AuthToken;
 import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.WorkflowConfig;
 
-import io.swagger.v1_0_5_20240611.client.model.LedgerResponse;
-import io.swagger.v1_0_5_20240611.client.model.ReturnProposal;
-import io.swagger.v1_0_5_20240611.client.model.SettlementType;
+import com.os.client.model.LedgerResponse;
+import com.os.client.model.ReturnProposal;
+import com.os.client.model.SettlementType;
 import reactor.core.publisher.Mono;
 
 public class ReturnNotificationTask implements Tasklet, StepExecutionListener {

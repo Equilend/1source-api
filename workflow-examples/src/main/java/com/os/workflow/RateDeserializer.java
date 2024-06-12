@@ -12,14 +12,14 @@ import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 
-import io.swagger.v1_0_5_20240611.client.model.BenchmarkCd;
-import io.swagger.v1_0_5_20240611.client.model.FeeRate;
-import io.swagger.v1_0_5_20240611.client.model.FixedRate;
-import io.swagger.v1_0_5_20240611.client.model.FixedRateDef;
-import io.swagger.v1_0_5_20240611.client.model.FloatingRate;
-import io.swagger.v1_0_5_20240611.client.model.FloatingRateDef;
-import io.swagger.v1_0_5_20240611.client.model.Rate;
-import io.swagger.v1_0_5_20240611.client.model.RebateRate;
+import com.os.client.model.BenchmarkCd;
+import com.os.client.model.FeeRate;
+import com.os.client.model.FixedRate;
+import com.os.client.model.FixedRateDef;
+import com.os.client.model.FloatingRate;
+import com.os.client.model.FloatingRateDef;
+import com.os.client.model.Rate;
+import com.os.client.model.RebateRate;
 
 public class RateDeserializer extends StdDeserializer<Rate> {
 

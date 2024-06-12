@@ -22,7 +22,7 @@ import com.os.workflow.AuthToken;
 import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.WorkflowConfig;
 
-import io.swagger.v1_0_5_20240611.client.model.Rerate;
+import com.os.client.model.Rerate;
 import reactor.core.publisher.Mono;
 
 public class RerateRetrievalByIdTask implements Tasklet, StepExecutionListener {

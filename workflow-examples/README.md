@@ -5,6 +5,16 @@ A set of examples exercising 1Source workflows
 - application.properties drives all examples
 - no local DB is required. Using H2 in memory.
 
+# 1source-client-api Local Maven install
+
+mvn install:install-file \  
+ -Dfile="./\lib/\1source-api-client-1.0.5.jar" \  
+ -DgroupId=com.os \  
+ -DartifactId=1source-api-client \  
+ -Dversion=1.0.5 \  
+ -Dpackaging=jar \  
+ -DgeneratePom=true  
+
 ## application.properties
 
 Each example is controlled through property sets in application.properties. Uncomment/Comment depending on which example you're executing. This is the section for the Contract Proposal Example
