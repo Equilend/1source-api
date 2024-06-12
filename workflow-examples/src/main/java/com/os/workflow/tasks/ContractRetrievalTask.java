@@ -23,14 +23,14 @@ import com.os.workflow.AuthToken;
 import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.WorkflowConfig;
 
-import io.swagger.v1_0_5_20240611.client.model.Contract;
-import io.swagger.v1_0_5_20240611.client.model.FeeRate;
-import io.swagger.v1_0_5_20240611.client.model.FixedRate;
-import io.swagger.v1_0_5_20240611.client.model.FloatingRate;
-import io.swagger.v1_0_5_20240611.client.model.PartyRole;
-import io.swagger.v1_0_5_20240611.client.model.RebateRate;
-import io.swagger.v1_0_5_20240611.client.model.TransactingParties;
-import io.swagger.v1_0_5_20240611.client.model.TransactingParty;
+import com.os.client.model.Contract;
+import com.os.client.model.FeeRate;
+import com.os.client.model.FixedRate;
+import com.os.client.model.FloatingRate;
+import com.os.client.model.PartyRole;
+import com.os.client.model.RebateRate;
+import com.os.client.model.TransactingParties;
+import com.os.client.model.TransactingParty;
 import reactor.core.publisher.Mono;
 
 public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
@@ -53,7 +53,7 @@ public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-
+		
 		contract = restWebClient.get().uri("/contracts/" + workflowConfig.getContract_id())
 				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
@@ -100,10 +100,11 @@ public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
 							counterparty = party.getParty().getPartyId();
 						}
 					}
-
 				}
-
 			}
+			logger.debug(myBorrowLoan + ":" + counterparty);
+			
+			
 			if (contract.getTrade().getQuantity() == null) {
 				logger.warn("Quantity information missing");
 			}
@@ -123,8 +124,8 @@ public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
 			if (myBorrowLoan == null) {
 				logger.warn("Not a transacting party");
 			} else {
-				String figi = contract.getTrade().getInstrument().getFigi();
-				Long quantity = contract.getTrade().getQuantity().longValue();
+//				String figi = contract.getTrade().getInstrument().getFigi();
+//				Long quantity = contract.getTrade().getQuantity().longValue();
 				BigDecimal rate = null;
 				if (contract.getTrade().getRate() instanceof FeeRate) {
 					rate = BigDecimal.valueOf(((FeeRate) contract.getTrade().getRate()).getFee().getBaseRate());

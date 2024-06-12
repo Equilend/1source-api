@@ -26,9 +26,9 @@ import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.LedgerRecord;
 import com.os.workflow.WorkflowConfig;
 
-import io.swagger.v1_0_5_20240611.client.model.ContractProposal;
-import io.swagger.v1_0_5_20240611.client.model.CurrencyCd;
-import io.swagger.v1_0_5_20240611.client.model.LedgerResponse;
+import com.os.client.model.ContractProposal;
+import com.os.client.model.CurrencyCd;
+import com.os.client.model.LedgerResponse;
 import reactor.core.publisher.Mono;
 
 public class ContractProposalTask implements Tasklet, StepExecutionListener {

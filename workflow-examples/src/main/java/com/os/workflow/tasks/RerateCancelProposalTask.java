@@ -16,8 +16,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.os.workflow.AuthToken;
 import com.os.workflow.WorkflowConfig;
 
-import io.swagger.v1_0_5_20240611.client.model.LedgerResponse;
-import io.swagger.v1_0_5_20240611.client.model.Rerate;
+import com.os.client.model.LedgerResponse;
 import reactor.core.publisher.Mono;
 
 public class RerateCancelProposalTask implements Tasklet, StepExecutionListener {
@@ -25,7 +24,7 @@ public class RerateCancelProposalTask implements Tasklet, StepExecutionListener 
 	private static final Logger logger = LoggerFactory.getLogger(RerateCancelProposalTask.class);
 
 	private AuthToken ledgerToken;
-	private Rerate rerate;
+	//private Rerate rerate;
 
 	@Autowired
 	WebClient restWebClient;
@@ -36,7 +35,7 @@ public class RerateCancelProposalTask implements Tasklet, StepExecutionListener 
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		ledgerToken = (AuthToken) stepExecution.getJobExecution().getExecutionContext().get("ledgerToken");
-		rerate = (Rerate) stepExecution.getJobExecution().getExecutionContext().get("rerate");
+		//rerate = (Rerate) stepExecution.getJobExecution().getExecutionContext().get("rerate");
 	}
 
 	@Override

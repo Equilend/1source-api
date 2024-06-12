@@ -21,9 +21,9 @@ import com.os.workflow.AuthToken;
 import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.WorkflowConfig;
 
-import io.swagger.v1_0_5_20240611.client.model.LedgerResponse;
-import io.swagger.v1_0_5_20240611.client.model.SettlementStatus;
-import io.swagger.v1_0_5_20240611.client.model.SettlementStatusUpdate;
+import com.os.client.model.LedgerResponse;
+import com.os.client.model.SettlementStatus;
+import com.os.client.model.SettlementStatusUpdate;
 import reactor.core.publisher.Mono;
 
 public class SettlementStatusUpdateTask implements Tasklet, StepExecutionListener {
