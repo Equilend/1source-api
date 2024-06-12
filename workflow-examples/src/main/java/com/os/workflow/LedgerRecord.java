@@ -1,12 +1,12 @@
 package com.os.workflow;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.util.Date;
 
 public class LedgerRecord {
 
 	String internalRefId;
-	LocalDate tradeDate;
+	Date tradeDate;
 	String borrowLoan;
 	String figi;
 	String ticker;
@@ -51,11 +51,11 @@ public class LedgerRecord {
 		this.internalRefId = internalRefId;
 	}
 
-	public LocalDate getTradeDate() {
+	public Date getTradeDate() {
 		return tradeDate;
 	}
 
-	public void setTradeDate(LocalDate tradeDate) {
+	public void setTradeDate(Date tradeDate) {
 		this.tradeDate = tradeDate;
 	}
 
