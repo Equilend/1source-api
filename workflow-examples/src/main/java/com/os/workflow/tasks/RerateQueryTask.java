@@ -22,15 +22,15 @@ import com.os.workflow.AuthToken;
 import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.WorkflowConfig;
 
-import io.swagger.v1_0_5_20240611.client.model.Rerate;
+import io.swagger.v1_0_5_20240611.client.model.Rerates;
 import reactor.core.publisher.Mono;
 
-public class RerateRetrievalTask implements Tasklet, StepExecutionListener {
+public class RerateQueryTask implements Tasklet, StepExecutionListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(RerateRetrievalTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(RerateQueryTask.class);
 
 	private AuthToken ledgerToken;
-	private Rerate rerate;
+	private Rerates rerates;
 	
 	@Autowired
 	WebClient restWebClient;
@@ -46,23 +46,23 @@ public class RerateRetrievalTask implements Tasklet, StepExecutionListener {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		rerate = restWebClient.get().uri("/contracts/" + workflowConfig.getContract_id() + "/rerates/" + workflowConfig.getRerate_id())
+		rerates = restWebClient.get().uri("/contracts/" + workflowConfig.getContract_id() + "/rerates")
 				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());
 					return Mono.empty();
-				}).bodyToMono(Rerate.class).block();
+				}).bodyToMono(Rerates.class).block();
 
 		Gson gson = new GsonBuilder()
 			    .registerTypeAdapter(Date.class, new DateGsonTypeAdapter())
 			    .create();
 
-		logger.debug(gson.toJson(rerate));
+		logger.debug(gson.toJson(rerates));
 
-		logger.debug(rerate.toString());
+		logger.debug(rerates.toString());
 
-		if (rerate == null || rerate.getRerate() == null) {
-			logger.warn("Invalid rerate object or rerate not found");
+		if (rerates == null || rerates.size() == 0) {
+			logger.warn("Invalid rerates object or rerates not found");
 		}
 		
 		return RepeatStatus.FINISHED;
@@ -70,7 +70,9 @@ public class RerateRetrievalTask implements Tasklet, StepExecutionListener {
 
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
-		stepExecution.getJobExecution().getExecutionContext().put("rerate", this.rerate);
+		if (this.rerates.size() > 0) {
+			stepExecution.getJobExecution().getExecutionContext().put("rerate", this.rerates.get(0));
+		}
 		return ExitStatus.COMPLETED;
 	}
 
