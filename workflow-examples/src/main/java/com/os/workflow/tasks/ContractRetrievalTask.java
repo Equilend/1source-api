@@ -1,10 +1,11 @@
 package com.os.workflow.tasks;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -18,18 +19,18 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.os.workflow.WorkflowConfig;
 import com.os.workflow.AuthToken;
-import io.swagger.v1_0_5_20240428.client.model.Contract;
-import io.swagger.v1_0_5_20240428.client.model.FeeRate;
-import io.swagger.v1_0_5_20240428.client.model.FixedRate;
-import io.swagger.v1_0_5_20240428.client.model.FloatingRate;
-import io.swagger.v1_0_5_20240428.client.model.LocalDateTypeAdapter;
-import io.swagger.v1_0_5_20240428.client.model.OffsetDateTimeTypeAdapter;
-import io.swagger.v1_0_5_20240428.client.model.PartyRole;
-import io.swagger.v1_0_5_20240428.client.model.RebateRate;
-import io.swagger.v1_0_5_20240428.client.model.TransactingParties;
-import io.swagger.v1_0_5_20240428.client.model.TransactingParty;
+import com.os.workflow.DateGsonTypeAdapter;
+import com.os.workflow.WorkflowConfig;
+
+import io.swagger.v1_0_5_20240611.client.model.Contract;
+import io.swagger.v1_0_5_20240611.client.model.FeeRate;
+import io.swagger.v1_0_5_20240611.client.model.FixedRate;
+import io.swagger.v1_0_5_20240611.client.model.FloatingRate;
+import io.swagger.v1_0_5_20240611.client.model.PartyRole;
+import io.swagger.v1_0_5_20240611.client.model.RebateRate;
+import io.swagger.v1_0_5_20240611.client.model.TransactingParties;
+import io.swagger.v1_0_5_20240611.client.model.TransactingParty;
 import reactor.core.publisher.Mono;
 
 public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
@@ -37,7 +38,8 @@ public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
 	private static final Logger logger = LoggerFactory.getLogger(ContractRetrievalTask.class);
 
 	private AuthToken ledgerToken;
-
+	private Contract contract;
+	
 	@Autowired
 	WebClient restWebClient;
 
@@ -52,15 +54,16 @@ public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		Contract contract = restWebClient.get().uri("/contracts/" + workflowConfig.getContract_id())
+		contract = restWebClient.get().uri("/contracts/" + workflowConfig.getContract_id())
 				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());
 					return Mono.empty();
 				}).bodyToMono(Contract.class).block();
 
-		Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
-				.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeAdapter()).create();
+		Gson gson = new GsonBuilder()
+			    .registerTypeAdapter(Date.class, new DateGsonTypeAdapter())
+			    .create();
 
 		logger.debug(gson.toJson(contract));
 
@@ -144,6 +147,12 @@ public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
 		}
 
 		return RepeatStatus.FINISHED;
+	}
+
+	@Override
+	public ExitStatus afterStep(StepExecution stepExecution) {
+		stepExecution.getJobExecution().getExecutionContext().put("contract", this.contract);
+		return ExitStatus.COMPLETED;
 	}
 
 }
