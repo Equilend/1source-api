@@ -1,7 +1,6 @@
 package com.os.workflow.tasks;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Date;
 import java.util.Random;
 
@@ -57,7 +56,8 @@ public class RerateProposalTask implements Tasklet, StepExecutionListener {
 
 		RerateProposal rerateProposal = new RerateProposal();
 
-		LocalDate rerateDate = LocalDate.now();
+		Date rerateDate = new Date();
+		
 		Random random = new Random();
 		
 		if (contract.getTrade().getRate() instanceof FeeRate) {
@@ -67,6 +67,7 @@ public class RerateProposalTask implements Tasklet, StepExecutionListener {
 			BigDecimal rerate = rate.add(new BigDecimal(random.nextInt(8) + 1));
 			
 			((FeeRate) contract.getTrade().getRate()).getFee().setBaseRate(rerate.doubleValue());
+			((FeeRate) contract.getTrade().getRate()).getFee().setEffectiveDate(rerateDate);
 
 			rerateProposal.setRate(((FeeRate) contract.getTrade().getRate()));
 
@@ -82,7 +83,8 @@ public class RerateProposalTask implements Tasklet, StepExecutionListener {
 				
 				BigDecimal rerate = rate.add(new BigDecimal(random.nextInt(8) + 1));
 				((FixedRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFixed().setBaseRate(rerate.doubleValue());
-
+				((FixedRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFixed().setEffectiveDate(rerateDate);
+				
 				rerateProposal.setRate(((RebateRate) contract.getTrade().getRate()));
 
 				logger.debug("Original Rebate Fixed Rate: " + rate.toPlainString() + " Rerate: " + rerate.toPlainString());
@@ -96,6 +98,7 @@ public class RerateProposalTask implements Tasklet, StepExecutionListener {
 				BigDecimal rerate = rate.add(new BigDecimal(random.nextInt(8) + 1));
 
 				((FloatingRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFloating().setSpread(rerate.doubleValue());
+				((FloatingRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFloating().setEffectiveDate(rerateDate);
 
 				rerateProposal.setRate(((RebateRate) contract.getTrade().getRate()));
 
