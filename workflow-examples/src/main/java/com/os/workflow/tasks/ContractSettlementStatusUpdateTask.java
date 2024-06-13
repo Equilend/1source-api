@@ -21,16 +21,14 @@ import com.os.workflow.AuthToken;
 import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.WorkflowConfig;
 
-import com.os.client.model.ContractProposalApproval;
 import com.os.client.model.LedgerResponse;
-import com.os.client.model.PartyRole;
-import com.os.client.model.PartySettlementInstruction;
-import com.os.client.model.SettlementInstruction;
+import com.os.client.model.SettlementStatus;
+import com.os.client.model.SettlementStatusUpdate;
 import reactor.core.publisher.Mono;
 
-public class ContractApprovalTask implements Tasklet, StepExecutionListener {
+public class ContractSettlementStatusUpdateTask implements Tasklet, StepExecutionListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractApprovalTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(ContractSettlementStatusUpdateTask.class);
 
 	private AuthToken ledgerToken;
 
@@ -48,33 +46,18 @@ public class ContractApprovalTask implements Tasklet, StepExecutionListener {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		ContractProposalApproval proposal = new ContractProposalApproval();
-
-		proposal.setInternalRefId("b_int_ref_z0001");
+		SettlementStatusUpdate update = new SettlementStatusUpdate();
 		
-		PartySettlementInstruction partySettlementInstruction = new PartySettlementInstruction();
-		partySettlementInstruction.setPartyRole(PartyRole.fromValue(workflowConfig.getActing_as()));
-		partySettlementInstruction.setInternalAcctCd("stl_b_12345");
-
-		SettlementInstruction instruction = new SettlementInstruction();
-		partySettlementInstruction.setInstruction(instruction);
-		instruction.setSettlementBic("DTCYUS33");
-		instruction.setLocalAgentBic("IRVTBEBBXXX");
-		instruction.setLocalAgentName("THE BANK OF NEW YORK MELLON SA/NV");
-		instruction.setLocalAgentAcct("A12345");
-		instruction.setDtcParticipantNumber("0901");
-
-		proposal.setSettlement(partySettlementInstruction);
+		update.setSettlementStatus(SettlementStatus.SETTLED);
 
 		Gson gson = new GsonBuilder()
 			    .registerTypeAdapter(Date.class, new DateGsonTypeAdapter())
 			    .create();
 
-		String json = gson.toJson(proposal);
-		
+		String json = gson.toJson(update);
 		logger.debug(json);
 
-		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts/" + workflowConfig.getContract_id() + "/approve").contentType(MediaType.APPLICATION_JSON)
+		LedgerResponse ledgerResponse = restWebClient.patch().uri("/contracts/" + workflowConfig.getContract_id()).contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(json).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					return Mono.empty();
