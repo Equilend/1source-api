@@ -1,10 +1,10 @@
 package com.os.workflow.tasks;
 
 import java.util.Date;
-import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -12,8 +12,8 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
@@ -22,17 +22,16 @@ import com.os.workflow.AuthToken;
 import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.WorkflowConfig;
 
-import com.os.client.model.LedgerResponse;
-import com.os.client.model.ReturnProposal;
-import com.os.client.model.SettlementType;
+import com.os.client.model.Rerate;
 import reactor.core.publisher.Mono;
 
-public class ReturnNotificationTask implements Tasklet, StepExecutionListener {
+public class RerateRetrievalByIdTask implements Tasklet, StepExecutionListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(ReturnNotificationTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(RerateRetrievalByIdTask.class);
 
 	private AuthToken ledgerToken;
-
+	private Rerate rerate;
+	
 	@Autowired
 	WebClient restWebClient;
 
@@ -47,34 +46,32 @@ public class ReturnNotificationTask implements Tasklet, StepExecutionListener {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		Random random = new Random();
-		
-		ReturnProposal proposal = new ReturnProposal();
-		
-		Date currentDate = new Date();
-		
-		proposal.setQuantity(((((random.nextInt(1000 - 100) + 1000))+99)/100)*100);
-		proposal.setReturnDate(currentDate);
-		proposal.setReturnSettlementDate(currentDate);
-		proposal.setSettlementType(SettlementType.DVP);
-		proposal.setCollateralValue(100000.00);
+		rerate = restWebClient.get().uri("/contracts/" + workflowConfig.getContract_id() + "/rerates/" + workflowConfig.getRerate_id())
+				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
+				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
+					logger.error(HttpStatus.NOT_FOUND.toString());
+					return Mono.empty();
+				}).bodyToMono(Rerate.class).block();
 
 		Gson gson = new GsonBuilder()
 			    .registerTypeAdapter(Date.class, new DateGsonTypeAdapter())
 			    .create();
 
-		String json = gson.toJson(proposal);
-		logger.debug(json);
+		logger.debug(gson.toJson(rerate));
 
-		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts/" + workflowConfig.getContract_id() + "/returns").contentType(MediaType.APPLICATION_JSON)
-				.bodyValue(json).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
-				.onStatus(HttpStatusCode::is4xxClientError, response -> {
-					return Mono.empty();
-				}).bodyToMono(LedgerResponse.class).block();
+		logger.debug(rerate.toString());
 
-		logger.debug("Ledger Response: " + ledgerResponse);
-
+		if (rerate == null || rerate.getRerate() == null) {
+			logger.warn("Invalid rerate object or rerate not found");
+		}
+		
 		return RepeatStatus.FINISHED;
+	}
+
+	@Override
+	public ExitStatus afterStep(StepExecution stepExecution) {
+		stepExecution.getJobExecution().getExecutionContext().put("rerate", this.rerate);
+		return ExitStatus.COMPLETED;
 	}
 
 }

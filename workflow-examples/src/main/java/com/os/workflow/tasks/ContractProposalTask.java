@@ -1,8 +1,7 @@
 package com.os.workflow.tasks;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
+import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
 
@@ -23,15 +22,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.os.workflow.AuthToken;
 import com.os.workflow.ContractProposalUtil;
+import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.LedgerRecord;
 import com.os.workflow.WorkflowConfig;
 
-import io.swagger.v1_0_5_20240428.client.model.ContractProposal;
-import io.swagger.v1_0_5_20240428.client.model.CurrencyCd;
-import io.swagger.v1_0_5_20240428.client.model.LedgerResponse;
-import io.swagger.v1_0_5_20240428.client.model.LocalDateTypeAdapter;
-import io.swagger.v1_0_5_20240428.client.model.OffsetDateTimeTypeAdapter;
-import io.swagger.v1_0_5_20240428.client.model.PartyRole;
+import com.os.client.model.ContractProposal;
+import com.os.client.model.CurrencyCd;
+import com.os.client.model.LedgerResponse;
 import reactor.core.publisher.Mono;
 
 public class ContractProposalTask implements Tasklet, StepExecutionListener {
@@ -60,8 +57,9 @@ public class ContractProposalTask implements Tasklet, StepExecutionListener {
 
 		ContractProposal proposal = contractUtil.createContractProposal(ledgerRecord);
 
-		Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
-				.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeAdapter()).create();
+		Gson gson = new GsonBuilder()
+			    .registerTypeAdapter(Date.class, new DateGsonTypeAdapter())
+			    .create();
 
 		logger.debug(gson.toJson(proposal));
 
@@ -82,7 +80,7 @@ public class ContractProposalTask implements Tasklet, StepExecutionListener {
 	    
 		LedgerRecord ledgerRecord = new LedgerRecord();
 		ledgerRecord.setInternalRefId(UUID.randomUUID().toString());
-		ledgerRecord.setTradeDate(LocalDate.now());
+		ledgerRecord.setTradeDate(new Date());
 		
 		ledgerRecord.setBorrowLoan(workflowConfig.getActing_as());
 		ledgerRecord.setFigi("BBG000B9XRY4");
