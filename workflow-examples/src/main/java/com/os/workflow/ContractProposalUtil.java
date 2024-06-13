@@ -1,14 +1,42 @@
 package com.os.workflow;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.swagger.v1_0_5_20240428.client.model.*;
+import com.os.client.model.BenchmarkCd;
+import com.os.client.model.Collateral;
+import com.os.client.model.CollateralType;
+import com.os.client.model.Contract;
+import com.os.client.model.ContractProposal;
+import com.os.client.model.CurrencyCd;
+import com.os.client.model.FloatingRate;
+import com.os.client.model.FloatingRateDef;
+import com.os.client.model.Instrument;
+import com.os.client.model.InternalReference;
+import com.os.client.model.Party;
+import com.os.client.model.PartyRole;
+import com.os.client.model.PartySettlementInstruction;
+import com.os.client.model.Price;
+import com.os.client.model.PriceUnit;
+import com.os.client.model.RebateRate;
+import com.os.client.model.RoundingMode;
+import com.os.client.model.SettlementInstruction;
+import com.os.client.model.SettlementStatus;
+import com.os.client.model.SettlementType;
+import com.os.client.model.TermType;
+import com.os.client.model.TradeAgreement;
+import com.os.client.model.TransactingParties;
+import com.os.client.model.TransactingParty;
+import com.os.client.model.Venue;
+import com.os.client.model.VenueParties;
+import com.os.client.model.VenueParty;
+import com.os.client.model.VenueType;
+import com.os.client.model.Venues;
 
 public class ContractProposalUtil {
 
@@ -70,7 +98,7 @@ public class ContractProposalUtil {
 		venue.setType(VenueType.OFFPLATFORM);
 		venue.setVenueName("Phone brokered");
 		venue.setVenueRefKey("2129012000");
-		venue.setTransactionDatetime(OffsetDateTime.now());
+		venue.setTransactionDatetime(new Date());
 
 		VenueParties venueParties = new VenueParties();
 		venue.setVenueParties(venueParties);
@@ -117,7 +145,8 @@ public class ContractProposalUtil {
 
 		trade.setInstrument(instrument);
 
-		LocalDate tradeDate = ledgerRecord.getTradeDate();
+		Calendar tradeDate = Calendar.getInstance();
+		tradeDate.setTime(ledgerRecord.getTradeDate());
 
 		Double r = null;
 		if (ledgerRecord.getSpreadRate() != null) {
@@ -133,7 +162,7 @@ public class ContractProposalUtil {
 		FloatingRateDef floatingRateDef = new FloatingRateDef();
 		floatingRateDef.setSpread(r);
 		floatingRateDef.setCutoffTime("18:00");
-		floatingRateDef.setEffectiveDate(tradeDate);
+		floatingRateDef.setEffectiveDate(tradeDate.getTime());
 		// floatingRateDef.setEffectiveRate(ledgerRecord.getEffectiveRate().doubleValue());
 		// //TODO - based on autorerate setting
 		floatingRateDef.setBenchmark(BenchmarkCd.OBFR);
@@ -159,10 +188,14 @@ public class ContractProposalUtil {
 		trade.setQuantity(q.intValue());
 		trade.setBillingCurrency(CurrencyCd.USD);
 		trade.setDividendRatePct(ledgerRecord.getDividendRate().doubleValue());
-		trade.setTradeDate(tradeDate);
+		trade.setTradeDate(tradeDate.getTime());
 		trade.setTermType(TermType.OPEN);
 		trade.setTermDate(null);
-		trade.setSettlementDate(LocalDate.now().plusDays(2));
+		
+		Calendar settlementDate = (Calendar)tradeDate.clone();
+		settlementDate.add(Calendar.DAY_OF_MONTH, 2);
+		
+		trade.setSettlementDate(settlementDate.getTime());
 		trade.setSettlementType(SettlementType.DVP);
 
 		Collateral collateral = new Collateral();

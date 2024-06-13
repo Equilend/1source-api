@@ -1,7 +1,7 @@
 package com.os.workflow.tasks;
 
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
+import java.util.Date;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.StepContribution;
@@ -17,16 +17,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.os.workflow.WorkflowConfig;
 import com.os.workflow.AuthToken;
+import com.os.workflow.DateGsonTypeAdapter;
+import com.os.workflow.WorkflowConfig;
 
-import io.swagger.v1_0_5_20240428.client.model.ContractProposalApproval;
-import io.swagger.v1_0_5_20240428.client.model.LedgerResponse;
-import io.swagger.v1_0_5_20240428.client.model.LocalDateTypeAdapter;
-import io.swagger.v1_0_5_20240428.client.model.OffsetDateTimeTypeAdapter;
-import io.swagger.v1_0_5_20240428.client.model.PartyRole;
-import io.swagger.v1_0_5_20240428.client.model.PartySettlementInstruction;
-import io.swagger.v1_0_5_20240428.client.model.SettlementInstruction;
+import com.os.client.model.ContractProposalApproval;
+import com.os.client.model.LedgerResponse;
+import com.os.client.model.PartyRole;
+import com.os.client.model.PartySettlementInstruction;
+import com.os.client.model.SettlementInstruction;
 import reactor.core.publisher.Mono;
 
 public class ContractApprovalTask implements Tasklet, StepExecutionListener {
@@ -67,8 +66,9 @@ public class ContractApprovalTask implements Tasklet, StepExecutionListener {
 
 		proposal.setSettlement(partySettlementInstruction);
 
-		Gson gson = new GsonBuilder().registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
-				.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeAdapter()).create();
+		Gson gson = new GsonBuilder()
+			    .registerTypeAdapter(Date.class, new DateGsonTypeAdapter())
+			    .create();
 
 		logger.debug(gson.toJson(proposal));
 

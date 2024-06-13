@@ -16,8 +16,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.workflow.WorkflowConfig;
 import com.os.workflow.AuthToken;
+import com.os.workflow.WorkflowConfig;
 
 public class AuthTask implements Tasklet, StepExecutionListener {
 
