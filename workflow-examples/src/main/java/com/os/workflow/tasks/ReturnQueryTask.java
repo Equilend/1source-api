@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
@@ -11,8 +12,8 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
@@ -21,17 +22,17 @@ import com.os.workflow.AuthToken;
 import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.WorkflowConfig;
 
-import com.os.client.model.LedgerResponse;
-import com.os.client.model.SettlementStatus;
-import com.os.client.model.SettlementStatusUpdate;
+import com.os.client.model.Returns;
+
 import reactor.core.publisher.Mono;
 
-public class SettlementStatusUpdateTask implements Tasklet, StepExecutionListener {
+public class ReturnQueryTask implements Tasklet, StepExecutionListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(SettlementStatusUpdateTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(ReturnQueryTask.class);
 
 	private AuthToken ledgerToken;
-
+	private Returns returns;
+	
 	@Autowired
 	WebClient restWebClient;
 
@@ -46,26 +47,34 @@ public class SettlementStatusUpdateTask implements Tasklet, StepExecutionListene
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		SettlementStatusUpdate update = new SettlementStatusUpdate();
-		
-		update.setSettlementStatus(SettlementStatus.SETTLED);
+		returns = restWebClient.get().uri("/contracts/" + workflowConfig.getContract_id() + "/returns")
+				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
+				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
+					logger.error(HttpStatus.NOT_FOUND.toString());
+					return Mono.empty();
+				}).bodyToMono(Returns.class).block();
 
 		Gson gson = new GsonBuilder()
 			    .registerTypeAdapter(Date.class, new DateGsonTypeAdapter())
 			    .create();
 
-		String json = gson.toJson(update);
-		logger.debug(json);
+		logger.debug(gson.toJson(returns));
 
-		LedgerResponse ledgerResponse = restWebClient.patch().uri("/contracts/" + workflowConfig.getContract_id()).contentType(MediaType.APPLICATION_JSON)
-				.bodyValue(json).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
-				.onStatus(HttpStatusCode::is4xxClientError, response -> {
-					return Mono.empty();
-				}).bodyToMono(LedgerResponse.class).block();
+		logger.debug(returns.toString());
 
-		logger.debug("Ledger Response: " + ledgerResponse);
-
+		if (returns == null || returns.size() == 0) {
+			logger.warn("Invalid returns object or returns not found");
+		}
+		
 		return RepeatStatus.FINISHED;
+	}
+
+	@Override
+	public ExitStatus afterStep(StepExecution stepExecution) {
+		if (this.returns.size() > 0) {
+			stepExecution.getJobExecution().getExecutionContext().put("returnObj", this.returns.get(0));
+		}
+		return ExitStatus.COMPLETED;
 	}
 
 }

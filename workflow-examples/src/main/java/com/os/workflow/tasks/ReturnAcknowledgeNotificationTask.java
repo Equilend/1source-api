@@ -15,24 +15,22 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.os.workflow.AuthToken;
 import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.WorkflowConfig;
-
-import com.os.client.model.ContractProposalApproval;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.os.client.model.AcknowledgementType;
 import com.os.client.model.LedgerResponse;
-import com.os.client.model.PartyRole;
-import com.os.client.model.PartySettlementInstruction;
-import com.os.client.model.SettlementInstruction;
+import com.os.client.model.ReturnAcknowledgement;
 import reactor.core.publisher.Mono;
 
-public class ContractApprovalTask implements Tasklet, StepExecutionListener {
+public class ReturnAcknowledgeNotificationTask implements Tasklet, StepExecutionListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractApprovalTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(ReturnAcknowledgeNotificationTask.class);
 
 	private AuthToken ledgerToken;
+	//private Return returnObj;
 
 	@Autowired
 	WebClient restWebClient;
@@ -43,39 +41,41 @@ public class ContractApprovalTask implements Tasklet, StepExecutionListener {
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		ledgerToken = (AuthToken) stepExecution.getJobExecution().getExecutionContext().get("ledgerToken");
+		//returnObj = (Return) stepExecution.getJobExecution().getExecutionContext().get("returnObj");
 	}
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		ContractProposalApproval proposal = new ContractProposalApproval();
-
-		proposal.setInternalRefId("b_int_ref_z0001");
+		ReturnAcknowledgement acknowledgement = new ReturnAcknowledgement();
 		
-		PartySettlementInstruction partySettlementInstruction = new PartySettlementInstruction();
-		partySettlementInstruction.setPartyRole(PartyRole.fromValue(workflowConfig.getActing_as()));
-		partySettlementInstruction.setInternalAcctCd("stl_b_12345");
-
-		SettlementInstruction instruction = new SettlementInstruction();
-		partySettlementInstruction.setInstruction(instruction);
-		instruction.setSettlementBic("DTCYUS33");
-		instruction.setLocalAgentBic("IRVTBEBBXXX");
-		instruction.setLocalAgentName("THE BANK OF NEW YORK MELLON SA/NV");
-		instruction.setLocalAgentAcct("A12345");
-		instruction.setDtcParticipantNumber("0901");
-
-		proposal.setSettlement(partySettlementInstruction);
+		acknowledgement.setAcknowledgementType(AcknowledgementType.POSITIVE);
+		
+//		PartySettlementInstruction partySettlementInstruction = new PartySettlementInstruction();
+//		partySettlementInstruction.setPartyRole(PartyRole.fromValue(workflowConfig.getActing_as()));
+//		partySettlementInstruction.setInternalAcctCd("stl_b_12345");
+//
+//		SettlementInstruction instruction = new SettlementInstruction();
+//		partySettlementInstruction.setInstruction(instruction);
+//		instruction.setSettlementBic("DTCYUS33");
+//		instruction.setLocalAgentBic("IRVTBEBBXXX");
+//		instruction.setLocalAgentName("THE BANK OF NEW YORK MELLON SA/NV");
+//		instruction.setLocalAgentAcct("A12345");
+//		instruction.setDtcParticipantNumber("0901");
+//
+//		acknowledgement.setSettlement(partySettlementInstruction);
 
 		Gson gson = new GsonBuilder()
 			    .registerTypeAdapter(Date.class, new DateGsonTypeAdapter())
 			    .create();
 
-		String json = gson.toJson(proposal);
+		String json = gson.toJson(acknowledgement);
 		
 		logger.debug(json);
 
-		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts/" + workflowConfig.getContract_id() + "/approve").contentType(MediaType.APPLICATION_JSON)
-				.bodyValue(json).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
+		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts/" + workflowConfig.getContract_id() + "/returns/" + workflowConfig.getReturn_id() + "/acknowledge").contentType(MediaType.APPLICATION_JSON)
+				.bodyValue(json)
+				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					return Mono.empty();
 				}).bodyToMono(LedgerResponse.class).block();
