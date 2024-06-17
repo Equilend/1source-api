@@ -6,8 +6,18 @@ import com.onesource.demo.util.JsonGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
-public class ApiDemo {
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+
+/**
+ * This class is similar to ApiDemoSpringApp but it does not run as a Spring application.
+ * It does, however, use a various Spring classes to make the API calls,
+  */
+public class ApiDemoApp {
 
     private static ApiHelper apiHelper = new ApiHelper();
 
@@ -19,17 +29,30 @@ public class ApiDemo {
         String borrowerToken = apiHelper.getAuthToken("TestBorrower1User", "FqnNQyUwaenQ8K3h");
         String lenderToken = apiHelper.getAuthToken("TestLender1User", "fjmxVeKzpzUDg3YJ");
 
-        String sinceTime = "2024-06-05T01:00:00.000Z";
-//        apiHelper.getEntity(lenderToken, "parties");
-//        apiHelper.getEntity(token, "agreements");
-//        apiHelper.getEntity(token, "delegations"); // Does not work... not implemented yet
-        apiHelper.getEntity(lenderToken, "events", "since=" + sinceTime);
-        apiHelper.getEntity(lenderToken, "contracts", "since=" + sinceTime);
-//        apiHelper.getEntity(lenderToken, "returns", "since=" + sinceTime);
-//        apiHelper.getEntity(lenderToken, "recalls", "since=" + sinceTime);
+//        String sinceTime = "2024-06-05T01:00:00.000Z";
+        LocalDateTime localDateTime = LocalDateTime.now().minusDays(10);
+        String sinceTime = localDateTime.atOffset(ZoneOffset.UTC).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
+        System.out.println("sinceTime " + sinceTime);
+
+        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+        queryParams.add("since", sinceTime);
+
+        apiHelper.getEntity(lenderToken, "parties");
+//        apiHelper.getEntity(lenderToken, "agreements");
+//        apiHelper.getEntity(lenderToken, "delegations"); // Does not work... not implemented yet
+//        apiHelper.getEntity(lenderToken, "events", queryParams);
+//        apiHelper.getEntity(lenderToken, "contracts", queryParams);
+//        apiHelper.getEntity(lenderToken, "returns", queryParams);
+//        apiHelper.getEntity(lenderToken, "recalls", queryParams);
 
 //        approveContract(borrowerToken, "cf796f2f-9d68-4efe-b5d4-887223f48d9a");
 //        submitNewReturn(borrowerToken, "a5ee63ed-2d63-4505-9478-97ab41d05b7e");
+
+        runFullDemo(lenderToken, borrowerToken, queryParams);
+        System.out.println("Done");
+    }
+
+    private static void runFullDemo(String lenderToken, String borrowerToken, MultiValueMap<String, String> queryParams) {
 
         submitNewContract(lenderToken);
 
@@ -44,14 +67,13 @@ public class ApiDemo {
             System.out.println("Found contractId: " + contractId);
 
             approveContract(borrowerToken, contractId);
-            patchContractSettled(borrowerToken, contractId);
-            patchContractSettled(lenderToken, contractId);
+            patchContract(borrowerToken, contractId);
+            patchContract(lenderToken, contractId);
             submitNewReturn(borrowerToken, contractId);
         }
 
-        apiHelper.getEntity(lenderToken, "contracts", "since=" + sinceTime);
-        apiHelper.getEntity(lenderToken, "returns", "since=" + sinceTime);
-        System.out.println("Done");
+        apiHelper.getEntity(lenderToken, "contracts", queryParams);
+        apiHelper.getEntity(lenderToken, "returns", queryParams);
     }
 
     private static void submitNewContract(String lenderToken) {
@@ -68,7 +90,7 @@ public class ApiDemo {
         apiHelper.postContractAction(borrowerToken, body.toString(), contractId, "approve");
     }
 
-    private static void patchContractSettled(String token, String contractId) {
+    private static void patchContract(String token, String contractId) {
         JSONObject body = JsonGenerator.generateSettlementStatusUpdateJson("SETTLED");
         System.out.println("------------------------------------------------------------------------------------");
         System.out.println("Update contract status:\n" + body.toString(2));

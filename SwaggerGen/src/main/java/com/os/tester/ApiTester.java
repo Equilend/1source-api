@@ -39,13 +39,8 @@ public class ApiTester {
         ContractsApi contractsApi = new ContractsApi();
         try {
             Calendar cal = Calendar.getInstance();
-//            cal.setTime(date);
             cal.add(Calendar.DATE, -10);
             Date fromDate = cal.getTime();
-//            LocalDate localDate = LocalDate.now().minusDays(10);
-//            Date fromDate = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-            Date since = new Date(); // Date | Contracts created (since) timestamp UTC
-            Date before = new Date(); // Date | Contracts created (before) timestamp UTC
             Integer size = 56; // Integer | Number of contracts to be returned. Can be used to facilitate paging
 
             contractsApi.ledgerContractsGet(null,null,null,null,null,null,null,null,null,null,null);
