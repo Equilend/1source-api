@@ -1,0 +1,46 @@
+
+spring.main.web-application-type : none
+spring.main.banner-mode : off
+
+spring:
+  application:
+    name: OneSourceGateway
+    id: OneSourceGateway
+
+  profiles:
+    active: ${USERNAME} #${System.getenv("USERNAME")}
+    include: application-${spring.profiles.active}.yml
+
+  dataSource:
+    # Using HikariCP pooling
+    configuration:
+      minimum-idle: 5     # default = same as maximumPoolSize
+      maximum-pool-size : 30  # Default = 10
+
+app:
+  config:
+    env-name : LOCAL
+    error-email-interval : 5
+    mq-enabled: false      # If false, then we do not start any MQ listeners 
+#    timezone: GMT
+    timezone: America/New_York
+
+#-----------------------------------------------------------------------------------
+# Copied from GEM... may or may not use this
+#-----------------------------------------------------------------------------------
+
+MAIL_SERVER_HOST : eqnycsapq01.equilend.com
+MAIL_SERVER_PORT : 587
+
+equilend.support.email   : your.name@equilend.com
+#equilend.support.email  : support@equilend.com     # PROD only
+#equilend.support.email  : qasupport@equilend.com   # QAX,QAR,STG
+
+#MAIL_SERVER_FROM_ADDRESS : do-not-reply@equilend.com
+MAIL_SERVER_FROM_ADDRESS : your.name@equilend.com
+
+MAIL_SERVER_FROM_NAME    : 1SourceGateway
+ALERT_MAIL_TO_ADDR       : your.name@equilend.com
+
+# Shutdown alert email is generated if app shuts down with non-zero exitCode
+SHUTDOWN_ALERT_TO_ADDR   : your.name@equilend.com

@@ -2,6 +2,7 @@ package com.onesource.demo.util;
 
 import com.intellecteu.onesource.integration.services.client.onesource.invoker.auth.Authentication;
 import com.intellecteu.onesource.integration.services.client.onesource.invoker.auth.OAuth;
+import com.intellecteu.onesource.integration.services.client.onesource.invoker.auth.RFC3339DateFormat;
 import com.onesource.demo.dto.LedgerResponseDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
@@ -10,12 +11,12 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.BufferingClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.util.LinkedMultiValueMap;
 
 import java.io.IOException;
 import java.net.URI;
@@ -25,16 +26,17 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.DateFormat;
+import java.util.*;
 
 public class ApiHelper {
 
     private HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2).build();
     private String basePath = "https://stageapi.equilend.com/v1";
     private RestTemplate restTemplate;
+    private Map<String, Authentication> authentications;
+    private DateFormat dateFormat;
+    private HttpHeaders defaultHeaders = new HttpHeaders();
 
     public ApiHelper() {
         restTemplate = new RestTemplate();
@@ -44,6 +46,19 @@ public class ApiHelper {
         BufferingClientHttpRequestFactory bufferingFactory = new BufferingClientHttpRequestFactory(httpComponentsFactory);
         restTemplate.setRequestFactory(bufferingFactory);
         restTemplate.getInterceptors().add(new RequestLoggingInterceptor());
+
+        // Use RFC3339 format for date and datetime.
+        // See http://xml2rfc.ietf.org/public/rfc/html/rfc3339.html#anchor14
+        dateFormat = new RFC3339DateFormat();
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+
+        defaultHeaders.add("User-Agent", "Java-SDK");
+
+        // Setup authentications (key: authentication name, value: authentication).
+        authentications = new HashMap<String, Authentication>();
+        authentications.put("stage_auth", new OAuth());
+        // Prevent the authentications from being modified.
+        authentications = Collections.unmodifiableMap(authentications);
     }
 
     public String getAuthToken(String userName, String password) {
@@ -78,66 +93,85 @@ public class ApiHelper {
         return getEntity(token, entity, null);
     }
 
-    public String getEntity(String token, String entity, String conditions) {
+    public String getEntity(String token, String entity, MultiValueMap<String, String> queryParams) {
         System.out.println("------------------------------------------------------------------------------------");
-        HttpRequest request = null;
-        HttpResponse<String> response = null;
 
-        String url = basePath + "/ledger/" + entity + (conditions == null ? "" : "?" + conditions);
+        String path = basePath + "/ledger/" + entity;
 
-        try {
-            request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-//                    .version(HttpClient.Version.HTTP_2)
-                    .header("Authorization", "Bearer " + token)
-                    .header("Accept", "application/json")
-                    .build();
+        final UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(basePath).path("/ledger/" + entity);
 
-            // Compare to: apiClient.invokeAPI(path, HttpMethod.GET, queryParams, postBody, headerParams, formParams, accept, contentType, authNames, returnType);
-            // from EventsApi:177
-            System.out.println("\nGET " + StringUtils.capitalize(entity) + "  " + url + "\n");
-
-            response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() == 200) {
-                System.out.println("Success");
-            }
-            else {
-                System.out.println("GET " + entity + " request failed with status " + response.statusCode() + " " + response);
-
-                if (response.body() != null) {
-                    System.out.println("response: " + response.body());
-                }
-                return url;
-            }
-        }
-        catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e);
+        if (queryParams != null) {
+            builder.queryParams(queryParams);
         }
 
-        String body = response.body();
-        System.out.println("response: " + body);
+        final RequestEntity.BodyBuilder requestBuilder = RequestEntity.method(HttpMethod.GET, builder.build().toUri());
 
-        String resultStr = ppJson(body);
+        HttpHeaders headerParams = new HttpHeaders();
+        headerParams.add("Authorization", "Bearer " + token);
+
+        String[] accepts = { "application/json" };
+        List<MediaType> accept = selectHeaderAccept(accepts);
+        requestBuilder.accept(accept.toArray(new MediaType[accept.size()]));
+
+        String[] contentTypes = { "application/json" };
+//        MediaType contentType = selectHeaderContentType(contentTypes);
+        MediaType contentType = MediaType.APPLICATION_JSON;
+        requestBuilder.contentType(contentType);
+
+        String[] authNames = new String[] { "stage_auth" };
+
+        updateParamsForAuth(authNames, queryParams, headerParams);
+
+        addHeadersToRequest(headerParams, requestBuilder);
+        addHeadersToRequest(defaultHeaders, requestBuilder);
+
+        String body = "";
+        ParameterizedTypeReference<String> returnType = new ParameterizedTypeReference<String>() {};
+        RequestEntity<Object> requestEntity = requestBuilder.body(selectBody(body, /*formParams*/ null, contentType));
+
+        System.out.println("\nGET " + StringUtils.capitalize(entity) + "  " + path + "\n");
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, returnType);
+
+        if (responseEntity.getStatusCode().is2xxSuccessful()) {
+            System.out.println("Success");
+        }
+        else {
+            System.out.println("GET " + entity + " request failed with status " + responseEntity.getStatusCode() + " " + responseEntity);
+
+            if (responseEntity.hasBody()) {
+                System.out.println("response: " + responseEntity.getBody());
+            }
+            return null;
+            // The error handler built into the RestTemplate should handle 400 and 500 series errors.
+//            throw new HttpClientErrorException(responseEntity.getStatusCode(),
+//                              "API returned " + responseEntity.getStatusCode()
+//                            + " and it wasn't handled by the RestTemplate error handler");
+        }
+
+        String responseBody = responseEntity.getBody();
+        System.out.println("response: " + responseBody);
+
+        String resultStr = ppJson(responseBody);
 
         System.out.println(StringUtils.capitalize(entity) + ":\n" + resultStr);
-        return body;
+        return responseBody;
     }
 
     public ResponseEntity<LedgerResponseDTO> postContractProposal(String token, String body) {
-        return postToApi(HttpMethod.POST, token, body, null, null, null, null, null);  // Contract Proposal
+        return submitApiPost(HttpMethod.POST, token, body, null, null, null, null, null);  // Contract Proposal
     }
 
     public ResponseEntity<LedgerResponseDTO> postContractAction(String token, String body, String contractId, String contractAction) {
-        return postToApi(HttpMethod.POST, token, body, contractId, contractAction, null, null, null);  // Approve, Cancel, Decline a contract
+        return submitApiPost(HttpMethod.POST, token, body, contractId, contractAction, null, null, null);  // Approve, Cancel, Decline a contract
     }
 
     public ResponseEntity<LedgerResponseDTO> patchContract(String token, /*ContractsContractIdBodyDTO*/ String body, String contractId) {
-        return postToApi(HttpMethod.PATCH, token, body, contractId, null, null, null, null); // Patch a contract (SettlementStatusUpdate, etc)
+        return submitApiPost(HttpMethod.PATCH, token, body, contractId, null, null, null, null); // Patch a contract (SettlementStatusUpdate, etc)
     }
 
     public ResponseEntity<LedgerResponseDTO> postReturnRecallProposal(String token, String body, String contractId, String entity) {
-        return postToApi(HttpMethod.POST, token, body, contractId, null, entity, null, null);  // Post a new return or recall proposal
+        return submitApiPost(HttpMethod.POST, token, body, contractId, null, entity, null, null);  // Post a new return or recall proposal
     }
 
     /**
@@ -151,15 +185,15 @@ public class ApiHelper {
      * @param entityAction   = "acknowlege" (return) or "cancel" (recall)
      * @return
      */
-    private ResponseEntity<LedgerResponseDTO> postToApi(HttpMethod httpMethod, String token, String body, String contractId, String contractAction,
-                                                        String entity, String entityId, String entityAction) {
+    private ResponseEntity<LedgerResponseDTO> submitApiPost(HttpMethod httpMethod, String token, String body, String contractId, String contractAction,
+                                                            String entity, String entityId, String entityAction) {
         if (body == null) {
             throw new RuntimeException("Missing required parameter 'body'");
         }
 
         String pathStr = "/ledger/contracts";
 
-        final Map<String, Object> uriVariables = new HashMap<String, Object>();
+        Map<String, Object> uriVariables = new HashMap<String, Object>();
 
         if (contractId != null) {
             pathStr += "/{contractId}";
@@ -188,13 +222,13 @@ public class ApiHelper {
 
         String path = UriComponentsBuilder.fromPath(pathStr).buildAndExpand(uriVariables).toUriString();
 
-        ResponseEntity<LedgerResponseDTO> responseEntity = getApiResponse(httpMethod, token, body, path);
-
-        return responseEntity;
+//        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+        ParameterizedTypeReference<LedgerResponseDTO> returnType = new ParameterizedTypeReference<LedgerResponseDTO>() {};
+        return getApiPostResponse(httpMethod, token, body, path, returnType);
     }
 
-    private ResponseEntity<LedgerResponseDTO> getApiResponse(HttpMethod httpMethod, String token, String body, String path) {
-        MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<String, String>();
+    private <T> ResponseEntity<T> getApiPostResponse(HttpMethod httpMethod, String token, String body,
+                                                                 String path, ParameterizedTypeReference<T> returnType) {
 
         HttpHeaders headerParams = new HttpHeaders();
         headerParams.add("Authorization", "Bearer " + token);
@@ -207,15 +241,12 @@ public class ApiHelper {
 
         String[] authNames = new String[] { "stage_auth" };
 
-        updateParamsForAuth(authNames, queryParams, headerParams);
+        updateParamsForAuth(authNames, null, headerParams);
 
         final UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(basePath).path(path);
 
-        if (queryParams != null) {
-            builder.queryParams(queryParams);
-        }
+        RequestEntity.BodyBuilder requestBuilder = RequestEntity.method(httpMethod, builder.build().toUri());
 
-        final RequestEntity.BodyBuilder requestBuilder = RequestEntity.method(httpMethod, builder.build().toUri());
         if(accept != null) {
             requestBuilder.accept(accept.toArray(new MediaType[accept.size()]));
         }
@@ -223,23 +254,12 @@ public class ApiHelper {
             requestBuilder.contentType(contentType);
         }
 
-        HttpHeaders defaultHeaders = new HttpHeaders();
-        defaultHeaders.add("User-Agent","Java-SDK");
-
         addHeadersToRequest(headerParams, requestBuilder);
         addHeadersToRequest(defaultHeaders, requestBuilder);
 
-        MultiValueMap<String, Object> formParams = new LinkedMultiValueMap<String, Object>();
+        RequestEntity<Object> requestEntity = requestBuilder.body(selectBody(body, null, contentType));
 
-        RequestEntity<Object> requestEntity = requestBuilder.body(selectBody(body, formParams, contentType));
-
-//        System.out.println("Request Method: " + requestEntity.getMethod());
-//        System.out.println("Request URI: " + requestEntity.getURI());
-//        System.out.println("Request Headers: " + requestEntity.getHeaders());
-//        System.out.println("Request Body: " + body); // new String(body, StandardCharsets.UTF_8));
-
-        ParameterizedTypeReference<LedgerResponseDTO> returnType = new ParameterizedTypeReference<LedgerResponseDTO>() {};
-        ResponseEntity<LedgerResponseDTO> responseEntity = restTemplate.exchange(requestEntity, returnType);
+        ResponseEntity<T> responseEntity = restTemplate.exchange(requestEntity, returnType);
 
         if (responseEntity.getStatusCode().is2xxSuccessful()) {
             System.out.println(httpMethod + " submitted successfully:\n" + responseEntity.getBody());
@@ -289,11 +309,11 @@ public class ApiHelper {
     }
 
     private void updateParamsForAuth(String[] authNames, MultiValueMap<String, String> queryParams, HttpHeaders headerParams) {
-        Map<String, Authentication>  authentications = new HashMap<String, Authentication>();
-        authentications.put("stage_auth", new OAuth());
-
-        // Prevent the authentications from being modified.
-        authentications = Collections.unmodifiableMap(authentications);
+//        Map<String, Authentication>  authentications = new HashMap<String, Authentication>();
+//        authentications.put("stage_auth", new OAuth());
+//
+//        // Prevent the authentications from being modified.
+//        authentications = Collections.unmodifiableMap(authentications);
 
         for (String authName : authNames) {
             Authentication auth = authentications.get(authName);
