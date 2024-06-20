@@ -1,17 +1,14 @@
-package com.os.workflow;
+package com.os.events.api;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-
 import com.os.client.model.BenchmarkCd;
 import com.os.client.model.FeeRate;
 import com.os.client.model.FixedRate;
@@ -65,7 +62,7 @@ public class RateDeserializer extends StdDeserializer<Rate> {
 
 				JsonNode nodeEffectiveDate = nodeRateRebateFixed.get("effectiveDate");
 				if (nodeEffectiveDate != null) {
-					fixedRateDef.setEffectiveDate(LocalDate.parse(nodeEffectiveDate.asText(), DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay(ZoneOffset.UTC).toLocalDate());
+					fixedRateDef.setEffectiveDate(LocalDate.parse(nodeEffectiveDate.asText(), DateTimeFormatter.ISO_LOCAL_DATE));
 				}
 
 				JsonNode nodeCutoffTime = nodeRateRebateFixed.get("cutoffTime");
@@ -109,7 +106,7 @@ public class RateDeserializer extends StdDeserializer<Rate> {
 
 					JsonNode nodeEffectiveDate = nodeRateRebateFloating.get("effectiveDate");
 					if (nodeEffectiveDate != null) {
-						floatingRateDef.setEffectiveDate(LocalDate.parse(nodeEffectiveDate.asText(), DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay(ZoneOffset.UTC).toLocalDate());
+						floatingRateDef.setEffectiveDate(LocalDate.parse(nodeEffectiveDate.asText(), DateTimeFormatter.ISO_LOCAL_DATE));
 					}
 
 					JsonNode nodeCutoffTime = nodeRateRebateFloating.get("cutoffTime");
@@ -141,7 +138,7 @@ public class RateDeserializer extends StdDeserializer<Rate> {
 
 				JsonNode nodeEffectiveDate = nodeRateFee.get("effectiveDate");
 				if (nodeEffectiveDate != null) {
-					fixedRateDef.setEffectiveDate(LocalDate.parse(nodeEffectiveDate.asText(), DateTimeFormatter.ISO_LOCAL_DATE).atStartOfDay(ZoneOffset.UTC).toLocalDate());
+					fixedRateDef.setEffectiveDate(LocalDate.parse(nodeEffectiveDate.asText(), DateTimeFormatter.ISO_LOCAL_DATE));
 				}
 
 				JsonNode nodeCutoffTime = nodeRateFee.get("cutoffTime");

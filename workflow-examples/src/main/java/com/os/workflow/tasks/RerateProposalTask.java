@@ -1,6 +1,8 @@
 package com.os.workflow.tasks;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Random;
 
@@ -56,7 +58,7 @@ public class RerateProposalTask implements Tasklet, StepExecutionListener {
 
 		RerateProposal rerateProposal = new RerateProposal();
 
-		Date rerateDate = new Date();
+		LocalDate rerateDate = LocalDate.now(ZoneId.of("UTC"));
 		
 		Random random = new Random();
 		

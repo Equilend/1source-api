@@ -1,6 +1,8 @@
 package com.os.workflow;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -96,26 +98,26 @@ public class ContractProposalUtil {
 
 		Venue venue = new Venue();
 		venue.setType(VenueType.OFFPLATFORM);
-		venue.setVenueName("Phone brokered");
+//		venue.setVenueName("Phone brokered");
 		venue.setVenueRefKey("2129012000");
-		venue.setTransactionDatetime(new Date());
+//		venue.setTransactionDatetime(new Date());
 
-		VenueParties venueParties = new VenueParties();
-		venue.setVenueParties(venueParties);
-
-		if (PartyRole.BORROWER.toString().equals(ledgerRecord.getBorrowLoan())) {
-
-			VenueParty borrowerVenueParty = new VenueParty();
-			borrowerVenueParty.setPartyRole(PartyRole.BORROWER);
-			venueParties.add(borrowerVenueParty);
-
-		} else if (PartyRole.LENDER.toString().equals(ledgerRecord.getBorrowLoan())) {
-
-			VenueParty lenderVenueParty = new VenueParty();
-			lenderVenueParty.setPartyRole(PartyRole.LENDER);
-			venueParties.add(lenderVenueParty);
-
-		}
+//		VenueParties venueParties = new VenueParties();
+//		venue.setVenueParties(venueParties);
+//
+//		if (PartyRole.BORROWER.toString().equals(ledgerRecord.getBorrowLoan())) {
+//
+//			VenueParty borrowerVenueParty = new VenueParty();
+//			borrowerVenueParty.setPartyRole(PartyRole.BORROWER);
+//			venueParties.add(borrowerVenueParty);
+//
+//		} else if (PartyRole.LENDER.toString().equals(ledgerRecord.getBorrowLoan())) {
+//
+//			VenueParty lenderVenueParty = new VenueParty();
+//			lenderVenueParty.setPartyRole(PartyRole.LENDER);
+//			venueParties.add(lenderVenueParty);
+//
+//		}
 
 		venues.add(venue);
 
@@ -145,8 +147,7 @@ public class ContractProposalUtil {
 
 		trade.setInstrument(instrument);
 
-		Calendar tradeDate = Calendar.getInstance();
-		tradeDate.setTime(ledgerRecord.getTradeDate());
+		LocalDate tradeDate = LocalDate.now(ZoneId.of("UTC"));
 
 		Double r = null;
 		if (ledgerRecord.getSpreadRate() != null) {
@@ -162,7 +163,7 @@ public class ContractProposalUtil {
 		FloatingRateDef floatingRateDef = new FloatingRateDef();
 		floatingRateDef.setSpread(r);
 		floatingRateDef.setCutoffTime("18:00");
-		floatingRateDef.setEffectiveDate(tradeDate.getTime());
+		floatingRateDef.setEffectiveDate(tradeDate);
 		// floatingRateDef.setEffectiveRate(ledgerRecord.getEffectiveRate().doubleValue());
 		// //TODO - based on autorerate setting
 		floatingRateDef.setBenchmark(BenchmarkCd.OBFR);
@@ -188,14 +189,11 @@ public class ContractProposalUtil {
 		trade.setQuantity(q.intValue());
 		trade.setBillingCurrency(CurrencyCd.USD);
 		trade.setDividendRatePct(ledgerRecord.getDividendRate().doubleValue());
-		trade.setTradeDate(tradeDate.getTime());
+		trade.setTradeDate(tradeDate);
 		trade.setTermType(TermType.OPEN);
 		trade.setTermDate(null);
 		
-		Calendar settlementDate = (Calendar)tradeDate.clone();
-		settlementDate.add(Calendar.DAY_OF_MONTH, 2);
-		
-		trade.setSettlementDate(settlementDate.getTime());
+		trade.setSettlementDate(tradeDate.plusDays(1));
 		trade.setSettlementType(SettlementType.DVP);
 
 		Collateral collateral = new Collateral();
