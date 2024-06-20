@@ -1,5 +1,7 @@
 package com.os.workflow.tasks;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Random;
 
@@ -51,7 +53,7 @@ public class ReturnNotificationTask implements Tasklet, StepExecutionListener {
 		
 		ReturnProposal proposal = new ReturnProposal();
 		
-		Date currentDate = new Date();
+		LocalDate currentDate = LocalDate.now(ZoneId.of("UTC"));
 		
 		proposal.setQuantity(((((random.nextInt(1000 - 100) + 1000))+99)/100)*100);
 		proposal.setReturnDate(currentDate);

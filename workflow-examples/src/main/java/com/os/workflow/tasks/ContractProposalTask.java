@@ -1,6 +1,8 @@
 package com.os.workflow.tasks;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.Random;
 import java.util.UUID;
@@ -24,6 +26,8 @@ import com.os.workflow.AuthToken;
 import com.os.workflow.ContractProposalUtil;
 import com.os.workflow.DateGsonTypeAdapter;
 import com.os.workflow.LedgerRecord;
+import com.os.workflow.LocalDateTypeAdapter;
+import com.os.workflow.OffsetDateTimeTypeAdapter;
 import com.os.workflow.WorkflowConfig;
 
 import com.os.client.model.ContractProposal;
@@ -59,12 +63,16 @@ public class ContractProposalTask implements Tasklet, StepExecutionListener {
 
 		Gson gson = new GsonBuilder()
 			    .registerTypeAdapter(Date.class, new DateGsonTypeAdapter())
+			    .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
+			    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeAdapter())
 			    .create();
 
-		logger.debug(gson.toJson(proposal));
+		String json = gson.toJson(proposal);
+		
+		logger.debug(json);
 
 		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts").contentType(MediaType.APPLICATION_JSON)
-				.bodyValue(proposal).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
+				.bodyValue(json).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					return Mono.empty();
 				}).bodyToMono(LedgerResponse.class).block();
