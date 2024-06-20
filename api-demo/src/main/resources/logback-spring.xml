@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <!-- read log properties from yml file-->
+    <springProperty scope="context" name="LOG_DIR" source="app.log.path"/>
+    <springProperty scope="context" name="LOG_FILE" source="app.log.file"/>
+
+    <!-- GSmith: Copied from GEM -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <!--            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5p] %-120m [%X{user} %t] %c{0} %n</pattern>-->
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5p] %-120m [%c{0}] %n</pattern>
+        </layout>
+    </appender>
+
+    <appender name="RollingFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_DIR}/${LOG_FILE}</file>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--        <Pattern>%d %p %C{1} [%t] %m%n</Pattern>-->
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss} [%-5p] %-120m [%c{0}] [%t]%n</Pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- rollover daily and when the file reaches 10 MegaBytes -->
+            <fileNamePattern>${LOG_DIR}/archived/${LOG_FILE}-%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>10MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <initialIndex>1</initialIndex>
+            <maxHistory>10</maxHistory>
+        </rollingPolicy>
+    </appender>
+
+    <logger name="org.springframework" additivity="false">
+        <appender-ref ref="RollingFile" level="debug"  />
+        <appender-ref ref="Console" level="warn"/>
+    </logger>
+
+    <logger name="com.equilend" level="debug" additivity="false">
+        <appender-ref ref="RollingFile"/>
+        <appender-ref ref="Console"/>
+    </logger>
+
+    <!-- LOG everything at INFO level -->
+    <root level="info">
+        <appender-ref ref="RollingFile"/>
+        <appender-ref ref="Console"/>
+    </root>
+
+</configuration>

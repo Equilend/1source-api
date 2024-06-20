@@ -1,0 +1,94 @@
+spring:
+  dataSource:
+    driver-class-name : org.postgresql.Driver
+    url : jdbc:postgresql://127.0.0.1:5432/osgateway?currentSchema=osgateway
+    username: gsmith
+    password: gsadmin
+
+    initial-size: 10
+    hikari:
+      connection-timeout: 300000
+      maximum-pool-size: 20
+
+    # Using HikariCP pooling
+#    configuration:
+#      minimum-idle: 5     # default = same as maximumPoolSize
+#      maximum-pool-size : 30  # Default = 10
+
+#spring:
+#  application:
+#    name: PTSDataFeed
+#  main:
+#    allow-bean-definition-overriding : true   - Why?
+#  datasource:
+#    driver-class-name: oracle.jdbc.OracleDriver
+#    password: equilend123
+#    url: jdbc:oracle:thin:@172.16.1.195:1531:PTSQAR01
+#    username: ptsdatafeed_app
+#    initial-size: 10
+#    hikari:
+#      connection-timeout: 300000
+#      maximum-pool-size: 20
+
+  kafka:
+    # bootstrap-servers: localhost:9092
+    bootstrap-servers: b-2.eql-kafka-v02.oumtxa.c2.kafka.us-east-1.amazonaws.com:9094,b-3.eql-kafka-v02.oumtxa.c2.kafka.us-east-1.amazonaws.com:9094,b-1.eql-kafka-v02.oumtxa.c2.kafka.us-east-1.amazonaws.com:9094
+    properties:
+      #     state.dir: /EL/kafka-streams/
+      security.protocol: SSL
+      ssl.protocol: SSL
+      ssl.truststore.location: ${JAVA_HOME}/lib/security/cacerts
+      request.timeout.ms: 20000   # 1800000 #30*60*1000
+      state.cleanup.delay.ms: 604800000 #7*24*60*60*1000
+      processing.guarantee: exactly_once
+      #replication.factor: 3
+    #      default.deserialization.exception.handler: LogAndContinueExceptionHandler
+    #      client-id: GEM
+    streams:
+      application-id: OneSourceGateway
+
+app:
+  log:
+    path: /apps/logs
+    file: OneSourceGateway.log
+
+  config:
+    env-name : LOCAL
+    error-email-interval : 5
+    mq-enabled: false      # If false, then we do not start any MQ listeners 
+#    timezone: GMT
+    timezone: America/New_York
+
+  kafka:
+    r2s:
+      returns:
+        topic: RETURN_SERVICE_UPDATE.DEV.GNS
+        consumer-group: return.1source.return_service_update.GNS
+        num-stream-threads: 2
+      recalls:
+        topic: RECALL_SERVICE_UPDATE.DEV.GN
+        consumer-group: recall.1source.recall_service_update.GNS
+        num-stream-threads: 2
+
+#-----------------------------------------------------------------------------------
+# Properties pulled from config.properties
+#-----------------------------------------------------------------------------------
+
+#MAIL_SERVER_HOST : eqnycsapq01.equilend.com
+MAIL_SERVER_HOST : email-smtp.us-east-1.amazonaws.com
+MAIL_SERVER_PORT : 587
+MAIL_SERVER_USER : AKIAJVS5RWKBOEKGNDAQ
+MAIL_SERVER_PASSWORD : Agtc6AYiiO4ayXTWGq+DTObDJseaTjs4f+zudVAwfeuA
+
+equilend.support.email   : guian.smith@equilend.com
+#equilend.support.email  : support@equilend.com     # PROD only
+#equilend.support.email  : qasupport@equilend.com   # QAX,QAR,STG
+
+#MAIL_SERVER_FROM_ADDRESS : do-not-reply@equilend.com
+MAIL_SERVER_FROM_ADDRESS : guian.smith@equilend.com
+
+MAIL_SERVER_FROM_NAME    : OneSourceGateway GSmith
+ALERT_MAIL_TO_ADDR       : guian.smith@equilend.com
+
+# Shutdown alert email is generated if app shuts down with non-zero exitCode
+SHUTDOWN_ALERT_TO_ADDR   : guian.smith@equilend.com
