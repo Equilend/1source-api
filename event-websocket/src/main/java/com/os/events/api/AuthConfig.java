@@ -15,8 +15,8 @@ public class AuthConfig {
 	private final String acting_as;
 
 	@ConstructorBinding
-	public AuthConfig(String auth_grant_type, String auth_client_id, String auth_client_secret,
-			String auth_username, String auth_password, String party_id, String acting_as) {
+	public AuthConfig(String auth_grant_type, String auth_client_id, String auth_client_secret, String auth_username,
+			String auth_password, String party_id, String acting_as) {
 		super();
 		this.auth_grant_type = auth_grant_type;
 		this.auth_client_id = auth_client_id;
@@ -53,6 +53,13 @@ public class AuthConfig {
 
 	public String getActing_as() {
 		return acting_as;
+	}
+
+	@Override
+	public String toString() {
+		return "AuthConfig [auth_grant_type=" + auth_grant_type + ", auth_client_id=" + auth_client_id
+				+ ", auth_client_secret=" + auth_client_secret + ", auth_username=" + auth_username + ", auth_password="
+				+ auth_password + ", party_id=" + party_id + ", acting_as=" + acting_as + "]";
 	}
 
 }
