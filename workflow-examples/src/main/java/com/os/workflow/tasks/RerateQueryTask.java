@@ -1,6 +1,7 @@
 package com.os.workflow.tasks;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +19,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.os.client.model.Rerates;
 import com.os.workflow.AuthToken;
-import com.os.workflow.DateGsonTypeAdapter;
+import com.os.workflow.LocalDateTypeGsonAdapter;
+import com.os.workflow.OffsetDateTimeTypeGsonAdapter;
 import com.os.workflow.WorkflowConfig;
 
-import com.os.client.model.Rerates;
 import reactor.core.publisher.Mono;
 
 public class RerateQueryTask implements Tasklet, StepExecutionListener {
@@ -54,7 +56,8 @@ public class RerateQueryTask implements Tasklet, StepExecutionListener {
 				}).bodyToMono(Rerates.class).block();
 
 		Gson gson = new GsonBuilder()
-			    .registerTypeAdapter(Date.class, new DateGsonTypeAdapter())
+			    .registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
+			    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
 			    .create();
 
 		logger.debug(gson.toJson(rerates));
