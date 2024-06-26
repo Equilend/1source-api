@@ -22,17 +22,16 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.os.workflow.AuthToken;
-import com.os.workflow.ContractProposalUtil;
-import com.os.workflow.DateGsonTypeAdapter;
-import com.os.workflow.LedgerRecord;
-import com.os.workflow.LocalDateTypeAdapter;
-import com.os.workflow.OffsetDateTimeTypeAdapter;
-import com.os.workflow.WorkflowConfig;
-
 import com.os.client.model.ContractProposal;
 import com.os.client.model.CurrencyCd;
 import com.os.client.model.LedgerResponse;
+import com.os.workflow.AuthToken;
+import com.os.workflow.ContractProposalUtil;
+import com.os.workflow.LedgerRecord;
+import com.os.workflow.LocalDateTypeGsonAdapter;
+import com.os.workflow.OffsetDateTimeTypeGsonAdapter;
+import com.os.workflow.WorkflowConfig;
+
 import reactor.core.publisher.Mono;
 
 public class ContractProposalTask implements Tasklet, StepExecutionListener {
@@ -62,9 +61,8 @@ public class ContractProposalTask implements Tasklet, StepExecutionListener {
 		ContractProposal proposal = contractUtil.createContractProposal(ledgerRecord);
 
 		Gson gson = new GsonBuilder()
-			    .registerTypeAdapter(Date.class, new DateGsonTypeAdapter())
-			    .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
-			    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeAdapter())
+			    .registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
+			    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
 			    .create();
 
 		String json = gson.toJson(proposal);

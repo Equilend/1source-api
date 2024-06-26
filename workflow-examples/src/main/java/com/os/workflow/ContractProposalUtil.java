@@ -3,9 +3,7 @@ package com.os.workflow;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.Collections;
-import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +33,6 @@ import com.os.client.model.TradeAgreement;
 import com.os.client.model.TransactingParties;
 import com.os.client.model.TransactingParty;
 import com.os.client.model.Venue;
-import com.os.client.model.VenueParties;
-import com.os.client.model.VenueParty;
 import com.os.client.model.VenueType;
 import com.os.client.model.Venues;
 

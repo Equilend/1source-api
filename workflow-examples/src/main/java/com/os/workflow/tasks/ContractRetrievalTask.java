@@ -1,7 +1,8 @@
 package com.os.workflow.tasks;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +20,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.os.workflow.AuthToken;
-import com.os.workflow.DateGsonTypeAdapter;
-import com.os.workflow.WorkflowConfig;
-
 import com.os.client.model.Contract;
 import com.os.client.model.FeeRate;
 import com.os.client.model.FixedRate;
@@ -31,6 +28,11 @@ import com.os.client.model.PartyRole;
 import com.os.client.model.RebateRate;
 import com.os.client.model.TransactingParties;
 import com.os.client.model.TransactingParty;
+import com.os.workflow.AuthToken;
+import com.os.workflow.LocalDateTypeGsonAdapter;
+import com.os.workflow.OffsetDateTimeTypeGsonAdapter;
+import com.os.workflow.WorkflowConfig;
+
 import reactor.core.publisher.Mono;
 
 public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
@@ -62,7 +64,8 @@ public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
 				}).bodyToMono(Contract.class).block();
 
 		Gson gson = new GsonBuilder()
-			    .registerTypeAdapter(Date.class, new DateGsonTypeAdapter())
+			    .registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
+			    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
 			    .create();
 
 		logger.debug(gson.toJson(contract));
