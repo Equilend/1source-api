@@ -52,8 +52,10 @@ public class ContractsConsole {
 								} catch (InterruptedException e) {
 									e.printStackTrace();
 								}
-								ContractConsole contractConsole = new ContractConsole();
-								contractConsole.execute(consoleIn, webClient, searchContractTask.getContract());
+								if (searchContractTask.getContract() != null) {
+									ContractConsole contractConsole = new ContractConsole();
+									contractConsole.execute(consoleIn, webClient, searchContractTask.getContract());
+								}
 							} else {
 								System.out.println("Invalid UUID");
 							}
@@ -78,9 +80,9 @@ public class ContractsConsole {
 		System.out.println();
 		System.out.println("Contracts Menu");
 		System.out.println("-----------------------");
-		System.out.println("A - List all contracts");
-		System.out.println("S <Contract Id> - Search for a contract by Id");
-		System.out.println("X - Go back");
+		System.out.println("A               - List all contracts");
+		System.out.println("S <Contract Id> - Load a contract by Id");
+		System.out.println("X               - Go back");
 		System.out.println();
 	}
 
