@@ -1,8 +1,10 @@
 package com.os.console;
 
 import java.io.BufferedReader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.os.console.api.AuthConfig;
 import com.os.console.api.tasks.AuthTask;
 

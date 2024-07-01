@@ -3,6 +3,7 @@ package com.os.console;
 import java.io.BufferedReader;
 import java.io.Console;
 import java.io.InputStreamReader;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,12 +44,12 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 			logger.info("args[{}]: {}", i, args[i]);
 		}
 
-//		Console console = System.console();
-//		
-//		if (console == null) {
-//			logger.warn("No console available");
-//			return;
-//		}
+		Console console = System.console();
+		
+		if (console == null) {
+			logger.warn("No console available");
+			return;
+		}
 
 		BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in));
 

@@ -6,46 +6,48 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
+import com.os.client.model.Recall;
 import com.os.console.api.AuthConfig;
 
 import reactor.core.publisher.Mono;
 
-public class SearchContractTask implements Runnable {
+public class SearchContractRecallTask implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(SearchContractTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SearchContractRecallTask.class);
 
 	private WebClient webClient;
 	private String contractId;
+	private String recallId;
 
-	private Contract contract;
+	private Recall recall;
 	
-	public SearchContractTask(WebClient webClient, String contractId) {
+	public SearchContractRecallTask(WebClient webClient, String contractId, String recallId) {
 		this.webClient = webClient;
 		this.contractId = contractId;
+		this.recallId = recallId;
 	}
 
 	@Override
 	public void run() {
 
-		contract = webClient.get().uri("/contracts/" + contractId)
+		recall = webClient.get().uri("/contracts/" + contractId + "/recalls/" + recallId)
 				.headers(h -> h.setBearerAuth(AuthConfig.TOKEN.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());
 					return Mono.empty();
-				}).bodyToMono(Contract.class).block();
+				}).bodyToMono(Recall.class).block();
 
-		if (contract == null || contract.getTrade() == null) {
-			logger.warn("Invalid contract object or contract not found");
-			System.out.println("contract not found");
+		if (recall == null) {
+			logger.warn("Invalid recall object or recall not found");
+			System.out.println("recall not found");
 		} else {
 			System.out.println("complete");
 			System.out.println();			
 		}
 	}
 
-	public Contract getContract() {
-		return contract;
+	public Recall getRecall() {
+		return recall;
 	}
 	
 	
