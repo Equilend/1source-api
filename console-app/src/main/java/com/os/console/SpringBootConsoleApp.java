@@ -64,9 +64,20 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 				command = command.trim();
 				if (command.equals("?") || command.equalsIgnoreCase("help")) {
 					printMainHelp();
+				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
+					System.exit(0);
 				} else if (command.equalsIgnoreCase("c")) {
 					ContractsConsole contractsConsole = new ContractsConsole();
 					contractsConsole.execute(consoleIn, restWebClient);
+				} else if (command.equalsIgnoreCase("u")) {
+					ReturnsConsole returnsConsole = new ReturnsConsole();
+					returnsConsole.execute(consoleIn, restWebClient);
+				} else if (command.equalsIgnoreCase("e")) {
+					RecallsConsole recallsConsole = new RecallsConsole();
+					recallsConsole.execute(consoleIn, restWebClient);
+				} else if (command.equalsIgnoreCase("a")) {
+					ReratesConsole reratesConsole = new ReratesConsole();
+					reratesConsole.execute(consoleIn, restWebClient);
 				} else {
 					System.out.println("Unknown command");
 				}
@@ -84,6 +95,9 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 		System.out.println("Main Menu");
 		System.out.println("-----------------------");
 		System.out.println("C - Contracts");
+		System.out.println("U - Returns");
+		System.out.println("E - Recalls");
+		System.out.println("A - Rerates");
 		System.out.println();
 	}
 

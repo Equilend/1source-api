@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
 import com.os.client.model.Recall;
 import com.os.client.model.Recalls;
 import com.os.console.api.AuthConfig;
@@ -14,22 +13,20 @@ import com.os.console.util.ConsoleOutputUtil;
 
 import reactor.core.publisher.Mono;
 
-public class SearchContractRecallsTask implements Runnable {
+public class SearchRecallsTask implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(SearchContractRecallsTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SearchRecallsTask.class);
 
 	private WebClient webClient;
-	private Contract contract;
 	
-	public SearchContractRecallsTask(WebClient webClient, Contract contract) {
+	public SearchRecallsTask(WebClient webClient) {
 		this.webClient = webClient;
-		this.contract = contract;
 	}
 
 	@Override
 	public void run() {
 		
-		Recalls recalls = webClient.get().uri("/contracts/" + contract.getContractId() + "/recalls")
+		Recalls recalls = webClient.get().uri("/recalls")
 				.headers(h -> h.setBearerAuth(AuthConfig.TOKEN.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());
@@ -49,6 +46,7 @@ public class SearchContractRecallsTask implements Runnable {
 					printHeader();
 				}
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getRecallId(), 40));
+				System.out.print(ConsoleOutputUtil.padSpaces(recall.getContractId(), 40));
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getStatus().toString(), 12));
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getLastUpdateDatetime(), 30));
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getRecallDate(), 15));
@@ -64,6 +62,7 @@ public class SearchContractRecallsTask implements Runnable {
 	public void printHeader() {
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("Recall Id", 40));
+		System.out.print(ConsoleOutputUtil.padSpaces("Contract Id", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("Status", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("Last Update DateTime", 30));
 		System.out.print(ConsoleOutputUtil.padSpaces("Recall Date", 15));
@@ -71,6 +70,7 @@ public class SearchContractRecallsTask implements Runnable {
 		System.out.print(ConsoleOutputUtil.padSpaces("Quantity", 15));
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("---------", 40));
+		System.out.print(ConsoleOutputUtil.padSpaces("-----------", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("------", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("--------------------", 30));
 		System.out.print(ConsoleOutputUtil.padSpaces("-----------", 15));

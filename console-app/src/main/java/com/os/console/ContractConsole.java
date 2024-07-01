@@ -86,7 +86,7 @@ public class ContractConsole {
 							System.out.println("Invalid UUID");
 						}
 					}
-				} else if (command.equalsIgnoreCase("c")) {
+				} else if (command.equalsIgnoreCase("e")) {
 					System.out.print("Retrieving all recalls...");
 					SearchContractRecallsTask searchContractRecallsTask = new SearchContractRecallsTask(webClient, contract);
 					Thread taskT = new Thread(searchContractRecallsTask);
@@ -96,7 +96,7 @@ public class ContractConsole {
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-				} else if (command.startsWith("c ") || command.startsWith("C ")) {
+				} else if (command.startsWith("e ") || command.startsWith("E ")) {
 					if (command.length() != 38) {
 						System.out.println("Invalid UUID");
 					} else {
@@ -182,8 +182,8 @@ public class ContractConsole {
 		System.out.println("J             - Print JSON");
 		System.out.println("U             - List Returns");
 		System.out.println("U <Return ID> - Load return by Id");
-		System.out.println("C             - List Recalls");
-		System.out.println("C <Recall ID> - Load recall by Id");
+		System.out.println("E             - List Recalls");
+		System.out.println("E <Recall ID> - Load recall by Id");
 		System.out.println("A             - List Rerates");
 		System.out.println("A <Recall ID> - Load rerate by Id");
 		System.out.println("X             - Go back");

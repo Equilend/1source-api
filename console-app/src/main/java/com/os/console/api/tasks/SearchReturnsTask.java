@@ -6,54 +6,51 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
-import com.os.client.model.Recall;
-import com.os.client.model.Recalls;
+import com.os.client.model.ModelReturn;
+import com.os.client.model.Returns;
 import com.os.console.api.AuthConfig;
 import com.os.console.util.ConsoleOutputUtil;
 
 import reactor.core.publisher.Mono;
 
-public class SearchContractRecallsTask implements Runnable {
+public class SearchReturnsTask implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(SearchContractRecallsTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SearchReturnsTask.class);
 
 	private WebClient webClient;
-	private Contract contract;
 	
-	public SearchContractRecallsTask(WebClient webClient, Contract contract) {
+	public SearchReturnsTask(WebClient webClient) {
 		this.webClient = webClient;
-		this.contract = contract;
 	}
 
 	@Override
 	public void run() {
 		
-		Recalls recalls = webClient.get().uri("/contracts/" + contract.getContractId() + "/recalls")
+		Returns returns = webClient.get().uri("/returns")
 				.headers(h -> h.setBearerAuth(AuthConfig.TOKEN.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());
 					return Mono.empty();
-				}).bodyToMono(Recalls.class).block();
+				}).bodyToMono(Returns.class).block();
 
-		if (recalls == null || recalls.size() == 0) {
-			logger.warn("Invalid recalls object or no recalls");			
-			System.out.println("no recalls found");
+		if (returns == null || returns.size() == 0) {
+			logger.warn("Invalid returns object or no returns");			
+			System.out.println("no returns found");
 			printHeader();
 		} else {
 			System.out.println("complete");
 			printHeader();
 			int rows = 1;
-			for (Recall recall : recalls) {
+			for (ModelReturn returnObj : returns) {
 				if (rows % 15 == 0) {
 					printHeader();
 				}
-				System.out.print(ConsoleOutputUtil.padSpaces(recall.getRecallId(), 40));
-				System.out.print(ConsoleOutputUtil.padSpaces(recall.getStatus().toString(), 12));
-				System.out.print(ConsoleOutputUtil.padSpaces(recall.getLastUpdateDatetime(), 30));
-				System.out.print(ConsoleOutputUtil.padSpaces(recall.getRecallDate(), 15));
-				System.out.print(ConsoleOutputUtil.padSpaces(recall.getRecallDueDate(), 18));
-				System.out.print(ConsoleOutputUtil.padSpaces(recall.getQuantity(), 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(returnObj.getReturnId(), 40));
+				System.out.print(ConsoleOutputUtil.padSpaces(returnObj.getContractId(), 40));
+				System.out.print(ConsoleOutputUtil.padSpaces(returnObj.getStatus().toString(), 12));
+				System.out.print(ConsoleOutputUtil.padSpaces(returnObj.getLastUpdateDatetime(), 30));
+				System.out.print(ConsoleOutputUtil.padSpaces(returnObj.getReturnDate(), 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(returnObj.getQuantity(), 15));
 				System.out.println();
 				
 				rows++;
@@ -63,18 +60,18 @@ public class SearchContractRecallsTask implements Runnable {
 
 	public void printHeader() {
 		System.out.println();
-		System.out.print(ConsoleOutputUtil.padSpaces("Recall Id", 40));
+		System.out.print(ConsoleOutputUtil.padSpaces("Return Id", 40));
+		System.out.print(ConsoleOutputUtil.padSpaces("Contract Id", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("Status", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("Last Update DateTime", 30));
-		System.out.print(ConsoleOutputUtil.padSpaces("Recall Date", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("Recall Due Date", 18));
+		System.out.print(ConsoleOutputUtil.padSpaces("Return Date", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Quantity", 15));
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("---------", 40));
+		System.out.print(ConsoleOutputUtil.padSpaces("-----------", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("------", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("--------------------", 30));
 		System.out.print(ConsoleOutputUtil.padSpaces("-----------", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("---------------", 18));
 		System.out.print(ConsoleOutputUtil.padSpaces("--------", 15));
 		System.out.println();
 	}
