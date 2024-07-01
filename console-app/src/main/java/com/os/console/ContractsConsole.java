@@ -24,6 +24,8 @@ public class ContractsConsole {
 				command = command.trim();
 				if (command.equals("?") || command.equalsIgnoreCase("help")) {
 					printMainContractsHelp();
+				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
+					System.exit(0);
 				} else if (command.equalsIgnoreCase("x")) {
 					break;
 				} else if (command.equalsIgnoreCase("a")) {
