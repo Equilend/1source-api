@@ -29,6 +29,8 @@ public class ContractRecallConsole {
 				command = command.trim();
 				if (command.equals("?") || command.equalsIgnoreCase("help")) {
 					printMainContractHelp();
+				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
+					System.exit(0);
 				} else if (command.equalsIgnoreCase("x")) {
 					break;
 				} else if (command.equalsIgnoreCase("j")) {
