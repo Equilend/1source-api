@@ -20,6 +20,7 @@ import com.os.console.api.tasks.SearchContractRerateTask;
 import com.os.console.api.tasks.SearchContractReratesTask;
 import com.os.console.api.tasks.SearchContractReturnTask;
 import com.os.console.api.tasks.SearchContractReturnsTask;
+import com.os.console.api.tasks.UpdateContractVenueKeyTask;
 
 public class ContractConsole {
 
@@ -35,24 +36,24 @@ public class ContractConsole {
 				command = command.trim();
 				if (command.equals("?") || command.equalsIgnoreCase("help")) {
 					printMainContractHelp();
-				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
+				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit")
+						|| command.equalsIgnoreCase("q")) {
 					System.exit(0);
 				} else if (command.equalsIgnoreCase("x")) {
 					break;
 				} else if (command.equalsIgnoreCase("j")) {
 
-					Gson gson = new GsonBuilder()
-							.setPrettyPrinting()
-						    .registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
-						    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
-						    .create();
-					
+					Gson gson = new GsonBuilder().setPrettyPrinting()
+							.registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
+							.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter()).create();
+
 					System.out.println(gson.toJson(contract));
 					System.out.println();
 
 				} else if (command.equalsIgnoreCase("u")) {
 					System.out.print("Retrieving all returns...");
-					SearchContractReturnsTask searchContractReturnsTask = new SearchContractReturnsTask(webClient, contract);
+					SearchContractReturnsTask searchContractReturnsTask = new SearchContractReturnsTask(webClient,
+							contract);
 					Thread taskT = new Thread(searchContractReturnsTask);
 					taskT.run();
 					try {
@@ -68,7 +69,8 @@ public class ContractConsole {
 						try {
 							if (UUID.fromString(returnId).toString().equals(returnId)) {
 								System.out.print("Retrieving return " + returnId + "...");
-								SearchContractReturnTask searchContractReturnTask = new SearchContractReturnTask(webClient, contract.getContractId(), returnId);
+								SearchContractReturnTask searchContractReturnTask = new SearchContractReturnTask(
+										webClient, contract.getContractId(), returnId);
 								Thread taskT = new Thread(searchContractReturnTask);
 								taskT.run();
 								try {
@@ -90,7 +92,8 @@ public class ContractConsole {
 					}
 				} else if (command.equalsIgnoreCase("e")) {
 					System.out.print("Retrieving all recalls...");
-					SearchContractRecallsTask searchContractRecallsTask = new SearchContractRecallsTask(webClient, contract);
+					SearchContractRecallsTask searchContractRecallsTask = new SearchContractRecallsTask(webClient,
+							contract);
 					Thread taskT = new Thread(searchContractRecallsTask);
 					taskT.run();
 					try {
@@ -106,7 +109,8 @@ public class ContractConsole {
 						try {
 							if (UUID.fromString(recallId).toString().equals(recallId)) {
 								System.out.print("Retrieving recall " + recallId + "...");
-								SearchContractRecallTask searchContractRecallTask = new SearchContractRecallTask(webClient, contract.getContractId(), recallId);
+								SearchContractRecallTask searchContractRecallTask = new SearchContractRecallTask(
+										webClient, contract.getContractId(), recallId);
 								Thread taskT = new Thread(searchContractRecallTask);
 								taskT.run();
 								try {
@@ -128,7 +132,8 @@ public class ContractConsole {
 					}
 				} else if (command.equalsIgnoreCase("a")) {
 					System.out.print("Retrieving all rerates...");
-					SearchContractReratesTask searchContractReratesTask = new SearchContractReratesTask(webClient, contract);
+					SearchContractReratesTask searchContractReratesTask = new SearchContractReratesTask(webClient,
+							contract);
 					Thread taskT = new Thread(searchContractReratesTask);
 					taskT.run();
 					try {
@@ -144,7 +149,8 @@ public class ContractConsole {
 						try {
 							if (UUID.fromString(rerateId).toString().equals(rerateId)) {
 								System.out.print("Retrieving rerate " + rerateId + "...");
-								SearchContractRerateTask searchContractRerateTask = new SearchContractRerateTask(webClient, contract.getContractId(), rerateId);
+								SearchContractRerateTask searchContractRerateTask = new SearchContractRerateTask(
+										webClient, contract.getContractId(), rerateId);
 								Thread taskT = new Thread(searchContractRerateTask);
 								taskT.run();
 								try {
@@ -162,6 +168,26 @@ public class ContractConsole {
 							}
 						} catch (Exception u) {
 							System.out.println("Invalid UUID");
+						}
+					}
+				} else if (command.startsWith("v ") || command.startsWith("V ")) {
+					if (command.length() > 100) {
+						System.out.println("Invalid reference key");
+					} else {
+						String venueRefKey = command.substring(2);
+						try {
+							System.out.print("Assigning venue reference " + venueRefKey + "...");
+							UpdateContractVenueKeyTask updateContractVenueKeyTask = new UpdateContractVenueKeyTask(webClient,
+									contract.getContractId(), venueRefKey);
+							Thread taskT = new Thread(updateContractVenueKeyTask);
+							taskT.run();
+							try {
+								taskT.join();
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+						} catch (Exception u) {
+							System.out.println("Invalid reference key");
 						}
 					}
 				} else {
@@ -188,6 +214,7 @@ public class ContractConsole {
 		System.out.println("E <Recall ID> - Load recall by Id");
 		System.out.println("A             - List Rerates");
 		System.out.println("A <Recall ID> - Load rerate by Id");
+		System.out.println("V <Venue Ref> - Add a venue reference key");
 		System.out.println("X             - Go back");
 		System.out.println();
 	}

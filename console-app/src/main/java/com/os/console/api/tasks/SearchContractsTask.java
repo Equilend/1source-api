@@ -8,6 +8,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Contract;
 import com.os.client.model.Contracts;
+import com.os.client.model.PartyRole;
+import com.os.client.model.TransactingParties;
+import com.os.client.model.TransactingParty;
 import com.os.console.api.AuthConfig;
 import com.os.console.util.ConsoleOutputUtil;
 
@@ -18,15 +21,15 @@ public class SearchContractsTask implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(SearchContractsTask.class);
 
 	private WebClient webClient;
-	
+
 	public SearchContractsTask(WebClient webClient) {
 		this.webClient = webClient;
 	}
 
 	@Override
 	public void run() {
-		
-		Contracts contracts= webClient.get().uri("/contracts")
+
+		Contracts contracts = webClient.get().uri("/contracts")
 				.headers(h -> h.setBearerAuth(AuthConfig.TOKEN.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());
@@ -34,7 +37,7 @@ public class SearchContractsTask implements Runnable {
 				}).bodyToMono(Contracts.class).block();
 
 		if (contracts == null || contracts.size() == 0) {
-			logger.warn("Invalid contracts object or no contracts");			
+			logger.warn("Invalid contracts object or no contracts");
 			System.out.println("no contracts found");
 			printHeader();
 		} else {
@@ -46,15 +49,30 @@ public class SearchContractsTask implements Runnable {
 					printHeader();
 				}
 				System.out.print(ConsoleOutputUtil.padSpaces(contract.getContractId(), 40));
-				System.out.print(ConsoleOutputUtil.padSpaces(contract.getLastUpdateDateTime(), 30));
+
+				String borrower = null;
+				String lender = null;
+				TransactingParties parties = contract.getTrade().getTransactingParties(); // there should be 2
+				if (parties != null) {
+					for (TransactingParty party : parties) {
+						if (borrower == null && PartyRole.BORROWER.equals(party.getPartyRole())) {
+							borrower = party.getParty().getPartyId();
+						} else if (lender == null && PartyRole.LENDER.equals(party.getPartyRole())) {
+							lender = party.getParty().getPartyId();
+						}
+
+					}
+				}
+				System.out.print(ConsoleOutputUtil.padSpaces(borrower, 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(lender, 15));
+
 				System.out.print(ConsoleOutputUtil.padSpaces(contract.getTrade().getTradeDate(), 15));
 				System.out.print(ConsoleOutputUtil.padSpaces(contract.getContractStatus().toString(), 12));
 				System.out.print(ConsoleOutputUtil.padSpaces(contract.getTrade().getInstrument().getFigi(), 15));
 				System.out.print(ConsoleOutputUtil.padSpaces(contract.getTrade().getInstrument().getTicker(), 15));
-				System.out.print(ConsoleOutputUtil.padSpaces(contract.getTrade().getInstrument().getSedol(), 15));
 				System.out.print(ConsoleOutputUtil.padSpaces(contract.getTrade().getQuantity(), 15));
 				System.out.println();
-				
+
 				rows++;
 			}
 		}
@@ -63,21 +81,21 @@ public class SearchContractsTask implements Runnable {
 	public void printHeader() {
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("Contract Id", 40));
-		System.out.print(ConsoleOutputUtil.padSpaces("Last Update DateTime", 30));
+		System.out.print(ConsoleOutputUtil.padSpaces("Borrower", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("Lender", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Trade Date", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Status", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("Figi", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Ticker", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("Sedol", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Quantity", 15));
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("-----------", 40));
-		System.out.print(ConsoleOutputUtil.padSpaces("--------------------", 30));
+		System.out.print(ConsoleOutputUtil.padSpaces("--------", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("------", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("----------", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("------", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("----", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("------", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("-----", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("--------", 15));
 		System.out.println();
 	}

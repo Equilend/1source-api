@@ -31,7 +31,7 @@ public class AuthTask implements Runnable {
 		formData.add("password", authConfig.getAuth_password());
 		formData.add("client_secret", authConfig.getAuth_client_secret());
 
-		WebClient authClient = WebClient.create("https://stageauth.equilend.com");
+		WebClient authClient = WebClient.create(authConfig.getAuth_uri());
 		
 		AuthToken ledgerToken = authClient.post()
 	      .uri("/auth/realms/1Source/protocol/openid-connect/token")
