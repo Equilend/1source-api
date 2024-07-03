@@ -3,6 +3,7 @@ package com.os.console.api;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
@@ -19,6 +20,9 @@ import com.os.client.model.Rate;
 @Configuration
 public class RESTWebClientConfig {
 
+	@Autowired
+	AuthConfig authConfig;
+
 	@Bean
 	public WebClient restWebClient() {
 		ObjectMapper objectMapper = new ObjectMapper()
@@ -26,7 +30,7 @@ public class RESTWebClientConfig {
 				.registerModule(new SimpleModule().addDeserializer(Rate.class, new RateDeserializer()))
 				.registerModule(new SimpleModule().addDeserializer(LocalDate.class, new LocalDateJacksonDeserializer()))
 				.registerModule(new SimpleModule().addDeserializer(OffsetDateTime.class, new OffsetDateTimeJacksonDeserializer()));
-		return WebClient.builder().baseUrl("https://stageapi.equilend.com/v1/ledger")
+		return WebClient.builder().baseUrl(authConfig.getApi_uri())
 				.exchangeStrategies(ExchangeStrategies.builder().codecs(clientDefaultCodecsConfigurer -> {
 					clientDefaultCodecsConfigurer.defaultCodecs()
 							.jackson2JsonEncoder(new Jackson2JsonEncoder(objectMapper, MediaType.APPLICATION_JSON));

@@ -44,18 +44,22 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 			logger.info("args[{}]: {}", i, args[i]);
 		}
 
-		Console console = System.console();
-		
-		if (console == null) {
-			logger.warn("No console available");
-			return;
-		}
+//		Console console = System.console();
+//		
+//		if (console == null) {
+//			logger.warn("No console available");
+//			return;
+//		}
 
 		BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in));
 
 		LoginConsole loginConsole = new LoginConsole();
 		loginConsole.login(authConfig, consoleIn);
 
+		if (AuthConfig.TOKEN == null) {
+			System.exit(-2);
+		}
+		
 		String command = null;
 		System.out.print("> ");
 
@@ -78,6 +82,9 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 				} else if (command.equalsIgnoreCase("a")) {
 					ReratesConsole reratesConsole = new ReratesConsole();
 					reratesConsole.execute(consoleIn, restWebClient);
+				} else if (command.equalsIgnoreCase("d")) {
+					DelegationsConsole delegationsConsole = new DelegationsConsole();
+					delegationsConsole.execute(consoleIn, restWebClient);
 				} else {
 					System.out.println("Unknown command");
 				}
@@ -98,7 +105,7 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 		System.out.println("U - Returns");
 		System.out.println("E - Recalls");
 		System.out.println("A - Rerates");
-		System.out.println();
+		System.out.println("D - Delegations");
 	}
 
 }

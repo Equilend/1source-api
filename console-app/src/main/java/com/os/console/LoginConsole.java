@@ -50,13 +50,14 @@ public class LoginConsole {
 			taskT.run();
 			try {
 				taskT.join();
-				System.out.println(AuthConfig.TOKEN == null ? "Invalid username and/or password." : "Success.");
+				System.out.println(AuthConfig.TOKEN == null ? "invalid username and/or password" : "success");
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 
 		} catch (Exception e) {
-			logger.error("Exception during authentication" + e.getMessage());
+			System.out.println("invalid username and/or password");
+			logger.error("Exception during authentication: " + e.getMessage());
 		} finally {
 		}
 
