@@ -21,12 +21,13 @@ import com.os.console.api.tasks.SearchContractReratesTask;
 import com.os.console.api.tasks.SearchContractReturnTask;
 import com.os.console.api.tasks.SearchContractReturnsTask;
 import com.os.console.api.tasks.UpdateContractVenueKeyTask;
+import com.os.console.api.tasks.UpdateSettlementStatusTask;
 
 public class ContractConsole {
 
 	private static final Logger logger = LoggerFactory.getLogger(ContractConsole.class);
 
-	public void execute(BufferedReader consoleIn, WebClient webClient, Contract contract) {
+	public void execute(BufferedReader consoleIn, WebClient webClient, Contract contract, String actingParty) {
 
 		String command = null;
 		System.out.print("/contracts/" + contract.getContractId() + " > ");
@@ -190,6 +191,17 @@ public class ContractConsole {
 							System.out.println("Invalid reference key");
 						}
 					}
+				} else if (command.equalsIgnoreCase("t")) {
+					System.out.print("Updating settlement status to SETTLED...");
+					UpdateSettlementStatusTask updateSettlementStatusTask = new UpdateSettlementStatusTask(webClient,
+							contract, actingParty);
+					Thread taskT = new Thread(updateSettlementStatusTask);
+					taskT.run();
+					try {
+						taskT.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
 				} else {
 					System.out.println("Unknown command");
 				}
@@ -214,6 +226,7 @@ public class ContractConsole {
 		System.out.println("E <Recall ID> - Load recall by Id");
 		System.out.println("A             - List Rerates");
 		System.out.println("A <Recall ID> - Load rerate by Id");
+		System.out.println("T             - Update settlement status to SETTLED");
 		System.out.println("V <Venue Ref> - Add a venue reference key");
 		System.out.println("X             - Go back");
 		System.out.println();

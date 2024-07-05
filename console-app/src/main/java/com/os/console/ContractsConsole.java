@@ -14,7 +14,7 @@ public class ContractsConsole {
 
 	private static final Logger logger = LoggerFactory.getLogger(ContractsConsole.class);
 
-	public void execute(BufferedReader consoleIn, WebClient webClient) {
+	public void execute(BufferedReader consoleIn, WebClient webClient, String actingParty) {
 
 		String command = null;
 		System.out.print("/contracts > ");
@@ -56,7 +56,7 @@ public class ContractsConsole {
 								}
 								if (searchContractTask.getContract() != null) {
 									ContractConsole contractConsole = new ContractConsole();
-									contractConsole.execute(consoleIn, webClient, searchContractTask.getContract());
+									contractConsole.execute(consoleIn, webClient, searchContractTask.getContract(), actingParty);
 								}
 							} else {
 								System.out.println("Invalid UUID");

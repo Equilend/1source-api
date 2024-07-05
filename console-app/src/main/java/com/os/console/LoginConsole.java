@@ -16,32 +16,43 @@ public class LoginConsole {
 
 		try {
 
-			System.out.print("Username: ");
-			String username;
+			if (authConfig.getAuth_username() == null) {
+				System.out.print("Username: ");
+				String username;
 
-			int retries = 0;
-			while ((username = consoleIn.readLine()) != null) {
-				username = username.trim();
-				if (username.length() == 0) {
-					if (retries == 3) {
-						System.exit(-1);
-						break;
+				int retries = 0;
+				while ((username = consoleIn.readLine()) != null) {
+					username = username.trim();
+					if (username.length() == 0) {
+						if (retries == 3) {
+							System.exit(-1);
+							break;
+						}
+						System.out.print("Username: ");
+						retries++;
+						continue;
 					}
-					System.out.print("Username: ");
-					retries++;
-					continue;
+					break;
 				}
-				break;
-			}
 
-			System.out.print("Password: ");
-			String password = consoleIn.readLine();
-			if (password == null || password.length() == 0) {
-				System.exit(-1);
-			}
+				System.out.print("Password: ");
+				String password = consoleIn.readLine();
+				if (password == null || password.length() == 0) {
+					System.exit(-1);
+				}
 
-			authConfig.setAuth_username(username);
-			authConfig.setAuth_password(password);
+				System.out.print("Party: ");
+				String party = consoleIn.readLine();
+				if (party == null || party.length() == 0) {
+					System.exit(-1);
+				}
+
+				authConfig.setAuth_username(username);
+				authConfig.setAuth_password(password);
+				authConfig.setAuth_party(party);
+			} else {
+				System.out.println("Using properties for authentication");
+			}
 			
 			System.out.print("Authenticating...");
 

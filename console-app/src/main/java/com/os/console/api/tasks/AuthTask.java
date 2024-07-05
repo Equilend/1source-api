@@ -43,7 +43,7 @@ public class AuthTask implements Runnable {
 		
 		if (ledgerToken != null) {
 			AuthConfig.TOKEN = ledgerToken;
-			logger.debug("Ledger access token: " + AuthConfig.TOKEN);
+			logger.debug("Ledger access token: " + AuthConfig.TOKEN.getAccess_token());
 		} else {
 			logger.warn("Not authorized");
 		}
