@@ -12,11 +12,13 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.console.api.AuthConfig;
 
 @SpringBootApplication
+@EnableScheduling
 @ConfigurationPropertiesScan
 public class SpringBootConsoleApp implements CommandLineRunner {
 
@@ -72,7 +74,7 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 					System.exit(0);
 				} else if (command.equalsIgnoreCase("c")) {
 					ContractsConsole contractsConsole = new ContractsConsole();
-					contractsConsole.execute(consoleIn, restWebClient);
+					contractsConsole.execute(consoleIn, restWebClient, authConfig.getAuth_party());
 				} else if (command.equalsIgnoreCase("u")) {
 					ReturnsConsole returnsConsole = new ReturnsConsole();
 					returnsConsole.execute(consoleIn, restWebClient);

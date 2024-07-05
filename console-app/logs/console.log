@@ -1,0 +1,108 @@
+2024-07-05T09:07:00.310-04:00  INFO 12992 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : Starting SpringBootConsoleApp using Java 17.0.10 with PID 12992 (C:\Users\mschoenberg\git\1source-api\console-app\target\classes started by mschoenberg in C:\Users\mschoenberg\git\1source-api\console-app)
+2024-07-05T09:07:00.320-04:00 DEBUG 12992 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-07-05T09:07:00.321-04:00  INFO 12992 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : No active profile set, falling back to 1 default profile: "default"
+2024-07-05T09:07:01.977-04:00  INFO 12992 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : Started SpringBootConsoleApp in 2.113 seconds (process running for 2.653)
+2024-07-05T09:07:01.981-04:00  INFO 12992 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : EXECUTING : command line runner
+2024-07-05T09:07:02.693-04:00 DEBUG 12992 --- [console-app] [main] com.os.console.api.tasks.AuthTask        : Ledger access token: com.os.console.api.AuthToken@6c33da7a
+2024-07-05T09:07:06.970-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 895722
+2024-07-05T09:07:11.971-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 890720
+2024-07-05T09:07:17.009-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 885682
+2024-07-05T09:07:21.970-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 880721
+2024-07-05T09:07:26.975-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 875716
+2024-07-05T09:07:31.971-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 870720
+2024-07-05T09:07:36.974-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 865717
+2024-07-05T09:07:41.970-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 860721
+2024-07-05T09:07:46.965-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 855726
+2024-07-05T09:07:51.964-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 850727
+2024-07-05T09:07:56.965-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 845726
+2024-07-05T09:08:01.978-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 840713
+2024-07-05T09:08:06.968-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 835723
+2024-07-05T09:08:11.972-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 830719
+2024-07-05T09:08:16.978-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 825713
+2024-07-05T09:08:21.968-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 820723
+2024-07-05T09:08:26.969-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 815722
+2024-07-05T09:08:31.967-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 810724
+2024-07-05T09:08:36.974-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 805717
+2024-07-05T09:08:41.967-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 800724
+2024-07-05T09:08:46.968-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 795723
+2024-07-05T09:08:51.974-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 790717
+2024-07-05T09:08:56.975-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 785716
+2024-07-05T09:09:01.973-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 780718
+2024-07-05T09:09:06.971-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 775720
+2024-07-05T09:09:11.972-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 770719
+2024-07-05T09:09:16.978-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 765713
+2024-07-05T09:09:21.972-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 760719
+2024-07-05T09:09:26.972-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 755719
+2024-07-05T09:09:31.976-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 750715
+2024-07-05T09:09:36.976-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 745715
+2024-07-05T09:09:41.968-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 740723
+2024-07-05T09:09:46.970-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 735721
+2024-07-05T09:09:51.980-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 730711
+2024-07-05T09:09:56.971-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 725720
+2024-07-05T09:10:01.972-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 720719
+2024-07-05T09:10:06.970-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 715721
+2024-07-05T09:10:11.967-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 710724
+2024-07-05T09:10:16.976-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 705715
+2024-07-05T09:10:21.969-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 700722
+2024-07-05T09:10:26.971-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 695720
+2024-07-05T09:10:32.003-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 690688
+2024-07-05T09:10:36.969-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 685722
+2024-07-05T09:10:41.970-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 680721
+2024-07-05T09:10:46.981-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 675710
+2024-07-05T09:10:51.977-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 670714
+2024-07-05T09:10:56.971-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 665720
+2024-07-05T09:11:01.987-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 660704
+2024-07-05T09:11:06.970-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 655721
+2024-07-05T09:11:11.969-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 650722
+2024-07-05T09:11:16.977-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 645714
+2024-07-05T09:11:21.980-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 640711
+2024-07-05T09:11:26.978-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 635713
+2024-07-05T09:11:31.981-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 630710
+2024-07-05T09:11:36.973-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 625718
+2024-07-05T09:11:41.969-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 620722
+2024-07-05T09:11:46.979-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 615712
+2024-07-05T09:11:51.973-04:00 DEBUG 12992 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 610718
+2024-07-05T09:12:48.526-04:00  INFO 868 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : Starting SpringBootConsoleApp using Java 17.0.10 with PID 868 (C:\Users\mschoenberg\git\1source-api\console-app\target\classes started by mschoenberg in C:\Users\mschoenberg\git\1source-api\console-app)
+2024-07-05T09:12:48.527-04:00 DEBUG 868 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-07-05T09:12:48.528-04:00  INFO 868 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : No active profile set, falling back to 1 default profile: "default"
+2024-07-05T09:12:52.202-04:00  INFO 868 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : Started SpringBootConsoleApp in 4.272 seconds (process running for 4.768)
+2024-07-05T09:12:52.208-04:00  INFO 868 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : EXECUTING : command line runner
+2024-07-05T09:12:53.258-04:00 DEBUG 868 --- [console-app] [main] com.os.console.api.tasks.AuthTask        : Ledger access token: com.os.console.api.AuthToken@68631b1d
+2024-07-05T09:12:57.177-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 896078
+2024-07-05T09:13:02.176-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 891079
+2024-07-05T09:13:07.178-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 886077
+2024-07-05T09:13:12.180-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 881075
+2024-07-05T09:13:17.176-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 876079
+2024-07-05T09:13:22.171-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 871084
+2024-07-05T09:13:27.179-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 866076
+2024-07-05T09:13:32.177-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 861078
+2024-07-05T09:13:37.176-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 856079
+2024-07-05T09:13:42.174-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 851081
+2024-07-05T09:13:47.176-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 846079
+2024-07-05T09:13:52.179-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 841076
+2024-07-05T09:13:57.179-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 836076
+2024-07-05T09:14:02.168-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 831087
+2024-07-05T09:14:07.177-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 826078
+2024-07-05T09:14:12.171-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 821084
+2024-07-05T09:14:17.182-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 816073
+2024-07-05T09:14:22.170-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 811085
+2024-07-05T09:14:27.180-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 806075
+2024-07-05T09:14:32.181-04:00 DEBUG 868 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 801074
+2024-07-05T09:14:51.818-04:00  INFO 14036 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : Starting SpringBootConsoleApp using Java 17.0.10 with PID 14036 (C:\Users\mschoenberg\git\1source-api\console-app\target\classes started by mschoenberg in C:\Users\mschoenberg\git\1source-api\console-app)
+2024-07-05T09:14:51.819-04:00 DEBUG 14036 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : Running with Spring Boot v3.3.1, Spring v6.1.10
+2024-07-05T09:14:51.820-04:00  INFO 14036 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : No active profile set, falling back to 1 default profile: "default"
+2024-07-05T09:14:53.555-04:00  INFO 14036 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : Started SpringBootConsoleApp in 2.301 seconds (process running for 2.866)
+2024-07-05T09:14:53.559-04:00  INFO 14036 --- [console-app] [main] com.os.console.SpringBootConsoleApp      : EXECUTING : command line runner
+2024-07-05T09:14:54.365-04:00 DEBUG 14036 --- [console-app] [main] com.os.console.api.tasks.AuthTask        : Ledger access token: eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI2YUFiZ2RLQUVyQVhCN2dRV2ZBbDc0a09Qck52WFdhSS1xTjBDckJkN0FjIn0.eyJleHAiOjE3MjAxODYxOTQsImlhdCI6MTcyMDE4NTI5NCwianRpIjoiYTk2ZTIzMzQtNjEzNS00MDkyLWI2YzctODA3NGFhOTg5YzA0IiwiaXNzIjoiaHR0cHM6Ly9xYWF1dGguZXF1aWxlbmQuY29tL2F1dGgvcmVhbG1zLzFTb3VyY2UiLCJzdWIiOiI3N2UwZGFhMC0wMDI1LTQ1YTgtYTM2NC00NjZiMWFjYjRiYmMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJjYW50b24tcGFydGljaXBhbnQxLWNsaWVudCIsInNlc3Npb25fc3RhdGUiOiIwOGRjNWRiNy05ZjRmLTQwMmItOGU0MC00ZDY2NjM1YTBmMWQiLCJhY3IiOiIxIiwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbImRlZmF1bHQtcm9sZXMtMXNvdXJjZSIsIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6ImVtYWlsIHByb2ZpbGUgZGFtbF9sZWRnZXJfYXBpIiwic2lkIjoiMDhkYzVkYjctOWY0Zi00MDJiLThlNDAtNGQ2NjYzNWEwZjFkIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJncm91cHMiOlsiL1BhcnRpY2lwYW50MS9FUUxSRVQiXSwicHJlZmVycmVkX3VzZXJuYW1lIjoiZXF1aWxlbmRyMnNyZXR1cm5zdXNlciJ9.E5MibiRSgz9kRbcPSt2w48_5gBHznHPU-iH3UtqtZxckCr_pTy_WvMqSAupi1nb932iLJoQd1aYQ5A0XiIB3kSAQwTGqkhkMIcCKWUhAQa8-S8YlYnVVsJu_QXBmCpJO6bTjV6Lw9H5nTT5n7GJCrd0NetJXGhNZKHHg5Y3Dhf_bSQrP7P93V7m8SayAWadLIqD-JTfmTWoeiZSRWKQcxSetDLm02MPokztZsD50T42wGThv_JKatN-OZ5nfqcJa2eDxjQejAx4HO_p7Jk0r0zWG4rvcRla8686tlQepk1gYBD04riQgoj3QDaM5EqDvSSzHEAj8CKlVctbaoVsqUg
+2024-07-05T09:14:58.553-04:00 DEBUG 14036 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 895811
+2024-07-05T09:15:03.542-04:00 DEBUG 14036 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 890822
+2024-07-05T09:15:08.545-04:00 DEBUG 14036 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 885819
+2024-07-05T09:15:13.547-04:00 DEBUG 14036 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 880817
+2024-07-05T09:15:18.553-04:00 DEBUG 14036 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 875811
+2024-07-05T09:15:23.545-04:00 DEBUG 14036 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 870819
+2024-07-05T09:15:28.553-04:00 DEBUG 14036 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 865811
+2024-07-05T09:15:33.547-04:00 DEBUG 14036 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 860817
+2024-07-05T09:15:38.553-04:00 DEBUG 14036 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 855811
+2024-07-05T09:15:43.550-04:00 DEBUG 14036 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 850814
+2024-07-05T09:15:48.545-04:00 DEBUG 14036 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 845819
+2024-07-05T09:15:53.553-04:00 DEBUG 14036 --- [console-app] [scheduling-1] com.os.console.api.ScheduledKeepAlive    : Token TTL: 840811

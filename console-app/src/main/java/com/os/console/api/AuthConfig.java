@@ -14,20 +14,20 @@ public class AuthConfig {
 
 	private String auth_username;
 	private String auth_password;
-	private String party_id;
+	private String auth_party;
 
 	private final String api_uri;
 
 	@ConstructorBinding
 	public AuthConfig(String auth_uri, String auth_client_id, String auth_client_secret, String auth_username,
-			String auth_password, String party_id, String api_uri) {
+			String auth_password, String auth_party, String api_uri) {
 		super();
 		this.auth_uri = auth_uri;
 		this.auth_client_id = auth_client_id;
 		this.auth_client_secret = auth_client_secret;
 		this.auth_username = auth_username;
 		this.auth_password = auth_password;
-		this.party_id = party_id;
+		this.auth_party = auth_party;
 		this.api_uri = api_uri;
 	}
 
@@ -51,12 +51,12 @@ public class AuthConfig {
 		this.auth_password = auth_password;
 	}
 
-	public String getParty_id() {
-		return party_id;
+	public String getAuth_party() {
+		return auth_party;
 	}
 
-	public void setParty_id(String party_id) {
-		this.party_id = party_id;
+	public void setAuth_party(String auth_party) {
+		this.auth_party = auth_party;
 	}
 
 	public String getAuth_client_id() {
