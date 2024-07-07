@@ -14,7 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.os.client.model.LedgerResponse;
 import com.os.client.model.VenueReferenceKeyUpdate;
-import com.os.console.api.AuthConfig;
+import com.os.console.api.ConsoleConfig;
 import com.os.console.api.LocalDateTypeGsonAdapter;
 import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
 
@@ -49,7 +49,7 @@ public class UpdateContractVenueKeyTask implements Runnable {
 
 		LedgerResponse ledgerResponse = webClient.patch().uri("/contracts/" + contractId)
 				.contentType(MediaType.APPLICATION_JSON).bodyValue(json)
-				.headers(h -> h.setBearerAuth(AuthConfig.TOKEN.getAccess_token())).retrieve()
+				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					System.out.println(response.statusCode().toString());
 					return Mono.empty();

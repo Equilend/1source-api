@@ -6,47 +6,47 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Delegation;
+import com.os.client.model.Party;
+import com.os.client.model.Parties;
 import com.os.console.api.ConsoleConfig;
 
 import reactor.core.publisher.Mono;
 
-public class SearchDelegationTask implements Runnable {
+public class SearchPartyTask implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(SearchDelegationTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SearchPartyTask.class);
 
 	private WebClient webClient;
-	private String delegationId;
+	private String partyId;
 
-	private Delegation delegation;
+	private Party party;
 	
-	public SearchDelegationTask(WebClient webClient, String delegationId) {
+	public SearchPartyTask(WebClient webClient, String partyId) {
 		this.webClient = webClient;
-		this.delegationId = delegationId;
+		this.partyId = partyId;
 	}
 
 	@Override
 	public void run() {
 
-		delegation = webClient.get().uri("/delegations/" + delegationId)
+		Parties parties = webClient.get().uri("/parties?partyId=" + partyId)
 				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());
 					return Mono.empty();
-				}).bodyToMono(Delegation.class).block();
+				}).bodyToMono(Parties.class).block();
 
-		if (delegation == null) {
-			logger.warn("Invalid delegation object or delegation not found");
-			System.out.println("delegation not found");
+		if (parties == null || parties.size() == 0) {
+			logger.warn("Invalid party object or party not found");
+			System.out.println("party not found");
 		} else {
+			party = parties.get(0);
 			System.out.println("complete");
-			System.out.println();			
 		}
 	}
 
-	public Delegation getDelegation() {
-		return delegation;
+	public Party getParty() {
+		return party;
 	}
-	
 	
 }

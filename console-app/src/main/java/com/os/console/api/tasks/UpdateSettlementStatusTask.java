@@ -18,7 +18,7 @@ import com.os.client.model.SettlementStatus;
 import com.os.client.model.SettlementStatusUpdate;
 import com.os.client.model.TransactingParties;
 import com.os.client.model.TransactingParty;
-import com.os.console.api.AuthConfig;
+import com.os.console.api.ConsoleConfig;
 import com.os.console.api.LocalDateTypeGsonAdapter;
 import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
 
@@ -67,7 +67,7 @@ public class UpdateSettlementStatusTask implements Runnable {
 
 		LedgerResponse ledgerResponse = webClient.patch().uri("/contracts/" + contract.getContractId())
 				.contentType(MediaType.APPLICATION_JSON).bodyValue(json)
-				.headers(h -> h.setBearerAuth(AuthConfig.TOKEN.getAccess_token())).retrieve()
+				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					System.out.println(response.statusCode().toString());
 					return Mono.empty();

@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.os.client.model.Contract;
+import com.os.console.api.ConsoleConfig;
 import com.os.console.api.LocalDateTypeGsonAdapter;
 import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
 import com.os.console.api.tasks.SearchContractRecallTask;
@@ -27,7 +28,7 @@ public class ContractConsole {
 
 	private static final Logger logger = LoggerFactory.getLogger(ContractConsole.class);
 
-	public void execute(BufferedReader consoleIn, WebClient webClient, Contract contract, String actingParty) {
+	public void execute(BufferedReader consoleIn, ConsoleConfig consoleConfig, WebClient webClient, Contract contract) {
 
 		String command = null;
 		System.out.print("/contracts/" + contract.getContractId() + " > ");
@@ -194,7 +195,7 @@ public class ContractConsole {
 				} else if (command.equalsIgnoreCase("t")) {
 					System.out.print("Updating settlement status to SETTLED...");
 					UpdateSettlementStatusTask updateSettlementStatusTask = new UpdateSettlementStatusTask(webClient,
-							contract, actingParty);
+							contract, consoleConfig.getAuth_party());
 					Thread taskT = new Thread(updateSettlementStatusTask);
 					taskT.run();
 					try {

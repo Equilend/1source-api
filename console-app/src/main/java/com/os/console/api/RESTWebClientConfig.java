@@ -21,7 +21,7 @@ import com.os.client.model.Rate;
 public class RESTWebClientConfig {
 
 	@Autowired
-	AuthConfig authConfig;
+	ConsoleConfig authConfig;
 
 	@Bean
 	public WebClient restWebClient() {
