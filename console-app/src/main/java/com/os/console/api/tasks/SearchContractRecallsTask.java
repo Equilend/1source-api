@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.os.client.model.Contract;
 import com.os.client.model.Recall;
 import com.os.client.model.Recalls;
-import com.os.console.api.AuthConfig;
+import com.os.console.api.ConsoleConfig;
 import com.os.console.util.ConsoleOutputUtil;
 
 import reactor.core.publisher.Mono;
@@ -30,7 +30,7 @@ public class SearchContractRecallsTask implements Runnable {
 	public void run() {
 		
 		Recalls recalls = webClient.get().uri("/contracts/" + contract.getContractId() + "/recalls")
-				.headers(h -> h.setBearerAuth(AuthConfig.TOKEN.getAccess_token())).retrieve()
+				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());
 					return Mono.empty();

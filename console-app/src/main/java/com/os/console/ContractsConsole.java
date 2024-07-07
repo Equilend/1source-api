@@ -7,14 +7,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.SearchContractTask;
 import com.os.console.api.tasks.SearchContractsTask;
+import com.os.console.api.tasks.SearchPartyTask;
 
 public class ContractsConsole {
 
 	private static final Logger logger = LoggerFactory.getLogger(ContractsConsole.class);
 
-	public void execute(BufferedReader consoleIn, WebClient webClient, String actingParty) {
+	public void execute(BufferedReader consoleIn, ConsoleConfig consoleConfig, WebClient webClient) {
 
 		String command = null;
 		System.out.print("/contracts > ");
@@ -56,13 +58,39 @@ public class ContractsConsole {
 								}
 								if (searchContractTask.getContract() != null) {
 									ContractConsole contractConsole = new ContractConsole();
-									contractConsole.execute(consoleIn, webClient, searchContractTask.getContract(), actingParty);
+									contractConsole.execute(consoleIn, consoleConfig, webClient, searchContractTask.getContract());
 								}
 							} else {
 								System.out.println("Invalid UUID");
 							}
 						} catch (Exception u) {
 							System.out.println("Invalid UUID");
+						}
+					}
+				} else if (command.startsWith("p ") || command.startsWith("P ")) {
+					if (command.length() > 100) {
+						System.out.println("Invalid Party Id");
+					} else if (consoleConfig.getAuth_party().equals(command)) {
+						System.out.println("You cannot propose a contract to yourself");
+					} else {
+					
+						String partyId = command.substring(2);
+						try {
+							System.out.print("Verifying party " + partyId + "...");
+							SearchPartyTask searchPartyTask = new SearchPartyTask(webClient, partyId);
+							Thread taskT = new Thread(searchPartyTask);
+							taskT.run();
+							try {
+								taskT.join();
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+							if (searchPartyTask.getParty() != null) {
+								ContractProposalConsole contractProposalConsole = new ContractProposalConsole();
+								contractProposalConsole.execute(consoleIn, consoleConfig, webClient, ConsoleConfig.ACTING_PARTY, searchPartyTask.getParty(), ConsoleConfig.ACTING_AS);
+							}
+						} catch (Exception u) {
+							System.out.println("Invalid party id");
 						}
 					}
 				} else {
@@ -84,6 +112,7 @@ public class ContractsConsole {
 		System.out.println("-----------------------");
 		System.out.println("A               - List all contracts");
 		System.out.println("S <Contract Id> - Load a contract by Id");
+		System.out.println("P <Party ID>    - Propose a contract to Party Id");
 		System.out.println("X               - Go back");
 		System.out.println();
 	}

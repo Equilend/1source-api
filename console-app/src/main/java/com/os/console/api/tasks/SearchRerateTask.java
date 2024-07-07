@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Rerate;
-import com.os.console.api.AuthConfig;
+import com.os.console.api.ConsoleConfig;
 
 import reactor.core.publisher.Mono;
 
@@ -29,7 +29,7 @@ public class SearchRerateTask implements Runnable {
 	public void run() {
 
 		rerate = webClient.get().uri("/rerates/" + rerateId)
-				.headers(h -> h.setBearerAuth(AuthConfig.TOKEN.getAccess_token())).retrieve()
+				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());
 					return Mono.empty();

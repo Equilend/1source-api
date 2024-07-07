@@ -1,7 +1,6 @@
 package com.os.console;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.InputStreamReader;
 
 import org.slf4j.Logger;
@@ -15,7 +14,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.console.api.AuthConfig;
+import com.os.console.api.ConsoleConfig;
 
 @SpringBootApplication
 @EnableScheduling
@@ -25,7 +24,7 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 	private static final Logger logger = LoggerFactory.getLogger(SpringBootConsoleApp.class);
 
 	@Autowired
-	AuthConfig authConfig;
+	ConsoleConfig authConfig;
 	
 	@Autowired
 	WebClient restWebClient;
@@ -56,12 +55,13 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 		BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in));
 
 		LoginConsole loginConsole = new LoginConsole();
-		loginConsole.login(authConfig, consoleIn);
+		loginConsole.login(authConfig, restWebClient, consoleIn);
 
-		if (AuthConfig.TOKEN == null) {
+		if (ConsoleConfig.TOKEN == null || ConsoleConfig.ACTING_PARTY == null || ConsoleConfig.ACTING_AS == null) {
 			System.exit(-2);
 		}
 		
+		System.out.println();
 		String command = null;
 		System.out.print("> ");
 
@@ -74,7 +74,7 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 					System.exit(0);
 				} else if (command.equalsIgnoreCase("c")) {
 					ContractsConsole contractsConsole = new ContractsConsole();
-					contractsConsole.execute(consoleIn, restWebClient, authConfig.getAuth_party());
+					contractsConsole.execute(consoleIn, authConfig, restWebClient);
 				} else if (command.equalsIgnoreCase("u")) {
 					ReturnsConsole returnsConsole = new ReturnsConsole();
 					returnsConsole.execute(consoleIn, restWebClient);

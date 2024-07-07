@@ -8,16 +8,16 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.console.api.AuthConfig;
 import com.os.console.api.AuthToken;
+import com.os.console.api.ConsoleConfig;
 
 public class AuthTask implements Runnable {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthTask.class);
 
-	AuthConfig authConfig;
+	ConsoleConfig authConfig;
 
-	public AuthTask(AuthConfig authConfig) {
+	public AuthTask(ConsoleConfig authConfig) {
 		this.authConfig = authConfig;
 	}
 	
@@ -42,8 +42,8 @@ public class AuthTask implements Runnable {
 	      .block();
 		
 		if (ledgerToken != null) {
-			AuthConfig.TOKEN = ledgerToken;
-			logger.debug("Ledger access token: " + AuthConfig.TOKEN.getAccess_token());
+			ConsoleConfig.TOKEN = ledgerToken;
+			logger.debug("Ledger access token: " + ConsoleConfig.TOKEN.getAccess_token());
 		} else {
 			logger.warn("Not authorized");
 		}
