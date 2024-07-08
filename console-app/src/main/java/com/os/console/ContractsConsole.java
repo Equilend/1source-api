@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.os.client.model.Party;
+import com.os.client.model.PartyRole;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.SearchContractTask;
 import com.os.console.api.tasks.SearchContractsTask;
@@ -87,7 +89,7 @@ public class ContractsConsole {
 							}
 							if (searchPartyTask.getParty() != null) {
 								ContractProposalConsole contractProposalConsole = new ContractProposalConsole();
-								contractProposalConsole.execute(consoleIn, consoleConfig, webClient, ConsoleConfig.ACTING_PARTY, searchPartyTask.getParty(), ConsoleConfig.ACTING_AS);
+								contractProposalConsole.execute(consoleIn, consoleConfig, webClient, (PartyRole.BORROWER.equals(ConsoleConfig.ACTING_AS) ? ConsoleConfig.ACTING_PARTY : searchPartyTask.getParty()), (PartyRole.LENDER.equals(ConsoleConfig.ACTING_AS) ? ConsoleConfig.ACTING_PARTY : searchPartyTask.getParty()), ConsoleConfig.ACTING_AS);
 							}
 						} catch (Exception u) {
 							System.out.println("Invalid party id");
