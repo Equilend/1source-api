@@ -42,6 +42,7 @@ import com.os.client.model.Venues;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.LocalDateTypeGsonAdapter;
 import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
+import com.os.console.api.tasks.ProposeContractTask;
 import com.os.console.util.InstrumentUtil;
 
 public class ContractProposalConsole {
@@ -84,8 +85,19 @@ public class ContractProposalConsole {
 
 				} else if (command.equalsIgnoreCase("s")) {
 				
-					System.out.println("TODO...submit contract propsal");
-					System.out.println();
+					try {
+						System.out.print("Proposing contract...");
+						ProposeContractTask proposeContractTask = new ProposeContractTask(webClient, contractProposal);
+						Thread taskT = new Thread(proposeContractTask);
+						taskT.run();
+						try {
+							taskT.join();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					} catch (Exception u) {
+						System.out.println("Error proposing contract");
+					}
 
 				} else {
 					System.out.println("Unknown command");
