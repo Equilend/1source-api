@@ -1,6 +1,7 @@
 package com.os.console;
 
 import java.io.BufferedReader;
+import java.io.Console;
 import java.io.InputStreamReader;
 
 import org.slf4j.Logger;
@@ -86,7 +87,7 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 					reratesConsole.execute(consoleIn, restWebClient);
 				} else if (command.equalsIgnoreCase("d")) {
 					DelegationsConsole delegationsConsole = new DelegationsConsole();
-					delegationsConsole.execute(consoleIn, restWebClient);
+					delegationsConsole.execute(consoleIn, authConfig, restWebClient);
 				} else {
 					System.out.println("Unknown command");
 				}

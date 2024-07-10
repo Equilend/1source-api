@@ -13,26 +13,34 @@ import com.google.gson.GsonBuilder;
 import com.os.client.model.Delegation;
 import com.os.console.api.LocalDateTypeGsonAdapter;
 import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
+import com.os.console.api.tasks.ApproveDelegationTask;
+import com.os.console.api.tasks.CancelDelegationTask;
+import com.os.console.api.tasks.DeclineDelegationTask;
+import com.os.console.api.tasks.SearchDelegationTask;
 
 public class DelegationConsole {
 
 	private static final Logger logger = LoggerFactory.getLogger(DelegationConsole.class);
 
-	public void execute(BufferedReader consoleIn, WebClient webClient, Delegation delegation) {
+	Delegation delegation;
+	
+	public void execute(BufferedReader consoleIn, WebClient webClient, Delegation origDelegation) {
 
+		this.delegation = origDelegation;
+		
 		String command = null;
 		System.out.print("/delegations/" + delegation.getDelegationId() + " > ");
 
 		try {
 			while ((command = consoleIn.readLine()) != null) {
 				command = command.trim();
-				if (command.equals("?") || command.equalsIgnoreCase("help")) {
+				if (command.equals("?") || command.equalsIgnoreCase("HELP")) {
 					printMainContractHelp();
-				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
+				} else if (command.equalsIgnoreCase("QUIT") || command.equalsIgnoreCase("EXIT") || command.equalsIgnoreCase("Q")) {
 					System.exit(0);
-				} else if (command.equalsIgnoreCase("x")) {
+				} else if (command.equalsIgnoreCase("X")) {
 					break;
-				} else if (command.equalsIgnoreCase("j")) {
+				} else if (command.equalsIgnoreCase("J")) {
 
 					Gson gson = new GsonBuilder()
 							.setPrettyPrinting()
@@ -43,6 +51,39 @@ public class DelegationConsole {
 					System.out.println(gson.toJson(delegation));
 					System.out.println();
 
+				} else if (command.equalsIgnoreCase("A")) {
+					System.out.print("Approving delegation...");
+					ApproveDelegationTask approveDelegationTask = new ApproveDelegationTask(webClient, delegation);
+					Thread taskT = new Thread(approveDelegationTask);
+					taskT.run();
+					try {
+						taskT.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					refreshDelegation(webClient);
+				} else if (command.equalsIgnoreCase("C")) {
+					System.out.print("Canceling delegation...");
+					CancelDelegationTask cancelDelegationTask = new CancelDelegationTask(webClient, delegation);
+					Thread taskT = new Thread(cancelDelegationTask);
+					taskT.run();
+					try {
+						taskT.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					refreshDelegation(webClient);
+				} else if (command.equalsIgnoreCase("D")) {
+					System.out.print("Declining delegation...");
+					DeclineDelegationTask declineDelegationTask = new DeclineDelegationTask(webClient, delegation);
+					Thread taskT = new Thread(declineDelegationTask);
+					taskT.run();
+					try {
+						taskT.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					refreshDelegation(webClient);
 				} else {
 					System.out.println("Unknown command");
 				}
@@ -56,11 +97,28 @@ public class DelegationConsole {
 
 	}
 
+	private void refreshDelegation(WebClient webClient) {
+		
+		System.out.print("Refreshing delegation " + delegation.getDelegationId() + "...");
+		SearchDelegationTask searchDelegationTask = new SearchDelegationTask(webClient, delegation.getDelegationId());
+		Thread taskT = new Thread(searchDelegationTask);
+		taskT.run();
+		try {
+			taskT.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		delegation = searchDelegationTask.getDelegation();
+	}
+	
 	private void printMainContractHelp() {
 		System.out.println();
 		System.out.println("Delgation Menu");
 		System.out.println("-----------------------");
 		System.out.println("J             - Print JSON");
+		System.out.println("A             - Approve");
+		System.out.println("C             - Cancel");
+		System.out.println("D             - Decline");
 		System.out.println("X             - Go back");
 		System.out.println();
 	}
