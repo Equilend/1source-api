@@ -6,8 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Party;
 import com.os.client.model.Parties;
+import com.os.client.model.Party;
 import com.os.console.api.ConsoleConfig;
 
 import reactor.core.publisher.Mono;

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.os.client.model.Party;
 import com.os.client.model.PartyRole;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.AuthTask;
@@ -56,7 +57,7 @@ public class LoginConsole {
 			} else {
 				System.out.println("Using properties for authentication");
 			}
-			
+
 			System.out.print("Authenticating...");
 
 			AuthTask authTask = new AuthTask(authConfig);
@@ -74,23 +75,6 @@ public class LoginConsole {
 				e.printStackTrace();
 			}
 
-			System.out.print("Authorizing " + authConfig.getAuth_party() + "...");
-
-			SearchPartyTask searchPartyTask = new SearchPartyTask(webClient, authConfig.getAuth_party());
-			taskT = new Thread(searchPartyTask);
-			taskT.run();
-			try {
-				taskT.join();
-				if (searchPartyTask.getParty() != null) {
-					ConsoleConfig.ACTING_PARTY = searchPartyTask.getParty();
-				} else {
-					System.out.println("acting party not recognized");
-					return;
-				}
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-
 			System.out.print("Verify acting as...");
 
 			PartyRole actingAs = PartyRole.fromValue(authConfig.getAuth_actAs());
@@ -99,7 +83,35 @@ public class LoginConsole {
 				System.out.println(ConsoleConfig.ACTING_AS);
 			} else {
 				System.out.println("act as not set properly");
+				return;
 			}
+
+			if (PartyRole.VENUE.equals(ConsoleConfig.ACTING_AS)) {
+				Party venueParty = new Party();
+				venueParty.setPartyId(authConfig.getAuth_party());
+				venueParty.setPartyName("Venue " + authConfig.getAuth_party());
+				venueParty.setGleifLei("213800BN4DRR1ADYGP92");
+				ConsoleConfig.ACTING_PARTY = venueParty;
+				System.out.println("TODO - Authorize venue party");
+			} else {
+				System.out.print("Authorizing " + authConfig.getAuth_party() + "...");
+
+				SearchPartyTask searchPartyTask = new SearchPartyTask(webClient, authConfig.getAuth_party());
+				taskT = new Thread(searchPartyTask);
+				taskT.run();
+				try {
+					taskT.join();
+					if (searchPartyTask.getParty() != null) {
+						ConsoleConfig.ACTING_PARTY = searchPartyTask.getParty();
+					} else {
+						System.out.println("acting party not recognized");
+						return;
+					}
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+
 		} catch (Exception e) {
 			System.out.println("Error during login");
 			logger.error("Exception during login: " + e.getMessage());
