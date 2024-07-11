@@ -15,40 +15,51 @@ import com.os.client.model.Rerate;
 import com.os.console.api.LocalDateTypeGsonAdapter;
 import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
 
-public class ContractRerateConsole {
+public class ContractRerateConsole extends AbstractConsole {
 
 	private static final Logger logger = LoggerFactory.getLogger(ContractRerateConsole.class);
 
-	public void execute(BufferedReader consoleIn, WebClient webClient, Contract contract, Rerate rerate) {
+	Contract contract;
+	Rerate rerate;
+
+	protected void prompt() {
+		System.out.print("/contracts/" + contract.getContractId() + "/rerates/" + rerate.getRerateId() + " > ");
+	}
+
+	public void execute(BufferedReader consoleIn, WebClient webClient, Contract origContract, Rerate origRerate) {
+
+		this.contract = origContract;
+		this.rerate = origRerate;
 
 		String command = null;
-		System.out.print("/contracts/" + contract.getContractId() + "/rerates/" + rerate.getRerateId() + " > ");
+		prompt();
 
 		try {
 			while ((command = consoleIn.readLine()) != null) {
-				command = command.trim();
-				if (command.equals("?") || command.equalsIgnoreCase("help")) {
-					printMainContractHelp();
-				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
-					System.exit(0);
-				} else if (command.equalsIgnoreCase("x")) {
+
+				command = command.trim().toUpperCase();
+
+				if (checkSystemCommand(command)) {
+					continue;
+				} else if (goBackMenu(command)) {
 					break;
-				} else if (command.equalsIgnoreCase("j")) {
-
-					Gson gson = new GsonBuilder()
-							.setPrettyPrinting()
-						    .registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
-						    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
-						    .create();
-					
-					System.out.println(gson.toJson(rerate));
-					System.out.println();
-
 				} else {
-					System.out.println("Unknown command");
-				}
+					if (command.equals("J")) {
 
-				System.out.print("/contracts/" + contract.getContractId() + "/rerates/" + rerate.getRerateId() + " > ");
+						Gson gson = new GsonBuilder().setPrettyPrinting()
+								.registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
+								.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
+								.create();
+
+						System.out.println(gson.toJson(rerate));
+						System.out.println();
+
+					} else {
+						System.out.println("Unknown command");
+					}
+				}
+				
+				prompt();
 			}
 		} catch (Exception e) {
 			logger.error("Exception with rerates command: " + command);
@@ -57,13 +68,11 @@ public class ContractRerateConsole {
 
 	}
 
-	private void printMainContractHelp() {
-		System.out.println();
-		System.out.println("Rerate Menu");
+	protected void printMenu() {
+		System.out.println("Contract Rerate Menu");
 		System.out.println("-----------------------");
 		System.out.println("J             - Print JSON");
 		System.out.println("X             - Go back");
-		System.out.println();
 	}
 
 }

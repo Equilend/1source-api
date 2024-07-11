@@ -1,7 +1,6 @@
 package com.os.console;
 
 import java.io.BufferedReader;
-import java.io.Console;
 import java.io.InputStreamReader;
 
 import org.slf4j.Logger;

@@ -13,7 +13,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.os.client.model.Delegation;
-import com.os.client.model.DelegationProposal;
 import com.os.client.model.LedgerResponse;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.LedgerException;
