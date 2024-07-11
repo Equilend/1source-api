@@ -14,40 +14,49 @@ import com.os.client.model.Rerate;
 import com.os.console.api.LocalDateTypeGsonAdapter;
 import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
 
-public class RerateConsole {
+public class RerateConsole extends AbstractConsole {
 
 	private static final Logger logger = LoggerFactory.getLogger(RerateConsole.class);
 
-	public void execute(BufferedReader consoleIn, WebClient webClient, Rerate rerate) {
-
-		String command = null;
+	Rerate rerate;
+	
+	protected void prompt() {
 		System.out.print("/rerates/" + rerate.getRerateId() + " > ");
+	}
+
+	public void execute(BufferedReader consoleIn, WebClient webClient, Rerate origRerate) {
+
+		this.rerate = origRerate;
+		
+		String command = null;
+		prompt();
 
 		try {
 			while ((command = consoleIn.readLine()) != null) {
-				command = command.trim();
-				if (command.equals("?") || command.equalsIgnoreCase("help")) {
-					printMainContractHelp();
-				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
-					System.exit(0);
-				} else if (command.equalsIgnoreCase("x")) {
+
+				command = command.trim().toUpperCase();
+
+				if (checkSystemCommand(command)) {
+					continue;
+				} else if (goBackMenu(command)) {
 					break;
-				} else if (command.equalsIgnoreCase("j")) {
-
-					Gson gson = new GsonBuilder()
-							.setPrettyPrinting()
-						    .registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
-						    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
-						    .create();
-					
-					System.out.println(gson.toJson(rerate));
-					System.out.println();
-
 				} else {
-					System.out.println("Unknown command");
+					if (command.equals("J")) {
+
+						Gson gson = new GsonBuilder().setPrettyPrinting()
+								.registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
+								.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
+								.create();
+
+						System.out.println(gson.toJson(rerate));
+						System.out.println();
+
+					} else {
+						System.out.println("Unknown command");
+					}
 				}
 
-				System.out.print("/rerates/" + rerate.getRerateId() + " > ");
+				prompt();
 			}
 		} catch (Exception e) {
 			logger.error("Exception with rerates command: " + command);
@@ -56,13 +65,11 @@ public class RerateConsole {
 
 	}
 
-	private void printMainContractHelp() {
-		System.out.println();
+	protected void printMenu() {
 		System.out.println("Rerate Menu");
 		System.out.println("-----------------------");
 		System.out.println("J             - Print JSON");
 		System.out.println("X             - Go back");
-		System.out.println();
 	}
 
 }

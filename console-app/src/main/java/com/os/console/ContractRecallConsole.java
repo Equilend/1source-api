@@ -15,40 +15,50 @@ import com.os.client.model.Recall;
 import com.os.console.api.LocalDateTypeGsonAdapter;
 import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
 
-public class ContractRecallConsole {
+public class ContractRecallConsole extends AbstractConsole {
 
 	private static final Logger logger = LoggerFactory.getLogger(ContractRecallConsole.class);
 
-	public void execute(BufferedReader consoleIn, WebClient webClient, Contract contract, Recall recall) {
+	private Contract contract;
+	private Recall recall;
+
+	protected void prompt() {
+		System.out.print("/contracts/" + contract.getContractId() + "/recalls/" + recall.getRecallId() + " > ");
+	}
+
+	public void execute(BufferedReader consoleIn, WebClient webClient, Contract origContract, Recall origRecall) {
+
+		this.contract = origContract;
+		this.recall = origRecall;
 
 		String command = null;
-		System.out.print("/contracts/" + contract.getContractId() + "/recalls/" + recall.getRecallId() + " > ");
+		prompt();
 
 		try {
 			while ((command = consoleIn.readLine()) != null) {
-				command = command.trim();
-				if (command.equals("?") || command.equalsIgnoreCase("help")) {
-					printMainContractHelp();
-				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
-					System.exit(0);
-				} else if (command.equalsIgnoreCase("x")) {
+
+				command = command.trim().toUpperCase();
+
+				if (checkSystemCommand(command)) {
+					continue;
+				} else if (goBackMenu(command)) {
 					break;
-				} else if (command.equalsIgnoreCase("j")) {
-
-					Gson gson = new GsonBuilder()
-							.setPrettyPrinting()
-						    .registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
-						    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
-						    .create();
-					
-					System.out.println(gson.toJson(recall));
-					System.out.println();
-
 				} else {
-					System.out.println("Unknown command");
-				}
+					if (command.equals("J")) {
 
-				System.out.print("/contracts/" + contract.getContractId() + "/recalls/" + recall.getRecallId() + " > ");
+						Gson gson = new GsonBuilder().setPrettyPrinting()
+								.registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
+								.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
+								.create();
+
+						System.out.println(gson.toJson(recall));
+						System.out.println();
+
+					} else {
+						System.out.println("Unknown command");
+					}
+				}
+				prompt();
 			}
 		} catch (Exception e) {
 			logger.error("Exception with recalls command: " + command);
@@ -57,13 +67,11 @@ public class ContractRecallConsole {
 
 	}
 
-	private void printMainContractHelp() {
-		System.out.println();
-		System.out.println("Recall Menu");
+	protected void printMenu() {
+		System.out.println("Contract Recall Menu");
 		System.out.println("-----------------------");
 		System.out.println("J             - Print JSON");
 		System.out.println("X             - Go back");
-		System.out.println();
 	}
 
 }

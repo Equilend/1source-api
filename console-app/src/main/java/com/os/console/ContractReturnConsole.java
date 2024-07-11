@@ -15,40 +15,52 @@ import com.os.client.model.ModelReturn;
 import com.os.console.api.LocalDateTypeGsonAdapter;
 import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
 
-public class ContractReturnConsole {
+public class ContractReturnConsole extends AbstractConsole {
 
 	private static final Logger logger = LoggerFactory.getLogger(ContractReturnConsole.class);
 
-	public void execute(BufferedReader consoleIn, WebClient webClient, Contract contract, ModelReturn returnObj) {
+	Contract contract;
+	ModelReturn modelReturn;
+
+	protected void prompt() {
+		System.out.print("/contracts/" + contract.getContractId() + "/returns/" + modelReturn.getReturnId() + " > ");
+	}
+
+	public void execute(BufferedReader consoleIn, WebClient webClient, Contract origContract,
+			ModelReturn origModelReturn) {
+
+		this.contract = origContract;
+		this.modelReturn = origModelReturn;
 
 		String command = null;
-		System.out.print("/contracts/" + contract.getContractId() + "/returns/" + returnObj.getReturnId() + " > ");
+		prompt();
 
 		try {
 			while ((command = consoleIn.readLine()) != null) {
-				command = command.trim();
-				if (command.equals("?") || command.equalsIgnoreCase("help")) {
-					printMainContractHelp();
-				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
-					System.exit(0);
-				} else if (command.equalsIgnoreCase("x")) {
+
+				command = command.trim().toUpperCase();
+
+				if (checkSystemCommand(command)) {
+					continue;
+				} else if (goBackMenu(command)) {
 					break;
-				} else if (command.equalsIgnoreCase("j")) {
-
-					Gson gson = new GsonBuilder()
-							.setPrettyPrinting()
-						    .registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
-						    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
-						    .create();
-					
-					System.out.println(gson.toJson(returnObj));
-					System.out.println();
-
 				} else {
-					System.out.println("Unknown command");
+					if (command.equals("J")) {
+
+						Gson gson = new GsonBuilder().setPrettyPrinting()
+								.registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
+								.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
+								.create();
+
+						System.out.println(gson.toJson(modelReturn));
+						System.out.println();
+
+					} else {
+						System.out.println("Unknown command");
+					}
 				}
 
-				System.out.print("/contracts/" + contract.getContractId() + "/returns/" + returnObj.getReturnId() + " > ");
+				prompt();
 			}
 		} catch (Exception e) {
 			logger.error("Exception with returns command: " + command);
@@ -57,13 +69,11 @@ public class ContractReturnConsole {
 
 	}
 
-	private void printMainContractHelp() {
-		System.out.println();
+	protected void printMenu() {
 		System.out.println("Return Menu");
 		System.out.println("-----------------------");
 		System.out.println("J             - Print JSON");
 		System.out.println("X             - Go back");
-		System.out.println();
 	}
 
 }
