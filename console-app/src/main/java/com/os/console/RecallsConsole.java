@@ -33,8 +33,8 @@ public class RecallsConsole extends AbstractConsole {
 				} else if (goBackMenu(command)) {
 					break;
 				} else {
-					if (command.equals("A")) {
-						System.out.print("Retrieving all recalls...");
+					if (command.equals("L")) {
+						System.out.print("Listing all recalls...");
 						SearchRecallsTask searchRecallsTask = new SearchRecallsTask(webClient);
 						Thread taskT = new Thread(searchRecallsTask);
 						taskT.run();
@@ -47,7 +47,7 @@ public class RecallsConsole extends AbstractConsole {
 						if (command.length() != 38) {
 							System.out.println("Invalid UUID");
 						} else {
-							String recallId = command.substring(2);
+							String recallId = command.substring(2).toLowerCase();
 							try {
 								if (UUID.fromString(recallId).toString().equals(recallId)) {
 									System.out.print("Retrieving recall " + recallId + "...");
@@ -87,7 +87,7 @@ public class RecallsConsole extends AbstractConsole {
 	protected void printMenu() {
 		System.out.println("Recalls Menu");
 		System.out.println("-----------------------");
-		System.out.println("A             - List all recalls");
+		System.out.println("L             - List all recalls");
 		System.out.println("S <Recall Id> - Load a recall by Id");
 		System.out.println("X             - Go back");
 	}

@@ -32,6 +32,8 @@ public class DelegationProposalConsole extends AbstractConsole {
 	public void execute(BufferedReader consoleIn, ConsoleConfig consoleConfig, WebClient webClient,
 			Party origCounterParty) {
 
+		this.counterParty = origCounterParty;
+		
 		Gson gson = new GsonBuilder().setPrettyPrinting()
 				.registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
 				.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter()).create();

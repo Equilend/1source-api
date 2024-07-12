@@ -58,7 +58,7 @@ public class LoginConsole {
 				System.out.println("Using properties for authentication");
 			}
 
-			System.out.print("Authenticating...");
+			System.out.print("Authenticating..." + authConfig.getAuth_uri());
 
 			AuthTask authTask = new AuthTask(authConfig);
 			Thread taskT = new Thread(authTask);
@@ -74,6 +74,8 @@ public class LoginConsole {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
+
+			System.out.println("Connecting..." + authConfig.getApi_uri());
 
 			System.out.print("Verify acting as...");
 

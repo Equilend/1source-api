@@ -45,8 +45,8 @@ public class ContractRecallsConsole extends AbstractConsole {
 				} else if (goBackMenu(command)) {
 					break;
 				} else {
-					if (command.equals("A")) {
-						System.out.print("Retrieving all recalls...");
+					if (command.equals("L")) {
+						System.out.print("Listing all recalls...");
 						SearchContractRecallsTask searchContractRecallsTask = new SearchContractRecallsTask(webClient,
 								contract);
 						Thread taskT = new Thread(searchContractRecallsTask);
@@ -60,7 +60,7 @@ public class ContractRecallsConsole extends AbstractConsole {
 						if (command.length() != 38) {
 							System.out.println("Invalid UUID");
 						} else {
-							String recallId = command.substring(2);
+							String recallId = command.substring(2).toLowerCase();
 							try {
 								if (UUID.fromString(recallId).toString().equals(recallId)) {
 									System.out.print("Retrieving recall " + recallId + "...");
@@ -159,7 +159,7 @@ public class ContractRecallsConsole extends AbstractConsole {
 	protected void printMenu() {
 		System.out.println("Contract Recalls Menu");
 		System.out.println("-----------------------");
-		System.out.println("A                   - List Recalls");
+		System.out.println("L                   - List all recalls");
 		System.out.println("S <Recall ID>       - Load recall by Id");
 		System.out.println("R <Quantity>        - Notify recall");
 		System.out.println("X                   - Go back");
