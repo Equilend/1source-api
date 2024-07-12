@@ -3,7 +3,6 @@ package com.os.console;
 import java.io.BufferedReader;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,12 +11,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.os.client.model.Contract;
-import com.os.client.model.ContractProposalApproval;
-import com.os.client.model.PartyRole;
-import com.os.client.model.PartySettlementInstruction;
-import com.os.client.model.RoundingMode;
-import com.os.client.model.SettlementInstruction;
-import com.os.client.model.SettlementStatus;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.LocalDateTypeGsonAdapter;
 import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
@@ -27,6 +20,7 @@ import com.os.console.api.tasks.DeclineContractTask;
 import com.os.console.api.tasks.SearchContractTask;
 import com.os.console.api.tasks.UpdateContractVenueKeyTask;
 import com.os.console.api.tasks.UpdateSettlementStatusTask;
+import com.os.console.util.PayloadUtil;
 
 public class ContractConsole extends AbstractConsole {
 
@@ -71,7 +65,7 @@ public class ContractConsole extends AbstractConsole {
 					} else if (command.equals("A")) {
 						System.out.print("Approving contract...");
 						ApproveContractTask approveContractTask = new ApproveContractTask(webClient,
-								contract.getContractId(), createContractProposalApproval(consoleConfig));
+								contract.getContractId(), PayloadUtil.createContractProposalApproval(consoleConfig));
 						Thread taskT = new Thread(approveContractTask);
 						taskT.run();
 						try {
@@ -159,38 +153,6 @@ public class ContractConsole extends AbstractConsole {
 			e.printStackTrace();
 		}
 
-	}
-
-	private ContractProposalApproval createContractProposalApproval(ConsoleConfig consoleConfig) {
-
-		ContractProposalApproval proposalApproval = new ContractProposalApproval();
-
-		proposalApproval.setInternalRefId(UUID.randomUUID().toString());
-
-		if (PartyRole.LENDER.equals(ConsoleConfig.ACTING_AS)) {
-			proposalApproval.setRoundingRule(10d);
-			proposalApproval.setRoundingMode(RoundingMode.ALWAYSUP);
-		}
-
-		PartySettlementInstruction partySettlementInstruction = new PartySettlementInstruction();
-		partySettlementInstruction.setPartyRole(ConsoleConfig.ACTING_AS);
-		partySettlementInstruction.setSettlementStatus(SettlementStatus.NONE);
-		partySettlementInstruction.setInternalAcctCd(consoleConfig.getSettlement_internalAcctCd());
-
-		SettlementInstruction instruction = new SettlementInstruction();
-		partySettlementInstruction.setInstruction(instruction);
-		instruction.setSettlementBic(consoleConfig.getSettlement_settlementBic());
-		instruction.setLocalAgentBic(consoleConfig.getSettlement_localAgentBic());
-		instruction.setLocalAgentName(consoleConfig.getSettlement_localAgentName());
-		instruction.setLocalAgentAcct(consoleConfig.getSettlement_localAgentAcct());
-		instruction.setCustodianBic(consoleConfig.getSettlement_custodianBic());
-		instruction.setCustodianName(consoleConfig.getSettlement_custodianName());
-		instruction.setCustodianAcct(consoleConfig.getSettlement_custodianAcct());
-		instruction.setDtcParticipantNumber(consoleConfig.getSettlement_dtcParticipantNumber());
-
-		proposalApproval.setSettlement(partySettlementInstruction);
-
-		return proposalApproval;
 	}
 
 	private void refreshContract(WebClient webClient) {

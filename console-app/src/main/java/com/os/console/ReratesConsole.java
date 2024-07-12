@@ -33,8 +33,8 @@ public class ReratesConsole extends AbstractConsole {
 				} else if (goBackMenu(command)) {
 					break;
 				} else {
-					if (command.equals("A")) {
-						System.out.print("Retrieving all rerates...");
+					if (command.equals("L")) {
+						System.out.print("Listing all rerates...");
 						SearchReratesTask searchReratesTask = new SearchReratesTask(webClient);
 						Thread taskT = new Thread(searchReratesTask);
 						taskT.run();
@@ -47,7 +47,7 @@ public class ReratesConsole extends AbstractConsole {
 						if (command.length() != 38) {
 							System.out.println("Invalid UUID");
 						} else {
-							String rerateId = command.substring(2);
+							String rerateId = command.substring(2).toLowerCase();
 							try {
 								if (UUID.fromString(rerateId).toString().equals(rerateId)) {
 									System.out.print("Retrieving rerate " + rerateId + "...");
@@ -87,7 +87,7 @@ public class ReratesConsole extends AbstractConsole {
 	protected void printMenu() {
 		System.out.println("Rerates Menu");
 		System.out.println("-----------------------");
-		System.out.println("A             - List all rerates");
+		System.out.println("L             - List all rerates");
 		System.out.println("S <Rerate Id> - Load a rerate by Id");
 		System.out.println("X             - Go back");
 	}

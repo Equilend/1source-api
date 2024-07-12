@@ -57,7 +57,7 @@ public class DelegationConsole extends AbstractConsole {
 
 					} else if (command.equals("A")) {
 						System.out.print("Approving delegation...");
-						ApproveDelegationTask approveDelegationTask = new ApproveDelegationTask(webClient, delegation);
+						ApproveDelegationTask approveDelegationTask = new ApproveDelegationTask(webClient, delegation.getDelegationId());
 						Thread taskT = new Thread(approveDelegationTask);
 						taskT.run();
 						try {
@@ -68,7 +68,7 @@ public class DelegationConsole extends AbstractConsole {
 						refreshDelegation(webClient);
 					} else if (command.equals("C")) {
 						System.out.print("Canceling delegation...");
-						CancelDelegationTask cancelDelegationTask = new CancelDelegationTask(webClient, delegation);
+						CancelDelegationTask cancelDelegationTask = new CancelDelegationTask(webClient, delegation.getDelegationId());
 						Thread taskT = new Thread(cancelDelegationTask);
 						taskT.run();
 						try {
@@ -79,7 +79,7 @@ public class DelegationConsole extends AbstractConsole {
 						refreshDelegation(webClient);
 					} else if (command.equals("D")) {
 						System.out.print("Declining delegation...");
-						DeclineDelegationTask declineDelegationTask = new DeclineDelegationTask(webClient, delegation);
+						DeclineDelegationTask declineDelegationTask = new DeclineDelegationTask(webClient, delegation.getDelegationId());
 						Thread taskT = new Thread(declineDelegationTask);
 						taskT.run();
 						try {

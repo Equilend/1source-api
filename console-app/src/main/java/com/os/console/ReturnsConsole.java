@@ -33,8 +33,8 @@ public class ReturnsConsole extends AbstractConsole {
 				} else if (goBackMenu(command)) {
 					break;
 				} else {
-					if (command.equals("A")) {
-						System.out.print("Retrieving all returns...");
+					if (command.equals("L")) {
+						System.out.print("Listing all returns...");
 						SearchReturnsTask searchReturnsTask = new SearchReturnsTask(webClient);
 						Thread taskT = new Thread(searchReturnsTask);
 						taskT.run();
@@ -47,7 +47,7 @@ public class ReturnsConsole extends AbstractConsole {
 						if (command.length() != 38) {
 							System.out.println("Invalid UUID");
 						} else {
-							String returnId = command.substring(2);
+							String returnId = command.substring(2).toLowerCase();
 							try {
 								if (UUID.fromString(returnId).toString().equals(returnId)) {
 									System.out.print("Retrieving return " + returnId + "...");
@@ -87,7 +87,7 @@ public class ReturnsConsole extends AbstractConsole {
 	protected void printMenu() {
 		System.out.println("Returns Menu");
 		System.out.println("-----------------------");
-		System.out.println("A             - List all returns");
+		System.out.println("L             - List all returns");
 		System.out.println("S <Return Id> - Load a return by Id");
 		System.out.println("X             - Go back");
 	}

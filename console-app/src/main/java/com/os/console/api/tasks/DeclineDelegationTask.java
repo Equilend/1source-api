@@ -12,7 +12,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.os.client.model.Delegation;
 import com.os.client.model.LedgerResponse;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.LedgerException;
@@ -24,11 +23,11 @@ public class DeclineDelegationTask implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(DeclineDelegationTask.class);
 
 	private WebClient webClient;
-	private Delegation delegation;
+	private String delegationId;
 
-	public DeclineDelegationTask(WebClient webClient, Delegation delegation) {
+	public DeclineDelegationTask(WebClient webClient, String delegationId) {
 		this.webClient = webClient;
-		this.delegation = delegation;
+		this.delegationId = delegationId;
 	}
 
 	@Override
@@ -42,7 +41,7 @@ public class DeclineDelegationTask implements Runnable {
 //		logger.debug(json);
 
 		try {
-			LedgerResponse ledgerResponse = webClient.post().uri("/delegations/" + delegation.getDelegationId() + "/decline").contentType(MediaType.APPLICATION_JSON)
+			LedgerResponse ledgerResponse = webClient.post().uri("/delegations/" + delegationId + "/decline").contentType(MediaType.APPLICATION_JSON)
 //					.bodyValue(json)
 					.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
 					.onStatus(HttpStatusCode::is4xxClientError, response -> {
