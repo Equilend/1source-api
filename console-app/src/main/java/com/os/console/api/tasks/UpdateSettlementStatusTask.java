@@ -19,6 +19,7 @@ import com.os.client.model.SettlementStatusUpdate;
 import com.os.client.model.TransactingParties;
 import com.os.client.model.TransactingParty;
 import com.os.console.api.ConsoleConfig;
+import com.os.console.api.LedgerException;
 import com.os.console.api.LocalDateTypeGsonAdapter;
 import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
 
@@ -65,20 +66,31 @@ public class UpdateSettlementStatusTask implements Runnable {
 		String json = gson.toJson(update);
 		logger.debug(json);
 
-		LedgerResponse ledgerResponse = webClient.patch().uri("/contracts/" + contract.getContractId())
-				.contentType(MediaType.APPLICATION_JSON).bodyValue(json)
-				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
-				.onStatus(HttpStatusCode::is4xxClientError, response -> {
-					System.out.println(response.statusCode().toString());
-					return Mono.empty();
-				}).bodyToMono(LedgerResponse.class).block();
+		try {
+			LedgerResponse ledgerResponse = webClient.patch().uri("/contracts/" + contract.getContractId())
+					.contentType(MediaType.APPLICATION_JSON).bodyValue(json)
+					.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
+					.onStatus(HttpStatusCode::is4xxClientError, response -> {
+						System.out.println(response.statusCode().toString());
+						return Mono.empty();
+					}).bodyToMono(LedgerResponse.class).block();
 
-		if (ledgerResponse != null && ledgerResponse.getCode().equals(String.valueOf(HttpStatus.OK.value()))) {
-			System.out.println("complete");
-			System.out.println();
-			System.out.println(ledgerResponse);
-		} else {
-			System.out.println("failed");			
+			if (ledgerResponse != null && ledgerResponse.getCode().equals(String.valueOf(HttpStatus.OK.value()))) {
+				System.out.println("complete");
+				System.out.println();
+				System.out.println(ledgerResponse);
+			} else {
+				System.out.println("failed");			
+			}
+
+		} catch (Exception e) {
+			if (e.getCause() instanceof LedgerException) {
+				System.out.println(gson.toJson(((LedgerException) e.getCause()).getLedgerResponse()));
+				System.out.println();
+			} else {
+				System.out.println("failed");
+			}
 		}
+
 	}
 }
