@@ -15,6 +15,7 @@ import com.os.console.api.tasks.DeclineContractTask;
 import com.os.console.api.tasks.SearchContractTask;
 import com.os.console.api.tasks.SearchContractsTask;
 import com.os.console.api.tasks.SearchPartyTask;
+import com.os.console.api.tasks.UpdateSettlementStatusTask;
 import com.os.console.util.PayloadUtil;
 
 public class ContractsConsole extends AbstractConsole {
@@ -27,20 +28,25 @@ public class ContractsConsole extends AbstractConsole {
 
 	public void execute(BufferedReader consoleIn, ConsoleConfig consoleConfig, WebClient webClient) {
 
-		String command = null;
+		String input = null;
+		
 		prompt();
 
 		try {
-			while ((command = consoleIn.readLine()) != null) {
+			while ((input = consoleIn.readLine()) != null) {
 
-				command = command.trim().toUpperCase();
-
-				if (checkSystemCommand(command)) {
+				String[] args = parseArgs(input);
+				if (args.length == 0) {
+					prompt();
 					continue;
-				} else if (goBackMenu(command)) {
+				}
+				
+				if (checkSystemCommand(args[0])) {
+					continue;
+				} else if (goBackMenu(args[0])) {
 					break;
 				} else {
-					if (command.equals("L")) {
+					if (args[0].equals("L")) {
 						System.out.print("Listing all contracts...");
 						SearchContractsTask searchContractsTask = new SearchContractsTask(webClient);
 						Thread taskT = new Thread(searchContractsTask);
@@ -50,11 +56,11 @@ public class ContractsConsole extends AbstractConsole {
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-					} else if (command.startsWith("S ")) {
-						if (command.length() != 38) {
+					} else if (args[0].equals("S")) {
+						if (args.length != 2 || args[1].length() != 36) {
 							System.out.println("Invalid UUID");
 						} else {
-							String contractId = command.substring(2).toLowerCase();
+							String contractId = args[1].toLowerCase();
 							try {
 								if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
 									System.out.print("Searching for contract " + contractId + "...");
@@ -79,11 +85,11 @@ public class ContractsConsole extends AbstractConsole {
 								System.out.println("Invalid UUID");
 							}
 						}
-					} else if (command.startsWith("A ")) {
-						if (command.length() != 38) {
+					} else if (args[0].equals("A")) {
+						if (args.length != 2 || args[1].length() != 36) {
 							System.out.println("Invalid UUID");
 						} else {
-							String contractId = command.substring(2).toLowerCase();
+							String contractId = args[1].toLowerCase();
 							try {
 								if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
 									System.out.print("Approving contract " + contractId + "...");
@@ -104,11 +110,11 @@ public class ContractsConsole extends AbstractConsole {
 								System.out.println("Invalid UUID");
 							}
 						}
-					} else if (command.startsWith("C ")) {
-						if (command.length() != 38) {
+					} else if (args[0].equals("C")) {
+						if (args.length != 2 || args[1].length() != 36) {
 							System.out.println("Invalid UUID");
 						} else {
-							String contractId = command.substring(2).toLowerCase();
+							String contractId = args[1].toLowerCase();
 							try {
 								if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
 									System.out.print("Canceling contract " + contractId + "...");
@@ -128,11 +134,11 @@ public class ContractsConsole extends AbstractConsole {
 								System.out.println("Invalid UUID");
 							}
 						}
-					} else if (command.startsWith("D ")) {
-						if (command.length() != 38) {
+					} else if (args[0].equals("D")) {
+						if (args.length != 2 || args[1].length() != 36) {
 							System.out.println("Invalid UUID");
 						} else {
-							String contractId = command.substring(2).toLowerCase();
+							String contractId = args[1].toLowerCase();
 							try {
 								if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
 									System.out.print("Declining contract " + contractId + "...");
@@ -152,14 +158,55 @@ public class ContractsConsole extends AbstractConsole {
 								System.out.println("Invalid UUID");
 							}
 						}
-					} else if (command.startsWith("P ")) {
-						if (command.length() > 100) {
+					} else if (args[0].equals("U")) {
+						if (args.length != 2 || args[1].length() != 36) {
+							System.out.println("Invalid UUID");
+						} else {
+							String contractId = args[1].toLowerCase();
+							try {
+								if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
+
+									System.out.print("Retrieving contract " + contractId + "...");
+
+									SearchContractTask searchContractTask = new SearchContractTask(webClient,
+											contractId);
+									Thread taskT = new Thread(searchContractTask);
+									taskT.run();
+									try {
+										taskT.join();
+									} catch (InterruptedException e) {
+										e.printStackTrace();
+									}
+
+									if (searchContractTask.getContract() != null) {
+										System.out.print(
+												"Updating contract " + contractId + " settlement status to SETTLED...");
+										UpdateSettlementStatusTask updateSettlementStatusTask = new UpdateSettlementStatusTask(
+												webClient, searchContractTask.getContract(),
+												consoleConfig.getAuth_party());
+										Thread taskU = new Thread(updateSettlementStatusTask);
+										taskU.run();
+										try {
+											taskU.join();
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+										}
+									}
+								} else {
+									System.out.println("Invalid UUID");
+								}
+							} catch (Exception u) {
+								System.out.println("Invalid UUID");
+							}
+						}
+					} else if (args[0].equals("P")) {
+						if (args.length != 2 || args[1].length() > 30) {
 							System.out.println("Invalid Party Id");
-						} else if (consoleConfig.getAuth_party().equals(command)) {
+						} else if (consoleConfig.getAuth_party().equals(args[1])) {
 							System.out.println("You cannot propose a contract to yourself");
 						} else {
 
-							String partyId = command.substring(2);
+							String partyId = args[1];
 							try {
 								System.out.print("Verifying party " + partyId + "...");
 								SearchPartyTask searchPartyTask = new SearchPartyTask(webClient, partyId);
@@ -192,7 +239,7 @@ public class ContractsConsole extends AbstractConsole {
 				prompt();
 			}
 		} catch (Exception e) {
-			logger.error("Exception with contracts command: " + command);
+			logger.error("Exception with contracts command: " + input);
 			e.printStackTrace();
 		}
 
@@ -207,6 +254,8 @@ public class ContractsConsole extends AbstractConsole {
 		System.out.println("A <Contract Id> - Approve a contract by Id");
 		System.out.println("C <Contract Id> - Cancel a contract by Id");
 		System.out.println("D <Contract Id> - Decline a contract by Id");
+		System.out.println();
+		System.out.println("U <Contract Id> - Update settlement status to SETTLED");
 		System.out.println();
 		System.out.println("P <Party ID>    - Propose a contract to Party Id");
 		System.out.println();

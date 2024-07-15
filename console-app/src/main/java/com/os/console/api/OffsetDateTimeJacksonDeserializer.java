@@ -27,7 +27,12 @@ public class OffsetDateTimeJacksonDeserializer extends JsonDeserializer<OffsetDa
 			dateAsString = dateAsString.substring(0, dateAsString.indexOf("Z"));
 		}
 		
-		int milliSize = dateAsString.substring(dateAsString.indexOf(".")+1).length();
+		int milliSize = 0;
+		if (dateAsString.indexOf(".") > 0) {
+			milliSize = dateAsString.substring(dateAsString.indexOf(".")+1).length();
+		} else {
+			dateAsString += ".";
+		}
 		
 		for (int i = milliSize; i<3; i++) {
 			dateAsString = dateAsString + "0";
