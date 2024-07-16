@@ -10,7 +10,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.os.client.model.DelegationAuthorization;
 import com.os.client.model.DelegationAuthorizationType;
 import com.os.client.model.DelegationProposal;
 import com.os.client.model.Party;
@@ -18,6 +17,7 @@ import com.os.console.api.ConsoleConfig;
 import com.os.console.api.LocalDateTypeGsonAdapter;
 import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
 import com.os.console.api.tasks.ProposeDelegationTask;
+import com.os.console.util.PayloadUtil;
 
 public class DelegationProposalConsole extends AbstractConsole {
 
@@ -76,7 +76,7 @@ public class DelegationProposalConsole extends AbstractConsole {
 															: null);
 
 							try {
-								DelegationProposal delegationProposal = createDelegationProposal(counterParty,
+								DelegationProposal delegationProposal = PayloadUtil.createDelegationProposal(counterParty,
 										venueParty, authorizationType);
 
 								System.out.println(gson.toJson(delegationProposal));
@@ -111,21 +111,6 @@ public class DelegationProposalConsole extends AbstractConsole {
 			e.printStackTrace();
 		}
 
-	}
-
-	private DelegationProposal createDelegationProposal(Party counterParty, Party venueParty,
-			DelegationAuthorizationType authorizationType) {
-
-		DelegationProposal delegationProposal = new DelegationProposal();
-
-		DelegationAuthorization authorization = new DelegationAuthorization();
-		authorization.setAuthorizationType(authorizationType);
-
-		delegationProposal.setAuthorization(authorization);
-		delegationProposal.setDelegationParty(venueParty);
-		delegationProposal.setCounterparty(counterParty);
-
-		return delegationProposal;
 	}
 
 	protected void printMenu() {

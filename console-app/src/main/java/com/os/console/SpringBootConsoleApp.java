@@ -46,12 +46,12 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 			logger.info("args[{}]: {}", i, args[i]);
 		}
 
-		Console console = System.console();
-		
-		if (console == null) {
-			logger.warn("No console available");
-			return;
-		}
+//		Console console = System.console();
+//		
+//		if (console == null) {
+//			logger.warn("No console available");
+//			return;
+//		}
 
 		BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in));
 
