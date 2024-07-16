@@ -1,8 +1,6 @@
 package com.os.console;
 
 import java.io.BufferedReader;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -10,15 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Contract;
-import com.os.client.model.FeeRate;
-import com.os.client.model.FixedRate;
-import com.os.client.model.FloatingRate;
-import com.os.client.model.RebateRate;
-import com.os.client.model.RerateProposal;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.ProposeRerateTask;
 import com.os.console.api.tasks.SearchContractRerateTask;
 import com.os.console.api.tasks.SearchContractReratesTask;
+import com.os.console.util.PayloadUtil;
 
 public class ContractReratesConsole extends AbstractConsole {
 
@@ -96,7 +90,7 @@ public class ContractReratesConsole extends AbstractConsole {
 							try {
 								System.out.print("Proposing rerate...");
 								ProposeRerateTask proposeRerateTask = new ProposeRerateTask(webClient,
-										contract.getContractId(), createRerateProposal(consoleConfig, rerate));
+										contract, PayloadUtil.createRerateProposal(consoleConfig, contract, rerate), ConsoleConfig.ACTING_PARTY);
 								Thread taskT = new Thread(proposeRerateTask);
 								taskT.run();
 								try {
@@ -121,40 +115,6 @@ public class ContractReratesConsole extends AbstractConsole {
 			e.printStackTrace();
 		}
 
-	}
-
-	private RerateProposal createRerateProposal(ConsoleConfig consoleConfig, Double rerate) {
-
-		RerateProposal proposal = new RerateProposal();
-
-		LocalDate rerateDate = LocalDate.now(ZoneId.of("UTC"));
-		
-		if (contract.getTrade().getRate() instanceof FeeRate) {
-			
-			((FeeRate) contract.getTrade().getRate()).getFee().setBaseRate(rerate);
-			((FeeRate) contract.getTrade().getRate()).getFee().setEffectiveDate(rerateDate);
-
-			proposal.setRate(((FeeRate) contract.getTrade().getRate()));
-
-		} else if (contract.getTrade().getRate() instanceof RebateRate) {
-			
-			if (((RebateRate) contract.getTrade().getRate()).getRebate() instanceof FixedRate) {
-			
-				((FixedRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFixed().setBaseRate(rerate);
-				((FixedRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFixed().setEffectiveDate(rerateDate);
-				
-				proposal.setRate(((RebateRate) contract.getTrade().getRate()));
-
-			} else if (((RebateRate) contract.getTrade().getRate()).getRebate() instanceof FloatingRate) {
-				
-				((FloatingRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFloating().setSpread(rerate);
-				((FloatingRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFloating().setEffectiveDate(rerateDate);
-
-				proposal.setRate(((RebateRate) contract.getTrade().getRate()));
-			}
-		}
-
-		return proposal;
 	}
 
 	protected void printMenu() {

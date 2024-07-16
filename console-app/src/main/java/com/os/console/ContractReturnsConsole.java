@@ -1,10 +1,6 @@
 package com.os.console;
 
 import java.io.BufferedReader;
-import java.math.BigDecimal;
-import java.time.DayOfWeek;
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.UUID;
 
 import org.slf4j.Logger;
@@ -12,12 +8,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Contract;
-import com.os.client.model.ReturnProposal;
-import com.os.client.model.SettlementType;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.ProposeReturnTask;
 import com.os.console.api.tasks.SearchContractReturnTask;
 import com.os.console.api.tasks.SearchContractReturnsTask;
+import com.os.console.util.PayloadUtil;
 
 public class ContractReturnsConsole extends AbstractConsole {
 
@@ -95,7 +90,7 @@ public class ContractReturnsConsole extends AbstractConsole {
 							try {
 								System.out.print("Notifying return...");
 								ProposeReturnTask proposeReturnTask = new ProposeReturnTask(webClient,
-										contract.getContractId(), createReturnProposal(consoleConfig, quantity));
+										contract, PayloadUtil.createReturnProposal(consoleConfig, contract, quantity), ConsoleConfig.ACTING_PARTY);
 								Thread taskT = new Thread(proposeReturnTask);
 								taskT.run();
 								try {
@@ -120,48 +115,6 @@ public class ContractReturnsConsole extends AbstractConsole {
 			e.printStackTrace();
 		}
 
-	}
-
-	private ReturnProposal createReturnProposal(ConsoleConfig consoleConfig, Integer quantity) {
-
-		ReturnProposal proposal = new ReturnProposal();
-
-		proposal.setQuantity(quantity);
-		proposal.setReturnDate(LocalDate.now(ZoneId.of("UTC")));
-		
-		LocalDate returnSettlementDate = proposal.getReturnDate().plusDays(1);
-		if (returnSettlementDate.getDayOfWeek().equals(DayOfWeek.SATURDAY)) {
-			returnSettlementDate = returnSettlementDate.plusDays(2);
-		} else if (returnSettlementDate.getDayOfWeek().equals(DayOfWeek.SUNDAY)) {
-			returnSettlementDate = returnSettlementDate.plusDays(1);
-		}
-		proposal.setReturnSettlementDate(returnSettlementDate);
-		proposal.setSettlementType(SettlementType.DVP);
-
-		BigDecimal collateralValue = BigDecimal
-				.valueOf(quantity.doubleValue() * contract.getTrade().getCollateral().getContractPrice().doubleValue() * 1.02);
-		collateralValue = collateralValue.setScale(2, java.math.RoundingMode.HALF_UP);
-		proposal.setCollateralValue(collateralValue.doubleValue());
-
-//		PartySettlementInstruction partySettlementInstruction = new PartySettlementInstruction();
-//		partySettlementInstruction.setPartyRole(ConsoleConfig.ACTING_AS);
-//		partySettlementInstruction.setSettlementStatus(SettlementStatus.NONE);
-//		partySettlementInstruction.setInternalAcctCd(consoleConfig.getSettlement_internalAcctCd());
-//
-//		SettlementInstruction instruction = new SettlementInstruction();
-//		partySettlementInstruction.setInstruction(instruction);
-//		instruction.setSettlementBic(consoleConfig.getSettlement_settlementBic());
-//		instruction.setLocalAgentBic(consoleConfig.getSettlement_localAgentBic());
-//		instruction.setLocalAgentName(consoleConfig.getSettlement_localAgentName());
-//		instruction.setLocalAgentAcct(consoleConfig.getSettlement_localAgentAcct());
-//		instruction.setCustodianBic(consoleConfig.getSettlement_custodianBic());
-//		instruction.setCustodianName(consoleConfig.getSettlement_custodianName());
-//		instruction.setCustodianAcct(consoleConfig.getSettlement_custodianAcct());
-//		instruction.setDtcParticipantNumber(consoleConfig.getSettlement_dtcParticipantNumber());
-//
-//		proposal.setSettlement(partySettlementInstruction);
-
-		return proposal;
 	}
 
 	protected void printMenu() {
