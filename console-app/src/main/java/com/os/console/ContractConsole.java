@@ -19,7 +19,7 @@ import com.os.console.api.tasks.CancelContractTask;
 import com.os.console.api.tasks.DeclineContractTask;
 import com.os.console.api.tasks.SearchContractTask;
 import com.os.console.api.tasks.UpdateContractVenueKeyTask;
-import com.os.console.api.tasks.UpdateSettlementStatusTask;
+import com.os.console.api.tasks.UpdateContractSettlementStatusTask;
 import com.os.console.util.PayloadUtil;
 
 public class ContractConsole extends AbstractConsole {
@@ -100,8 +100,8 @@ public class ContractConsole extends AbstractConsole {
 						refreshContract(webClient);
 					} else if (command.equals("U")) {
 						System.out.print("Updating settlement status to SETTLED...");
-						UpdateSettlementStatusTask updateSettlementStatusTask = new UpdateSettlementStatusTask(
-								webClient, contract, consoleConfig.getAuth_party());
+						UpdateContractSettlementStatusTask updateSettlementStatusTask = new UpdateContractSettlementStatusTask(
+								webClient, contract, ConsoleConfig.ACTING_PARTY);
 						Thread taskT = new Thread(updateSettlementStatusTask);
 						taskT.run();
 						try {

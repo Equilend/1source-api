@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.UUID;
 
+import com.os.client.model.AcknowledgementType;
 import com.os.client.model.BenchmarkCd;
 import com.os.client.model.Collateral;
 import com.os.client.model.CollateralType;
@@ -30,6 +31,7 @@ import com.os.client.model.PartySettlementInstruction;
 import com.os.client.model.RebateRate;
 import com.os.client.model.RecallProposal;
 import com.os.client.model.RerateProposal;
+import com.os.client.model.ReturnAcknowledgement;
 import com.os.client.model.ReturnProposal;
 import com.os.client.model.RoundingMode;
 import com.os.client.model.SettlementInstruction;
@@ -353,4 +355,13 @@ public class PayloadUtil {
 		return delegationProposal;
 	}
 
+	public static ReturnAcknowledgement createReturnAcknowledgement(AcknowledgementType acknowledgementType, String message) {
+		
+		ReturnAcknowledgement returnAcknowledgement = new ReturnAcknowledgement();
+		
+		returnAcknowledgement.setAcknowledgementType(acknowledgementType);
+		returnAcknowledgement.setDescription(message);
+		
+		return returnAcknowledgement;
+	}
 }

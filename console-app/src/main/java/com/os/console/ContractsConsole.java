@@ -15,7 +15,7 @@ import com.os.console.api.tasks.DeclineContractTask;
 import com.os.console.api.tasks.SearchContractTask;
 import com.os.console.api.tasks.SearchContractsTask;
 import com.os.console.api.tasks.SearchPartyTask;
-import com.os.console.api.tasks.UpdateSettlementStatusTask;
+import com.os.console.api.tasks.UpdateContractSettlementStatusTask;
 import com.os.console.util.PayloadUtil;
 
 public class ContractsConsole extends AbstractConsole {
@@ -181,9 +181,9 @@ public class ContractsConsole extends AbstractConsole {
 									if (searchContractTask.getContract() != null) {
 										System.out.print(
 												"Updating contract " + contractId + " settlement status to SETTLED...");
-										UpdateSettlementStatusTask updateSettlementStatusTask = new UpdateSettlementStatusTask(
+										UpdateContractSettlementStatusTask updateSettlementStatusTask = new UpdateContractSettlementStatusTask(
 												webClient, searchContractTask.getContract(),
-												consoleConfig.getAuth_party());
+												ConsoleConfig.ACTING_PARTY);
 										Thread taskU = new Thread(updateSettlementStatusTask);
 										taskU.run();
 										try {

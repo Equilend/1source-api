@@ -62,7 +62,7 @@ public class ContractReturnsConsole extends AbstractConsole {
 								if (UUID.fromString(returnId).toString().equals(returnId)) {
 									System.out.print("Retrieving return " + returnId + "...");
 									SearchContractReturnTask searchContractReturnTask = new SearchContractReturnTask(
-											webClient, contract.getContractId(), returnId);
+											webClient, contract, returnId);
 									Thread taskT = new Thread(searchContractReturnTask);
 									taskT.run();
 									try {
