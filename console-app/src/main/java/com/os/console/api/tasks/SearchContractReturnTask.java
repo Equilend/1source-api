@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.os.client.model.Contract;
 import com.os.client.model.ModelReturn;
 import com.os.console.api.ConsoleConfig;
 
@@ -16,21 +17,21 @@ public class SearchContractReturnTask implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(SearchContractReturnTask.class);
 
 	private WebClient webClient;
-	private String contractId;
+	private Contract contract;
 	private String returnId;
 
 	private ModelReturn returnObj;
 	
-	public SearchContractReturnTask(WebClient webClient, String contractId, String returnId) {
+	public SearchContractReturnTask(WebClient webClient, Contract contract, String returnId) {
 		this.webClient = webClient;
-		this.contractId = contractId;
+		this.contract = contract;
 		this.returnId = returnId;
 	}
 
 	@Override
 	public void run() {
 
-		returnObj = webClient.get().uri("/contracts/" + contractId + "/returns/" + returnId)
+		returnObj = webClient.get().uri("/contracts/" + contract.getContractId() + "/returns/" + returnId)
 				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());

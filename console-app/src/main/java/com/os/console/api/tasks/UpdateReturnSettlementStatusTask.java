@@ -14,6 +14,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.os.client.model.Contract;
 import com.os.client.model.LedgerResponse;
+import com.os.client.model.ModelReturn;
+import com.os.client.model.Party;
 import com.os.client.model.SettlementStatus;
 import com.os.client.model.SettlementStatusUpdate;
 import com.os.client.model.TransactingParties;
@@ -25,17 +27,19 @@ import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
 
 import reactor.core.publisher.Mono;
 
-public class UpdateSettlementStatusTask implements Runnable {
+public class UpdateReturnSettlementStatusTask implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(UpdateSettlementStatusTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(UpdateReturnSettlementStatusTask.class);
 
 	private WebClient webClient;
 	private Contract contract;
-	private String actingParty;
+	private ModelReturn modelReturn;
+	private Party actingParty;
 
-	public UpdateSettlementStatusTask(WebClient webClient, Contract contract, String actingParty) {
+	public UpdateReturnSettlementStatusTask(WebClient webClient, Contract contract, ModelReturn modelReturn, Party actingParty) {
 		this.webClient = webClient;
 		this.contract = contract;
+		this.modelReturn = modelReturn;
 		this.actingParty = actingParty;
 	}
 
@@ -45,7 +49,7 @@ public class UpdateSettlementStatusTask implements Runnable {
 		TransactingParties parties = contract.getTrade().getTransactingParties();
 		boolean canAct = false;
 		for (TransactingParty transactingParty : parties) {
-			if (actingParty.equals(transactingParty.getParty().getPartyId())) {
+			if (actingParty.equals(transactingParty.getParty())) {
 				canAct = true;
 				break;
 			}
@@ -67,7 +71,7 @@ public class UpdateSettlementStatusTask implements Runnable {
 		logger.debug(json);
 
 		try {
-			LedgerResponse ledgerResponse = webClient.patch().uri("/contracts/" + contract.getContractId())
+			LedgerResponse ledgerResponse = webClient.patch().uri("/contracts/" + contract.getContractId() + "/returns/" + modelReturn.getReturnId())
 					.contentType(MediaType.APPLICATION_JSON).bodyValue(json)
 					.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
 					.onStatus(HttpStatusCode::is4xxClientError, response -> {
