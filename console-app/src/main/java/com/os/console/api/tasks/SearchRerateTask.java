@@ -2,14 +2,10 @@ package com.os.console.api.tasks;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Rerate;
-import com.os.console.api.ConsoleConfig;
-
-import reactor.core.publisher.Mono;
+import com.os.console.util.RESTUtil;
 
 public class SearchRerateTask implements Runnable {
 
@@ -28,12 +24,7 @@ public class SearchRerateTask implements Runnable {
 	@Override
 	public void run() {
 
-		rerate = webClient.get().uri("/rerates/" + rerateId)
-				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
-				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
-					logger.error(HttpStatus.NOT_FOUND.toString());
-					return Mono.empty();
-				}).bodyToMono(Rerate.class).block();
+		rerate = (Rerate) RESTUtil.getRequest(webClient, "/rerates/" + rerateId, Rerate.class);
 
 		if (rerate == null) {
 			logger.warn("Invalid rerate object or rerate not found");

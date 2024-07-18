@@ -2,16 +2,12 @@ package com.os.console.api.tasks;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Recall;
 import com.os.client.model.Recalls;
-import com.os.console.api.ConsoleConfig;
 import com.os.console.util.ConsoleOutputUtil;
-
-import reactor.core.publisher.Mono;
+import com.os.console.util.RESTUtil;
 
 public class SearchRecallsTask implements Runnable {
 
@@ -25,13 +21,8 @@ public class SearchRecallsTask implements Runnable {
 
 	@Override
 	public void run() {
-		
-		Recalls recalls = webClient.get().uri("/recalls")
-				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
-				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
-					logger.error(HttpStatus.NOT_FOUND.toString());
-					return Mono.empty();
-				}).bodyToMono(Recalls.class).block();
+
+		Recalls recalls = (Recalls) RESTUtil.getRequest(webClient, "/recalls", Recalls.class);
 
 		if (recalls == null || recalls.size() == 0) {
 			logger.warn("Invalid recalls object or no recalls");			

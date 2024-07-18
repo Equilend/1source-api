@@ -2,16 +2,12 @@ package com.os.console.api.tasks;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.ModelReturn;
 import com.os.client.model.Returns;
-import com.os.console.api.ConsoleConfig;
 import com.os.console.util.ConsoleOutputUtil;
-
-import reactor.core.publisher.Mono;
+import com.os.console.util.RESTUtil;
 
 public class SearchReturnsTask implements Runnable {
 
@@ -25,13 +21,8 @@ public class SearchReturnsTask implements Runnable {
 
 	@Override
 	public void run() {
-		
-		Returns returns = webClient.get().uri("/returns")
-				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
-				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
-					logger.error(HttpStatus.NOT_FOUND.toString());
-					return Mono.empty();
-				}).bodyToMono(Returns.class).block();
+
+		Returns returns = (Returns) RESTUtil.getRequest(webClient, "/returns", Returns.class);
 
 		if (returns == null || returns.size() == 0) {
 			logger.warn("Invalid returns object or no returns");			

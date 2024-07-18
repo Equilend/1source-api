@@ -65,7 +65,7 @@ public class ContractConsole extends AbstractConsole {
 					} else if (command.equals("A")) {
 						System.out.print("Approving contract...");
 						ApproveContractTask approveContractTask = new ApproveContractTask(webClient,
-								contract.getContractId(), PayloadUtil.createContractProposalApproval(consoleConfig));
+								contract, PayloadUtil.createContractProposalApproval(consoleConfig));
 						Thread taskT = new Thread(approveContractTask);
 						taskT.run();
 						try {
