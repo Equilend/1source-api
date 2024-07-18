@@ -2,14 +2,10 @@ package com.os.console.api.tasks;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Delegation;
-import com.os.console.api.ConsoleConfig;
-
-import reactor.core.publisher.Mono;
+import com.os.console.util.RESTUtil;
 
 public class SearchDelegationTask implements Runnable {
 
@@ -28,12 +24,7 @@ public class SearchDelegationTask implements Runnable {
 	@Override
 	public void run() {
 
-		delegation = webClient.get().uri("/delegations/" + delegationId)
-				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
-				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
-					logger.error(HttpStatus.NOT_FOUND.toString());
-					return Mono.empty();
-				}).bodyToMono(Delegation.class).block();
+		delegation = (Delegation) RESTUtil.getRequest(webClient, "/delegations/" + delegationId, Delegation.class);
 
 		if (delegation == null) {
 			logger.warn("Invalid delegation object or delegation not found");

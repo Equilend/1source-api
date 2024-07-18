@@ -29,7 +29,7 @@ public class ContractsConsole extends AbstractConsole {
 	public void execute(BufferedReader consoleIn, ConsoleConfig consoleConfig, WebClient webClient) {
 
 		String input = null;
-		
+
 		prompt();
 
 		try {
@@ -40,7 +40,7 @@ public class ContractsConsole extends AbstractConsole {
 					prompt();
 					continue;
 				}
-				
+
 				if (checkSystemCommand(args[0])) {
 					continue;
 				} else if (goBackMenu(args[0])) {
@@ -92,17 +92,29 @@ public class ContractsConsole extends AbstractConsole {
 							String contractId = args[1].toLowerCase();
 							try {
 								if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
-									System.out.print("Approving contract " + contractId + "...");
-									ApproveContractTask approveContractTask = new ApproveContractTask(webClient,
-											contractId, PayloadUtil.createContractProposalApproval(consoleConfig));
-									Thread taskT = new Thread(approveContractTask);
+									System.out.print("Searching for contract " + contractId + "...");
+									SearchContractTask searchContractTask = new SearchContractTask(webClient,
+											contractId);
+									Thread taskT = new Thread(searchContractTask);
 									taskT.run();
 									try {
 										taskT.join();
 									} catch (InterruptedException e) {
 										e.printStackTrace();
 									}
-
+									if (searchContractTask.getContract() != null) {
+										System.out.print("Approving contract " + contractId + "...");
+										ApproveContractTask approveContractTask = new ApproveContractTask(webClient,
+												searchContractTask.getContract(),
+												PayloadUtil.createContractProposalApproval(consoleConfig));
+										Thread taskS = new Thread(approveContractTask);
+										taskS.run();
+										try {
+											taskS.join();
+										} catch (InterruptedException e) {
+											e.printStackTrace();
+										}
+									}
 								} else {
 									System.out.println("Invalid UUID");
 								}

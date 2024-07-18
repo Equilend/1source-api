@@ -2,15 +2,11 @@ package com.os.console.api.tasks;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Parties;
 import com.os.client.model.Party;
-import com.os.console.api.ConsoleConfig;
-
-import reactor.core.publisher.Mono;
+import com.os.console.util.RESTUtil;
 
 public class SearchPartyTask implements Runnable {
 
@@ -29,12 +25,7 @@ public class SearchPartyTask implements Runnable {
 	@Override
 	public void run() {
 
-		Parties parties = webClient.get().uri("/parties?partyId=" + partyId)
-				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
-				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
-					logger.error(HttpStatus.NOT_FOUND.toString());
-					return Mono.empty();
-				}).bodyToMono(Parties.class).block();
+		Parties parties = (Parties) RESTUtil.getRequest(webClient, "/parties?partyId=" + partyId, Parties.class);
 
 		if (parties == null || parties.size() == 0) {
 			logger.warn("Invalid party object or party not found");

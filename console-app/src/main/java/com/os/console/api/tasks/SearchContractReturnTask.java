@@ -2,15 +2,11 @@ package com.os.console.api.tasks;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Contract;
 import com.os.client.model.ModelReturn;
-import com.os.console.api.ConsoleConfig;
-
-import reactor.core.publisher.Mono;
+import com.os.console.util.RESTUtil;
 
 public class SearchContractReturnTask implements Runnable {
 
@@ -20,7 +16,7 @@ public class SearchContractReturnTask implements Runnable {
 	private Contract contract;
 	private String returnId;
 
-	private ModelReturn returnObj;
+	private ModelReturn modelReturn;
 	
 	public SearchContractReturnTask(WebClient webClient, Contract contract, String returnId) {
 		this.webClient = webClient;
@@ -31,14 +27,9 @@ public class SearchContractReturnTask implements Runnable {
 	@Override
 	public void run() {
 
-		returnObj = webClient.get().uri("/contracts/" + contract.getContractId() + "/returns/" + returnId)
-				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
-				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
-					logger.error(HttpStatus.NOT_FOUND.toString());
-					return Mono.empty();
-				}).bodyToMono(ModelReturn.class).block();
+		modelReturn = (ModelReturn) RESTUtil.getRequest(webClient, "/contracts/" + contract.getContractId() + "/returns/" + returnId, ModelReturn.class);
 
-		if (returnObj == null) {
+		if (modelReturn == null) {
 			logger.warn("Invalid return object or return not found");
 			System.out.println("return not found");
 		} else {
@@ -48,7 +39,7 @@ public class SearchContractReturnTask implements Runnable {
 	}
 
 	public ModelReturn getReturn() {
-		return returnObj;
+		return modelReturn;
 	}
 	
 	

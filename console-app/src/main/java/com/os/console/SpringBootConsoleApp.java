@@ -76,13 +76,13 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 				} else if (command.equalsIgnoreCase("c")) {
 					ContractsConsole contractsConsole = new ContractsConsole();
 					contractsConsole.execute(consoleIn, authConfig, restWebClient);
-				} else if (command.equalsIgnoreCase("u")) {
+				} else if (command.equalsIgnoreCase("r")) {
 					ReturnsConsole returnsConsole = new ReturnsConsole();
 					returnsConsole.execute(consoleIn, restWebClient);
 				} else if (command.equalsIgnoreCase("e")) {
 					RecallsConsole recallsConsole = new RecallsConsole();
 					recallsConsole.execute(consoleIn, restWebClient);
-				} else if (command.equalsIgnoreCase("a")) {
+				} else if (command.equalsIgnoreCase("t")) {
 					ReratesConsole reratesConsole = new ReratesConsole();
 					reratesConsole.execute(consoleIn, restWebClient);
 				} else if (command.equalsIgnoreCase("d")) {
@@ -105,9 +105,9 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 		System.out.println("Main Menu");
 		System.out.println("-----------------------");
 		System.out.println("C - Contracts");
-		System.out.println("U - Returns");
+		System.out.println("R - Returns");
 		System.out.println("E - Recalls");
-		System.out.println("A - Rerates");
+		System.out.println("T - Rerates");
 		System.out.println("D - Delegations");
 	}
 

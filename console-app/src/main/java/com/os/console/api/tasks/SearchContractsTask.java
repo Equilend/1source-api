@@ -4,8 +4,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Contract;
@@ -14,10 +12,8 @@ import com.os.client.model.PartyRole;
 import com.os.client.model.PartySettlementInstruction;
 import com.os.client.model.TransactingParties;
 import com.os.client.model.TransactingParty;
-import com.os.console.api.ConsoleConfig;
 import com.os.console.util.ConsoleOutputUtil;
-
-import reactor.core.publisher.Mono;
+import com.os.console.util.RESTUtil;
 
 public class SearchContractsTask implements Runnable {
 
@@ -32,12 +28,7 @@ public class SearchContractsTask implements Runnable {
 	@Override
 	public void run() {
 
-		Contracts contracts = webClient.get().uri("/contracts")
-				.headers(h -> h.setBearerAuth(ConsoleConfig.TOKEN.getAccess_token())).retrieve()
-				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
-					logger.error(HttpStatus.NOT_FOUND.toString());
-					return Mono.empty();
-				}).bodyToMono(Contracts.class).block();
+		Contracts contracts = (Contracts) RESTUtil.getRequest(webClient, "/contracts", Contracts.class);
 
 		if (contracts == null || contracts.size() == 0) {
 			logger.warn("Invalid contracts object or no contracts");
