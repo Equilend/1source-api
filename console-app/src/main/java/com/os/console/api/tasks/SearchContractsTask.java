@@ -82,6 +82,7 @@ public class SearchContractsTask implements Runnable {
 				System.out.print(ConsoleOutputUtil.padSpaces(contract.getTrade().getTradeDate(), 15));
 				System.out.print(ConsoleOutputUtil.padSpaces(contract.getTrade().getInstrument().getTicker(), 15));
 				System.out.print(ConsoleOutputUtil.padSpaces(contract.getTrade().getQuantity(), 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(contract.getTrade().getOpenQuantity(), 15));
 				System.out.println();
 
 				rows++;
@@ -99,7 +100,8 @@ public class SearchContractsTask implements Runnable {
 		System.out.print(ConsoleOutputUtil.padSpaces("Settlement", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Trade Date", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Ticker", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("Quantity", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("Orig Quantity", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("Open Quantity", 15));
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("-----------", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("------", 12));
@@ -109,7 +111,8 @@ public class SearchContractsTask implements Runnable {
 		System.out.print(ConsoleOutputUtil.padSpaces("----------", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("----------", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("------", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("--------", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("-------------", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("-------------", 15));
 		System.out.println();
 	}
 }
