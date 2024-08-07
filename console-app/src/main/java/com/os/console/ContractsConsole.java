@@ -23,8 +23,9 @@ public class ContractsConsole extends AbstractConsole {
 
 	}
 
-	protected void prompt() {
+	protected boolean prompt() {
 		System.out.print("/contracts > ");
+		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {

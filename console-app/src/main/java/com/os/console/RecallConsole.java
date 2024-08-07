@@ -14,8 +14,16 @@ public class RecallConsole extends AbstractConsole {
 		this.recall = recall;
 	}
 
-	protected void prompt() {
+	protected boolean prompt() {
+		
+		if (recall == null) {
+			System.out.println("Recall not available");
+			return false;
+		}
+		
 		System.out.print("/recalls/" + recall.getRecallId() + " > ");
+		
+		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {

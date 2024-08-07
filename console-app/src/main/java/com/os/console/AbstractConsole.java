@@ -14,7 +14,7 @@ public abstract class AbstractConsole {
 	private static final Logger logger = LoggerFactory.getLogger(AbstractConsole.class);
 
 	protected abstract void printMenu();
-	protected abstract void prompt();
+	protected abstract boolean prompt();
 	protected abstract void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient);
 
 	public void execute(BufferedReader consoleIn, WebClient webClient) {
@@ -40,7 +40,9 @@ public abstract class AbstractConsole {
 					handleArgs(args, consoleIn, webClient);
 				}
 				
-				prompt();
+				if (!prompt()) {
+					break;
+				}
 			}
 		} catch (Exception e) {
 			logger.error("Exception with rerates command: " + input);

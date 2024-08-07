@@ -19,8 +19,9 @@ public class DelegationsConsole extends AbstractConsole {
 
 	private static final Logger logger = LoggerFactory.getLogger(DelegationsConsole.class);
 
-	protected void prompt() {
+	protected boolean prompt() {
 		System.out.print("/delegations > ");
+		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {

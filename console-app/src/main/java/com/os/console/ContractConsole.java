@@ -27,8 +27,16 @@ public class ContractConsole extends AbstractConsole {
 		this.contract = contract;
 	}
 
-	protected void prompt() {
+	protected boolean prompt() {
+		
+		if (contract == null) {
+			System.out.println("Contract not available");
+			return false;
+		}
+		
 		System.out.print("/contracts/" + contract.getContractId() + " > ");
+		
+		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {

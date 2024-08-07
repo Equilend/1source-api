@@ -29,8 +29,9 @@ public class ContractProposalConsole extends AbstractConsole {
 		this.proposingPartyRole = proposingPartyRole;
 	}
 
-	protected void prompt() {
+	protected boolean prompt() {
 		System.out.print("/contracts/ proposal > ");
+		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {

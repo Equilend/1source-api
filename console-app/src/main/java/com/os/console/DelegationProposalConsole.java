@@ -19,8 +19,16 @@ public class DelegationProposalConsole extends AbstractConsole {
 		this.counterParty = counterParty;
 	}
 
-	protected void prompt() {
+	protected boolean prompt() {
+		
+		if (counterParty == null) {
+			System.out.println("Counterparty not available");
+			return false;
+		}
+
 		System.out.print("/delegations/ proposal:" + counterParty.getPartyId() + " > ");
+		
+		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {

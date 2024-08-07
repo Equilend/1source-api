@@ -17,8 +17,18 @@ public class ContractRecallConsole extends AbstractConsole {
 		this.recall = recall;
 	}
 
-	protected void prompt() {
+	protected boolean prompt() {
+
+		if (contract == null) {
+			System.out.println("Contract not available");
+			return false;
+		} else if (recall == null) {
+			System.out.println("Recall not available");
+			return false;
+		}
+
 		System.out.print("/contracts/" + contract.getContractId() + "/recalls/" + recall.getRecallId() + " > ");
+		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
