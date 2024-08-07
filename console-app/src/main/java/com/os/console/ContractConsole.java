@@ -11,6 +11,7 @@ import com.os.console.api.tasks.ApproveContractTask;
 import com.os.console.api.tasks.CancelContractTask;
 import com.os.console.api.tasks.DeclineContractTask;
 import com.os.console.api.tasks.SearchContractHistoryTask;
+import com.os.console.api.tasks.SearchContractRateHistoryTask;
 import com.os.console.api.tasks.SearchContractTask;
 import com.os.console.api.tasks.UpdateContractVenueKeyTask;
 import com.os.console.api.tasks.UpdateContractSettlementStatusTask;
@@ -46,9 +47,19 @@ public class ContractConsole extends AbstractConsole {
 		} else if (args[0].equals("F")) {
 			refreshContract(webClient);
 		} else if (args[0].equals("H")) {
-			System.out.print("Listing history...");
+			System.out.print("Listing full history...");
 			SearchContractHistoryTask searchContractHistoryTask = new SearchContractHistoryTask(webClient, contract);
 			Thread taskT = new Thread(searchContractHistoryTask);
+			taskT.run();
+			try {
+				taskT.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} else if (args[0].equals("Y")) {
+			System.out.print("Listing rate change history...");
+			SearchContractRateHistoryTask searchContractRateHistoryTask = new SearchContractRateHistoryTask(webClient, contract);
+			Thread taskT = new Thread(searchContractRateHistoryTask);
 			taskT.run();
 			try {
 				taskT.join();
@@ -156,7 +167,8 @@ public class ContractConsole extends AbstractConsole {
 		System.out.println("-----------------------");
 		System.out.println("J                   - Print JSON");
 		System.out.println("F                   - Refresh");
-		System.out.println("H                   - History");
+		System.out.println("H                   - Full history");
+		System.out.println("Y                   - Rate change history");
 		System.out.println();
 		System.out.println("A                   - Approve");
 		System.out.println("C                   - Cancel");

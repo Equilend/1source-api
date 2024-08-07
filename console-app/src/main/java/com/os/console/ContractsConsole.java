@@ -11,6 +11,7 @@ import com.os.console.api.tasks.ApproveContractTask;
 import com.os.console.api.tasks.CancelContractTask;
 import com.os.console.api.tasks.DeclineContractTask;
 import com.os.console.api.tasks.SearchContractHistoryTask;
+import com.os.console.api.tasks.SearchContractRateHistoryTask;
 import com.os.console.api.tasks.SearchContractTask;
 import com.os.console.api.tasks.SearchContractsTask;
 import com.os.console.api.tasks.SearchPartyTask;
@@ -84,9 +85,43 @@ public class ContractsConsole extends AbstractConsole {
 							e.printStackTrace();
 						}
 						if (searchContractTask.getContract() != null) {
-							System.out.print("Listing contract history " + contractId + "...");
+							System.out.print("Listing contract full history " + contractId + "...");
 							SearchContractHistoryTask searchContractHistoryTask = new SearchContractHistoryTask(webClient, searchContractTask.getContract());
 							Thread taskS = new Thread(searchContractHistoryTask);
+							taskS.run();
+							try {
+								taskS.join();
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+						}
+					} else {
+						System.out.println("Invalid UUID");
+					}
+				} catch (Exception u) {
+					System.out.println("Invalid UUID");
+				}
+			}
+		} else if (args[0].equals("Y")) {
+			if (args.length != 2 || args[1].length() != 36) {
+				System.out.println("Invalid UUID");
+			} else {
+				String contractId = args[1].toLowerCase();
+				try {
+					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
+						System.out.print("Searching for contract " + contractId + "...");
+						SearchContractTask searchContractTask = new SearchContractTask(webClient, contractId);
+						Thread taskT = new Thread(searchContractTask);
+						taskT.run();
+						try {
+							taskT.join();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						if (searchContractTask.getContract() != null) {
+							System.out.print("Listing contract rate change history " + contractId + "...");
+							SearchContractRateHistoryTask searchContractRateHistoryTask = new SearchContractRateHistoryTask(webClient, searchContractTask.getContract());
+							Thread taskS = new Thread(searchContractRateHistoryTask);
 							taskS.run();
 							try {
 								taskS.join();
@@ -262,7 +297,8 @@ public class ContractsConsole extends AbstractConsole {
 		System.out.println("-----------------------");
 		System.out.println("L               - List all contracts");
 		System.out.println("S <Contract Id> - Search a contract by Id");
-		System.out.println("H <Contract Id> - Show history for contract Id");
+		System.out.println("H <Contract Id> - Show full history for contract Id");
+		System.out.println("Y <Contract Id> - Show rate change history for contract Id");
 		System.out.println();
 		System.out.println("A <Contract Id> - Approve a contract by Id");
 		System.out.println("C <Contract Id> - Cancel a contract by Id");
