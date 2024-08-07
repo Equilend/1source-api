@@ -31,27 +31,27 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 	WebClient restWebClient;
 
 	public static void main(String[] args) {
-		logger.info("STARTING THE APPLICATION");
+		logger.debug("STARTING THE APPLICATION");
 		ConfigurableApplicationContext applicationContext = SpringApplication.run(SpringBootConsoleApp.class, args);
 		SpringApplication.exit(applicationContext);
-		logger.info("APPLICATION FINISHED");
+		logger.debug("APPLICATION FINISHED");
 	}
 
 	@Override
 	public void run(String... args) {
 
-		logger.info("EXECUTING : command line runner");
+		logger.debug("EXECUTING : command line runner");
 
 		for (int i = 0; i < args.length; ++i) {
 			logger.info("args[{}]: {}", i, args[i]);
 		}
 
-//		Console console = System.console();
-//		
-//		if (console == null) {
-//			logger.warn("No console available");
-//			return;
-//		}
+		Console console = System.console();
+		
+		if (console == null) {
+			logger.warn("No console available");
+			return;
+		}
 
 		BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in));
 
