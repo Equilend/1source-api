@@ -75,7 +75,7 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 					System.exit(0);
 				} else if (command.equalsIgnoreCase("c")) {
 					ContractsConsole contractsConsole = new ContractsConsole();
-					contractsConsole.execute(consoleIn, authConfig, restWebClient);
+					contractsConsole.execute(consoleIn, restWebClient);
 				} else if (command.equalsIgnoreCase("r")) {
 					ReturnsConsole returnsConsole = new ReturnsConsole();
 					returnsConsole.execute(consoleIn, restWebClient);
@@ -87,7 +87,7 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 					reratesConsole.execute(consoleIn, restWebClient);
 				} else if (command.equalsIgnoreCase("d")) {
 					DelegationsConsole delegationsConsole = new DelegationsConsole();
-					delegationsConsole.execute(consoleIn, authConfig, restWebClient);
+					delegationsConsole.execute(consoleIn, restWebClient);
 				} else {
 					System.out.println("Unknown command");
 				}

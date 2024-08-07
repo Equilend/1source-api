@@ -25,7 +25,7 @@ public class SearchContractRecallsTask implements Runnable {
 	@Override
 	public void run() {
 		
-		Recalls recalls = (Recalls) RESTUtil.getRequest(webClient, "/contracts/" + contract.getContractId() + "/returns", Recalls.class);
+		Recalls recalls = (Recalls) RESTUtil.getRequest(webClient, "/contracts/" + contract.getContractId() + "/recalls", Recalls.class);
 
 		if (recalls == null || recalls.size() == 0) {
 			logger.warn("Invalid recalls object or no recalls");			

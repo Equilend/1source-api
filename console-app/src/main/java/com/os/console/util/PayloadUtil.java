@@ -27,15 +27,12 @@ import com.os.client.model.Instrument;
 import com.os.client.model.InternalReference;
 import com.os.client.model.Party;
 import com.os.client.model.PartyRole;
-import com.os.client.model.PartySettlementInstruction;
 import com.os.client.model.RebateRate;
 import com.os.client.model.RecallProposal;
 import com.os.client.model.RerateProposal;
 import com.os.client.model.ReturnAcknowledgement;
 import com.os.client.model.ReturnProposal;
 import com.os.client.model.RoundingMode;
-import com.os.client.model.SettlementInstruction;
-import com.os.client.model.SettlementStatus;
 import com.os.client.model.SettlementType;
 import com.os.client.model.TermType;
 import com.os.client.model.TradeAgreement;
@@ -48,7 +45,7 @@ import com.os.console.api.ConsoleConfig;
 
 public class PayloadUtil {
 
-	public static ContractProposal createContractProposal(ConsoleConfig consoleConfig, Party borrowerParty, Party lenderParty,
+	public static ContractProposal createContractProposal(Party borrowerParty, Party lenderParty,
 			PartyRole proposingPartyRole) {
 
 		Random random = new Random();
@@ -157,28 +154,12 @@ public class PayloadUtil {
 
 		contractProposal.setTrade(trade);
 
-		PartySettlementInstruction partySettlementInstruction = new PartySettlementInstruction();
-		partySettlementInstruction.setPartyRole(proposingPartyRole);
-		partySettlementInstruction.setSettlementStatus(SettlementStatus.NONE);
-		partySettlementInstruction.setInternalAcctCd(consoleConfig.getSettlement_internalAcctCd());
-
-		SettlementInstruction instruction = new SettlementInstruction();
-		partySettlementInstruction.setInstruction(instruction);
-		instruction.setSettlementBic(consoleConfig.getSettlement_settlementBic());
-		instruction.setLocalAgentBic(consoleConfig.getSettlement_localAgentBic());
-		instruction.setLocalAgentName(consoleConfig.getSettlement_localAgentName());
-		instruction.setLocalAgentAcct(consoleConfig.getSettlement_localAgentAcct());
-		instruction.setCustodianBic(consoleConfig.getSettlement_custodianBic());
-		instruction.setCustodianName(consoleConfig.getSettlement_custodianName());
-		instruction.setCustodianAcct(consoleConfig.getSettlement_custodianAcct());
-		instruction.setDtcParticipantNumber(consoleConfig.getSettlement_dtcParticipantNumber());
-
-		contractProposal.setSettlement(Collections.singletonList(partySettlementInstruction));
+		contractProposal.setSettlement(Collections.singletonList(ConsoleConfig.SETTLEMENT_INSTRUCTIONS));
 
 		return contractProposal;
 	}
 
-	public static ContractProposalApproval createContractProposalApproval(ConsoleConfig consoleConfig) {
+	public static ContractProposalApproval createContractProposalApproval() {
 
 		ContractProposalApproval proposalApproval = new ContractProposalApproval();
 
@@ -189,28 +170,12 @@ public class PayloadUtil {
 			proposalApproval.setRoundingMode(RoundingMode.ALWAYSUP);
 		}
 
-		PartySettlementInstruction partySettlementInstruction = new PartySettlementInstruction();
-		partySettlementInstruction.setPartyRole(ConsoleConfig.ACTING_AS);
-		partySettlementInstruction.setSettlementStatus(SettlementStatus.NONE);
-		partySettlementInstruction.setInternalAcctCd(consoleConfig.getSettlement_internalAcctCd());
-
-		SettlementInstruction instruction = new SettlementInstruction();
-		partySettlementInstruction.setInstruction(instruction);
-		instruction.setSettlementBic(consoleConfig.getSettlement_settlementBic());
-		instruction.setLocalAgentBic(consoleConfig.getSettlement_localAgentBic());
-		instruction.setLocalAgentName(consoleConfig.getSettlement_localAgentName());
-		instruction.setLocalAgentAcct(consoleConfig.getSettlement_localAgentAcct());
-		instruction.setCustodianBic(consoleConfig.getSettlement_custodianBic());
-		instruction.setCustodianName(consoleConfig.getSettlement_custodianName());
-		instruction.setCustodianAcct(consoleConfig.getSettlement_custodianAcct());
-		instruction.setDtcParticipantNumber(consoleConfig.getSettlement_dtcParticipantNumber());
-
-		proposalApproval.setSettlement(partySettlementInstruction);
+		proposalApproval.setSettlement(ConsoleConfig.SETTLEMENT_INSTRUCTIONS);
 
 		return proposalApproval;
 	}
 
-	public static ReturnProposal createReturnProposal(ConsoleConfig consoleConfig, Contract contract, Integer quantity) {
+	public static ReturnProposal createReturnProposal(Contract contract, Integer quantity) {
 
 		ReturnProposal proposal = new ReturnProposal();
 
@@ -258,7 +223,7 @@ public class PayloadUtil {
 		return proposal;
 	}
 
-	public static RecallProposal createRecallProposal(ConsoleConfig consoleConfig, Integer quantity) {
+	public static RecallProposal createRecallProposal(Integer quantity) {
 
 		RecallProposal proposal = new RecallProposal();
 
@@ -300,7 +265,7 @@ public class PayloadUtil {
 		return proposal;
 	}
 
-	public static RerateProposal createRerateProposal(ConsoleConfig consoleConfig, Contract contract, Double rerate) {
+	public static RerateProposal createRerateProposal(Contract contract, Double rerate) {
 
 		RerateProposal proposal = new RerateProposal();
 

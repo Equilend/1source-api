@@ -1,25 +1,20 @@
 package com.os.console;
 
 import java.io.BufferedReader;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.os.client.model.Contract;
 import com.os.console.api.ConsoleConfig;
-import com.os.console.api.LocalDateTypeGsonAdapter;
-import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
 import com.os.console.api.tasks.ApproveContractTask;
 import com.os.console.api.tasks.CancelContractTask;
 import com.os.console.api.tasks.DeclineContractTask;
+import com.os.console.api.tasks.SearchContractHistoryTask;
 import com.os.console.api.tasks.SearchContractTask;
 import com.os.console.api.tasks.UpdateContractVenueKeyTask;
 import com.os.console.api.tasks.UpdateContractSettlementStatusTask;
+import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.PayloadUtil;
 
 public class ContractConsole extends AbstractConsole {
@@ -28,131 +23,110 @@ public class ContractConsole extends AbstractConsole {
 
 	Contract contract;
 
+	public ContractConsole(Contract contract) {
+		this.contract = contract;
+	}
+
 	protected void prompt() {
 		System.out.print("/contracts/" + contract.getContractId() + " > ");
 	}
 
-	public void execute(BufferedReader consoleIn, ConsoleConfig consoleConfig, WebClient webClient,
-			Contract origContract) {
+	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 
-		contract = origContract;
-
-		String command = null;
-		prompt();
-
-		try {
-			while ((command = consoleIn.readLine()) != null) {
-
-				command = command.trim().toUpperCase();
-
-				if (checkSystemCommand(command)) {
-					continue;
-				} else if (goBackMenu(command)) {
-					break;
-				} else {
-					if (command.equals("J")) {
-
-						Gson gson = new GsonBuilder().setPrettyPrinting()
-								.registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
-								.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
-								.create();
-
-						System.out.println(gson.toJson(contract));
-						System.out.println();
-
-					} else if (command.equals("F")) {
-						refreshContract(webClient);
-					} else if (command.equals("A")) {
-						System.out.print("Approving contract...");
-						ApproveContractTask approveContractTask = new ApproveContractTask(webClient,
-								contract, PayloadUtil.createContractProposalApproval(consoleConfig));
-						Thread taskT = new Thread(approveContractTask);
-						taskT.run();
-						try {
-							taskT.join();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						refreshContract(webClient);
-					} else if (command.equals("C")) {
-						System.out.print("Canceling contract...");
-						CancelContractTask cancelContractTask = new CancelContractTask(webClient,
-								contract.getContractId());
-						Thread taskT = new Thread(cancelContractTask);
-						taskT.run();
-						try {
-							taskT.join();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						refreshContract(webClient);
-					} else if (command.equals("D")) {
-						System.out.print("Declining contract...");
-						DeclineContractTask declineContractTask = new DeclineContractTask(webClient,
-								contract.getContractId());
-						Thread taskT = new Thread(declineContractTask);
-						taskT.run();
-						try {
-							taskT.join();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						refreshContract(webClient);
-					} else if (command.equals("U")) {
-						System.out.print("Updating settlement status to SETTLED...");
-						UpdateContractSettlementStatusTask updateSettlementStatusTask = new UpdateContractSettlementStatusTask(
-								webClient, contract, ConsoleConfig.ACTING_PARTY);
-						Thread taskT = new Thread(updateSettlementStatusTask);
-						taskT.run();
-						try {
-							taskT.join();
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						refreshContract(webClient);
-					} else if (command.startsWith("V ")) {
-						if (command.length() > 100) {
-							System.out.println("Invalid reference key");
-						} else {
-							String venueRefKey = command.substring(2);
-							try {
-								System.out.print("Assigning venue reference " + venueRefKey + "...");
-								UpdateContractVenueKeyTask updateContractVenueKeyTask = new UpdateContractVenueKeyTask(
-										webClient, contract.getContractId(), venueRefKey);
-								Thread taskT = new Thread(updateContractVenueKeyTask);
-								taskT.run();
-								try {
-									taskT.join();
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-								refreshContract(webClient);
-							} catch (Exception u) {
-								System.out.println("Invalid reference key");
-							}
-						}
-					} else if (command.equals("R")) {
-						ContractReturnsConsole contractReturnsConsole = new ContractReturnsConsole();
-						contractReturnsConsole.execute(consoleIn, consoleConfig, webClient, contract);
-					} else if (command.equals("E")) {
-						ContractRecallsConsole contractRecallsConsole = new ContractRecallsConsole();
-						contractRecallsConsole.execute(consoleIn, consoleConfig, webClient, contract);
-					} else if (command.equals("T")) {
-						ContractReratesConsole contractReratesConsole = new ContractReratesConsole();
-						contractReratesConsole.execute(consoleIn, consoleConfig, webClient, contract);
-					} else {
-						System.out.println("Unknown command");
-					}
-
-				}
-
-				prompt();
+		if (args[0].equals("J")) {
+			ConsoleOutputUtil.printObject(contract);
+		} else if (args[0].equals("F")) {
+			refreshContract(webClient);
+		} else if (args[0].equals("H")) {
+			System.out.print("Listing history...");
+			SearchContractHistoryTask searchContractHistoryTask = new SearchContractHistoryTask(webClient, contract);
+			Thread taskT = new Thread(searchContractHistoryTask);
+			taskT.run();
+			try {
+				taskT.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			logger.error("Exception with contracts command: " + command);
-			e.printStackTrace();
+		} else if (args[0].equals("A")) {
+		
+			System.out.print("Approving contract...");
+			ApproveContractTask approveContractTask = new ApproveContractTask(webClient, contract,
+					PayloadUtil.createContractProposalApproval());
+			Thread taskT = new Thread(approveContractTask);
+			taskT.run();
+			try {
+				taskT.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			refreshContract(webClient);
+		} else if (args[0].equals("C")) {
+			System.out.print("Canceling contract...");
+			CancelContractTask cancelContractTask = new CancelContractTask(webClient, contract.getContractId());
+			Thread taskT = new Thread(cancelContractTask);
+			taskT.run();
+			try {
+				taskT.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			refreshContract(webClient);
+		} else if (args[0].equals("D")) {
+			System.out.print("Declining contract...");
+			DeclineContractTask declineContractTask = new DeclineContractTask(webClient, contract.getContractId());
+			Thread taskT = new Thread(declineContractTask);
+			taskT.run();
+			try {
+				taskT.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			refreshContract(webClient);
+		} else if (args[0].equals("U")) {
+			System.out.print("Updating settlement status to SETTLED...");
+			UpdateContractSettlementStatusTask updateSettlementStatusTask = new UpdateContractSettlementStatusTask(
+					webClient, contract, ConsoleConfig.ACTING_PARTY);
+			Thread taskT = new Thread(updateSettlementStatusTask);
+			taskT.run();
+			try {
+				taskT.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			refreshContract(webClient);
+		} else if (args[0].equals("V")) {
+			if (args.length != 2 || args[1].length() == 0 || args[1].length() > 50) {
+				System.out.println("Invalid reference key");
+			} else {
+				String venueRefKey = args[1];
+				try {
+					System.out.print("Assigning venue reference " + venueRefKey + "...");
+					UpdateContractVenueKeyTask updateContractVenueKeyTask = new UpdateContractVenueKeyTask(webClient,
+							contract.getContractId(), venueRefKey);
+					Thread taskT = new Thread(updateContractVenueKeyTask);
+					taskT.run();
+					try {
+						taskT.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					refreshContract(webClient);
+				} catch (Exception u) {
+					System.out.println("Invalid reference key");
+				}
+			}
+		} else if (args[0].equals("R")) {
+			ContractReturnsConsole contractReturnsConsole = new ContractReturnsConsole(contract);
+			contractReturnsConsole.execute(consoleIn, webClient);
+		} else if (args[0].equals("E")) {
+			ContractRecallsConsole contractRecallsConsole = new ContractRecallsConsole(contract);
+			contractRecallsConsole.execute(consoleIn, webClient);
+		} else if (args[0].equals("T")) {
+			ContractReratesConsole contractReratesConsole = new ContractReratesConsole(contract);
+			contractReratesConsole.execute(consoleIn, webClient);
+		} else {
+			System.out.println("Unknown command");
 		}
-
 	}
 
 	private void refreshContract(WebClient webClient) {
@@ -174,6 +148,7 @@ public class ContractConsole extends AbstractConsole {
 		System.out.println("-----------------------");
 		System.out.println("J                   - Print JSON");
 		System.out.println("F                   - Refresh");
+		System.out.println("H                   - History");
 		System.out.println();
 		System.out.println("A                   - Approve");
 		System.out.println("C                   - Cancel");

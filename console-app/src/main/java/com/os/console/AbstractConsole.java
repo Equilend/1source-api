@@ -1,13 +1,53 @@
 package com.os.console;
 
+import java.io.BufferedReader;
 import java.util.ArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.console.api.ConsoleConfig;
 
 public abstract class AbstractConsole {
 
+	private static final Logger logger = LoggerFactory.getLogger(AbstractConsole.class);
+
 	protected abstract void printMenu();
 	protected abstract void prompt();
+	protected abstract void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient);
+
+	public void execute(BufferedReader consoleIn, WebClient webClient) {
+
+		String input = null;
+
+		prompt();
+
+		try {
+			while ((input = consoleIn.readLine()) != null) {
+
+				String[] args = parseArgs(input);
+				if (args.length == 0) {
+					prompt();
+					continue;
+				}
+
+				if (checkSystemCommand(args[0])) {
+					continue;
+				} else if (goBackMenu(args[0])) {
+					break;
+				} else {
+					handleArgs(args, consoleIn, webClient);
+				}
+				
+				prompt();
+			}
+		} catch (Exception e) {
+			logger.error("Exception with rerates command: " + input);
+			e.printStackTrace();
+		}
+
+	}
 
 	/**
 	 * The program accepts 2 args. The second arg can be a multi-word string.
