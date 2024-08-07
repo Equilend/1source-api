@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 import com.os.client.model.Party;
 import com.os.client.model.PartyRole;
+import com.os.client.model.PartySettlementInstruction;
 
 @ConfigurationProperties(prefix = "com.os.config")
 public class ConsoleConfig {
@@ -12,6 +13,7 @@ public class ConsoleConfig {
 	public static AuthToken TOKEN = null;
     public static Party ACTING_PARTY = null;
     public static PartyRole ACTING_AS = null;
+    public static PartySettlementInstruction SETTLEMENT_INSTRUCTIONS = null;
     
 	private final String api_uri;
 

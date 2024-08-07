@@ -1,21 +1,15 @@
 package com.os.console;
 
 import java.io.BufferedReader;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.os.client.model.ContractProposal;
 import com.os.client.model.Party;
 import com.os.client.model.PartyRole;
-import com.os.console.api.ConsoleConfig;
-import com.os.console.api.LocalDateTypeGsonAdapter;
-import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
 import com.os.console.api.tasks.ProposeContractTask;
+import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.PayloadUtil;
 
 public class ContractProposalConsole extends AbstractConsole {
@@ -24,72 +18,54 @@ public class ContractProposalConsole extends AbstractConsole {
 
 	private ContractProposal contractProposal;
 
+	private Party borrowerParty;
+	private Party lenderParty;
+	private PartyRole proposingPartyRole;
+
+	public ContractProposalConsole(Party borrowerParty, Party lenderParty, PartyRole proposingPartyRole) {
+
+		this.borrowerParty = borrowerParty;
+		this.lenderParty = lenderParty;
+		this.proposingPartyRole = proposingPartyRole;
+	}
+
 	protected void prompt() {
 		System.out.print("/contracts/ proposal > ");
 	}
-	
-	public void execute(BufferedReader consoleIn, ConsoleConfig consoleConfig, WebClient webClient, Party borrowerParty,
-			Party lenderParty, PartyRole proposingPartyRole) {
 
-		Gson gson = new GsonBuilder().setPrettyPrinting()
-				.registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
-				.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter()).create();
+	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 
-		contractProposal = PayloadUtil.createContractProposal(consoleConfig, borrowerParty, lenderParty, proposingPartyRole);
+		contractProposal = PayloadUtil.createContractProposal(borrowerParty, lenderParty, proposingPartyRole);
 
-		System.out.println(gson.toJson(contractProposal));
-		System.out.println();
+		ConsoleOutputUtil.printObject(contractProposal);
 
-		String command = null;
-		prompt();
+		if (args[0].equals("R")) {
 
-		try {
-			while ((command = consoleIn.readLine()) != null) {
+			contractProposal = PayloadUtil.createContractProposal(borrowerParty, lenderParty, proposingPartyRole);
 
-				command = command.trim().toUpperCase();
+			ConsoleOutputUtil.printObject(contractProposal);
 
-				if (checkSystemCommand(command)) {
-					continue;
-				} else if (goBackMenu(command)) {
-					break;
-				} else {
-					if (command.equals("R")) {
+		} else if (args[0].equals("S")) {
 
-						contractProposal = PayloadUtil.createContractProposal(consoleConfig, borrowerParty, lenderParty,
-								proposingPartyRole);
-
-						System.out.println(gson.toJson(contractProposal));
-						System.out.println();
-
-					} else if (command.equals("S")) {
-
-						try {
-							System.out.print("Proposing contract...");
-							ProposeContractTask proposeContractTask = new ProposeContractTask(webClient,
-									contractProposal);
-							Thread taskT = new Thread(proposeContractTask);
-							taskT.run();
-							try {
-								taskT.join();
-							} catch (InterruptedException e) {
-								e.printStackTrace();
-							}
-						} catch (Exception u) {
-							System.out.println("Error proposing contract");
-						}
-
-					} else {
-						System.out.println("Unknown command");
-					}
+			try {
+				System.out.print("Proposing contract...");
+				ProposeContractTask proposeContractTask = new ProposeContractTask(webClient, contractProposal);
+				Thread taskT = new Thread(proposeContractTask);
+				taskT.run();
+				try {
+					taskT.join();
+				} catch (InterruptedException e) {
+					logger.error("Propose contract interrupted.", e);
+					e.printStackTrace();
 				}
-				
-				prompt();
+			} catch (Exception u) {
+				logger.error("Error proposing contract.", u);
+				System.out.println("Error proposing contract");
 			}
-		} catch (Exception e) {
-			logger.error("Exception with returns command: " + command);
-			e.printStackTrace();
-		}
 
+		} else {
+			System.out.println("Unknown command");
+		}
 	}
 
 	protected void printMenu() {
@@ -97,6 +73,7 @@ public class ContractProposalConsole extends AbstractConsole {
 		System.out.println("-----------------------");
 		System.out.println("S             - Submit contract proposal");
 		System.out.println("R             - Regenerate contract");
+		System.out.println();
 		System.out.println("X             - Go back");
 	}
 

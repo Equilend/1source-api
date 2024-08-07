@@ -8,6 +8,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Party;
 import com.os.client.model.PartyRole;
+import com.os.client.model.PartySettlementInstruction;
+import com.os.client.model.SettlementInstruction;
+import com.os.client.model.SettlementStatus;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.AuthTask;
 import com.os.console.api.tasks.SearchPartyTask;
@@ -114,6 +117,24 @@ public class LoginConsole {
 				}
 			}
 
+			PartySettlementInstruction partySettlementInstruction = new PartySettlementInstruction();
+			partySettlementInstruction.setPartyRole(ConsoleConfig.ACTING_AS);
+			partySettlementInstruction.setSettlementStatus(SettlementStatus.NONE);
+			partySettlementInstruction.setInternalAcctCd(authConfig.getSettlement_internalAcctCd());
+
+			SettlementInstruction instruction = new SettlementInstruction();
+			partySettlementInstruction.setInstruction(instruction);
+			instruction.setSettlementBic(authConfig.getSettlement_settlementBic());
+			instruction.setLocalAgentBic(authConfig.getSettlement_localAgentBic());
+			instruction.setLocalAgentName(authConfig.getSettlement_localAgentName());
+			instruction.setLocalAgentAcct(authConfig.getSettlement_localAgentAcct());
+			instruction.setCustodianBic(authConfig.getSettlement_custodianBic());
+			instruction.setCustodianName(authConfig.getSettlement_custodianName());
+			instruction.setCustodianAcct(authConfig.getSettlement_custodianAcct());
+			instruction.setDtcParticipantNumber(authConfig.getSettlement_dtcParticipantNumber());
+			
+			ConsoleConfig.SETTLEMENT_INSTRUCTIONS = partySettlementInstruction;
+			
 		} catch (Exception e) {
 			System.out.println("Error during login");
 			logger.error("Exception during login: " + e.getMessage());

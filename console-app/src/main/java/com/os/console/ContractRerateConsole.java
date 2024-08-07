@@ -1,77 +1,42 @@
 package com.os.console;
 
 import java.io.BufferedReader;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.os.client.model.Contract;
 import com.os.client.model.Rerate;
-import com.os.console.api.LocalDateTypeGsonAdapter;
-import com.os.console.api.OffsetDateTimeTypeGsonAdapter;
+import com.os.console.util.ConsoleOutputUtil;
 
 public class ContractRerateConsole extends AbstractConsole {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractRerateConsole.class);
-
 	Contract contract;
 	Rerate rerate;
+
+	public ContractRerateConsole(Contract contract, Rerate rerate) {
+		this.contract = contract;
+		this.rerate = rerate;
+	}
 
 	protected void prompt() {
 		System.out.print("/contracts/" + contract.getContractId() + "/rerates/" + rerate.getRerateId() + " > ");
 	}
 
-	public void execute(BufferedReader consoleIn, WebClient webClient, Contract origContract, Rerate origRerate) {
+	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 
-		this.contract = origContract;
-		this.rerate = origRerate;
+		if (args[0].equals("J")) {
 
-		String command = null;
-		prompt();
+			ConsoleOutputUtil.printObject(rerate);
 
-		try {
-			while ((command = consoleIn.readLine()) != null) {
-
-				command = command.trim().toUpperCase();
-
-				if (checkSystemCommand(command)) {
-					continue;
-				} else if (goBackMenu(command)) {
-					break;
-				} else {
-					if (command.equals("J")) {
-
-						Gson gson = new GsonBuilder().setPrettyPrinting()
-								.registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
-								.registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
-								.create();
-
-						System.out.println(gson.toJson(rerate));
-						System.out.println();
-
-					} else {
-						System.out.println("Unknown command");
-					}
-				}
-				
-				prompt();
-			}
-		} catch (Exception e) {
-			logger.error("Exception with rerates command: " + command);
-			e.printStackTrace();
+		} else {
+			System.out.println("Unknown command");
 		}
-
 	}
 
 	protected void printMenu() {
 		System.out.println("Contract Rerate Menu");
 		System.out.println("-----------------------");
 		System.out.println("J             - Print JSON");
+		System.out.println();
 		System.out.println("X             - Go back");
 	}
 

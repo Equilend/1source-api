@@ -23,173 +23,147 @@ public class DelegationsConsole extends AbstractConsole {
 		System.out.print("/delegations > ");
 	}
 
-	public void execute(BufferedReader consoleIn, ConsoleConfig consoleConfig, WebClient webClient) {
+	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 
-		String command = null;
-		prompt();
-
-		try {
-			while ((command = consoleIn.readLine()) != null) {
-
-				command = command.trim().toUpperCase();
-
-				if (checkSystemCommand(command)) {
-					continue;
-				} else if (goBackMenu(command)) {
-					break;
-				} else {
-					if (command.equals("L")) {
-						System.out.print("Listing all delegations...");
-						SearchDelegationsTask searchDelegationsTask = new SearchDelegationsTask(webClient);
-						Thread taskT = new Thread(searchDelegationsTask);
+		if (args[0].equals("L")) {
+			System.out.print("Listing all delegations...");
+			SearchDelegationsTask searchDelegationsTask = new SearchDelegationsTask(webClient);
+			Thread taskT = new Thread(searchDelegationsTask);
+			taskT.run();
+			try {
+				taskT.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		} else if (args[0].equals("S")) {
+			if (args.length != 2 || args[1].length() != 36) {
+				System.out.println("Invalid UUID");
+			} else {
+				String delegationId = args[1];
+				try {
+					if (UUID.fromString(delegationId).toString().equals(delegationId)) {
+						System.out.print("Retrieving delegation " + delegationId + "...");
+						SearchDelegationTask searchDelegationTask = new SearchDelegationTask(webClient, delegationId);
+						Thread taskT = new Thread(searchDelegationTask);
 						taskT.run();
 						try {
 							taskT.join();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-					} else if (command.startsWith("S ")) {
-						if (command.length() != 38) {
-							System.out.println("Invalid UUID");
-						} else {
-							String delegationId = command.substring(2).toLowerCase();
-							try {
-								if (UUID.fromString(delegationId).toString().equals(delegationId)) {
-									System.out.print("Retrieving delegation " + delegationId + "...");
-									SearchDelegationTask searchDelegationTask = new SearchDelegationTask(webClient,
-											delegationId);
-									Thread taskT = new Thread(searchDelegationTask);
-									taskT.run();
-									try {
-										taskT.join();
-									} catch (InterruptedException e) {
-										e.printStackTrace();
-									}
-									if (searchDelegationTask.getDelegation() != null) {
-										DelegationConsole delegationConsole = new DelegationConsole();
-										delegationConsole.execute(consoleIn, webClient,
-												searchDelegationTask.getDelegation());
-									}
-								} else {
-									System.out.println("Invalid UUID");
-								}
-							} catch (Exception u) {
-								System.out.println(u.getMessage());
-								logger.error(u.getMessage(), u);
-							}
-						}
-					} else if (command.equals("A")) {
-						if (command.length() != 38) {
-							System.out.println("Invalid UUID");
-						} else {
-							String delegationId = command.substring(2).toLowerCase();
-							try {
-								if (UUID.fromString(delegationId).toString().equalsIgnoreCase(delegationId)) {
-									System.out.print("Approving delegation " + delegationId + "...");
-									ApproveDelegationTask approveDelegationTask = new ApproveDelegationTask(webClient,
-											delegationId);
-									Thread taskT = new Thread(approveDelegationTask);
-									taskT.run();
-									try {
-										taskT.join();
-									} catch (InterruptedException e) {
-										e.printStackTrace();
-									}
-								} else {
-									System.out.println("Invalid UUID");
-								}
-							} catch (Exception u) {
-								System.out.println("Invalid UUID");
-							}
-						}
-					} else if (command.equals("C")) {
-						if (command.length() != 38) {
-							System.out.println("Invalid UUID");
-						} else {
-							String delegationId = command.substring(2).toLowerCase();
-							try {
-								if (UUID.fromString(delegationId).toString().equalsIgnoreCase(delegationId)) {
-									System.out.print("Canceling delegation " + delegationId + "...");
-									CancelDelegationTask cancelDelegationTask = new CancelDelegationTask(webClient,
-											delegationId);
-									Thread taskT = new Thread(cancelDelegationTask);
-									taskT.run();
-									try {
-										taskT.join();
-									} catch (InterruptedException e) {
-										e.printStackTrace();
-									}
-								} else {
-									System.out.println("Invalid UUID");
-								}
-							} catch (Exception u) {
-								System.out.println("Invalid UUID");
-							}
-						}
-					} else if (command.equals("D")) {
-						if (command.length() != 38) {
-							System.out.println("Invalid UUID");
-						} else {
-							String delegationId = command.substring(2).toLowerCase();
-							try {
-								if (UUID.fromString(delegationId).toString().equalsIgnoreCase(delegationId)) {
-									System.out.print("Declining delegation " + delegationId + "...");
-									DeclineDelegationTask declineDelegationTask = new DeclineDelegationTask(webClient,
-											delegationId);
-									Thread taskT = new Thread(declineDelegationTask);
-									taskT.run();
-									try {
-										taskT.join();
-									} catch (InterruptedException e) {
-										e.printStackTrace();
-									}
-								} else {
-									System.out.println("Invalid UUID");
-								}
-							} catch (Exception u) {
-								System.out.println("Invalid UUID");
-							}
-						}
-					} else if (command.startsWith("P ")) {
-						if (command.length() > 100) {
-							System.out.println("Invalid Party Id");
-						} else if (consoleConfig.getAuth_party().equalsIgnoreCase(command)) {
-							System.out.println("You cannot propose a delegation to yourself");
-						} else {
-
-							String partyId = command.substring(2).toUpperCase();
-							try {
-								System.out.print("Verifying party " + partyId + "...");
-								SearchPartyTask searchPartyTask = new SearchPartyTask(webClient, partyId);
-								Thread taskT = new Thread(searchPartyTask);
-								taskT.run();
-								try {
-									taskT.join();
-								} catch (InterruptedException e) {
-									e.printStackTrace();
-								}
-								if (searchPartyTask.getParty() != null) {
-									DelegationProposalConsole delegationProposalConsole = new DelegationProposalConsole();
-									delegationProposalConsole.execute(consoleIn, consoleConfig, webClient,
-											searchPartyTask.getParty());
-								}
-							} catch (Exception u) {
-								logger.error("Problem verifying party", u);
-								System.out.println("Invalid party id");
-							}
+						if (searchDelegationTask.getDelegation() != null) {
+							DelegationConsole delegationConsole = new DelegationConsole(searchDelegationTask.getDelegation());
+							delegationConsole.execute(consoleIn, webClient);
 						}
 					} else {
-						System.out.println("Unknown command");
+						System.out.println("Invalid UUID");
 					}
+				} catch (Exception u) {
+					System.out.println(u.getMessage());
+					logger.error(u.getMessage(), u);
 				}
-
-				prompt();
 			}
-		} catch (Exception e) {
-			logger.error("Exception with delegations command: " + command);
-			e.printStackTrace();
-		}
+		} else if (args[0].equals("A")) {
+			if (args.length != 2 || args[1].length() != 36) {
+				System.out.println("Invalid UUID");
+			} else {
+				String delegationId = args[1];
+				try {
+					if (UUID.fromString(delegationId).toString().equalsIgnoreCase(delegationId)) {
+						System.out.print("Approving delegation " + delegationId + "...");
+						ApproveDelegationTask approveDelegationTask = new ApproveDelegationTask(webClient,
+								delegationId);
+						Thread taskT = new Thread(approveDelegationTask);
+						taskT.run();
+						try {
+							taskT.join();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					} else {
+						System.out.println("Invalid UUID");
+					}
+				} catch (Exception u) {
+					System.out.println("Invalid UUID");
+				}
+			}
+		} else if (args[0].equals("C")) {
+			if (args.length != 2 || args[1].length() != 36) {
+				System.out.println("Invalid UUID");
+			} else {
+				String delegationId = args[1];
+				try {
+					if (UUID.fromString(delegationId).toString().equalsIgnoreCase(delegationId)) {
+						System.out.print("Canceling delegation " + delegationId + "...");
+						CancelDelegationTask cancelDelegationTask = new CancelDelegationTask(webClient, delegationId);
+						Thread taskT = new Thread(cancelDelegationTask);
+						taskT.run();
+						try {
+							taskT.join();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					} else {
+						System.out.println("Invalid UUID");
+					}
+				} catch (Exception u) {
+					System.out.println("Invalid UUID");
+				}
+			}
+		} else if (args[0].equals("D")) {
+			if (args.length != 2 || args[1].length() != 36) {
+				System.out.println("Invalid UUID");
+			} else {
+				String delegationId = args[1];
+				try {
+					if (UUID.fromString(delegationId).toString().equalsIgnoreCase(delegationId)) {
+						System.out.print("Declining delegation " + delegationId + "...");
+						DeclineDelegationTask declineDelegationTask = new DeclineDelegationTask(webClient,
+								delegationId);
+						Thread taskT = new Thread(declineDelegationTask);
+						taskT.run();
+						try {
+							taskT.join();
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+					} else {
+						System.out.println("Invalid UUID");
+					}
+				} catch (Exception u) {
+					System.out.println("Invalid UUID");
+				}
+			}
+		} else if (args[0].equals("P")) {
+			if (args.length != 2 || args[1].length() > 100) {
+				System.out.println("Invalid Party Id");
+			} else if (ConsoleConfig.ACTING_PARTY.getPartyId().equalsIgnoreCase(args[1])) {
+				System.out.println("You cannot propose a delegation to yourself");
+			} else {
 
+				String partyId = args[1];
+				try {
+					System.out.print("Verifying party " + partyId + "...");
+					SearchPartyTask searchPartyTask = new SearchPartyTask(webClient, partyId);
+					Thread taskT = new Thread(searchPartyTask);
+					taskT.run();
+					try {
+						taskT.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					if (searchPartyTask.getParty() != null) {
+						DelegationProposalConsole delegationProposalConsole = new DelegationProposalConsole(searchPartyTask.getParty());
+						delegationProposalConsole.execute(consoleIn, webClient);
+					}
+				} catch (Exception u) {
+					logger.error("Problem verifying party", u);
+					System.out.println("Invalid party id");
+				}
+			}
+		} else {
+			System.out.println("Unknown command");
+		}
 	}
 
 	protected void printMenu() {
