@@ -28,8 +28,16 @@ public class ReturnConsole extends AbstractConsole {
 		this.modelReturn = modelReturn;
 	}
 
-	protected void prompt() {
+	protected boolean prompt() {
+		
+		if (modelReturn == null) {
+			System.out.println("Return not available");
+			return false;
+		}
+		
 		System.out.print("/returns/" + modelReturn.getReturnId() + " > ");
+		
+		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {

@@ -47,21 +47,25 @@ public class SearchContractHistoryTask implements Runnable {
 			ArrayList<ContractHistory> history = new ArrayList<>();
 			for (Contract contract : contracts) {
 				Double rate = null;
+				Double effectiveRate = null;
 				Rate contractRate = contract.getTrade().getRate();
 				if (contractRate instanceof RebateRate) {
 					OneOfRebateRateRebate oneOfRebateRateRebate = ((RebateRate) contractRate).getRebate();
 					if (oneOfRebateRateRebate instanceof FloatingRate) {
 						rate = ((FloatingRate) oneOfRebateRateRebate).getFloating().getSpread();
+						effectiveRate = ((FloatingRate) oneOfRebateRateRebate).getFloating().getEffectiveRate();
 					} else if (oneOfRebateRateRebate instanceof FixedRate) {
 						rate = ((FixedRate) oneOfRebateRateRebate).getFixed().getBaseRate();
+						effectiveRate = ((FloatingRate) oneOfRebateRateRebate).getFloating().getEffectiveRate();
 					}
 				} else if (contractRate instanceof FeeRate) {
 					rate = ((FeeRate) contractRate).getFee().getBaseRate();
+					effectiveRate = ((FeeRate) contractRate).getFee().getEffectiveRate();
 				}
 
 				history.add(new ContractHistory(contract.getLastUpdateDateTime(),
 						contract.getLastEvent().getEventType().toString(), contract.getContractStatus().toString(),
-						contract.getTrade().getQuantity(), contract.getTrade().getOpenQuantity(), rate,
+						contract.getTrade().getQuantity(), contract.getTrade().getOpenQuantity(), rate, effectiveRate,
 						contract.getTrade().getCollateral().getContractPrice()));
 			}
 
@@ -82,7 +86,8 @@ public class SearchContractHistoryTask implements Runnable {
 				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.contractStatus, 12));
 				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.origQuantity, 15));
 				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.openQuantity, 15));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.rate, 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.rate, 10));
+				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.effectiveRate, 15));
 				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.price, 15));
 				System.out.println();
 
@@ -99,10 +104,11 @@ public class SearchContractHistoryTask implements Runnable {
 		Integer origQuantity;
 		Integer openQuantity;
 		Double rate;
+		Double effectiveRate;
 		Double price;
 
 		public ContractHistory(OffsetDateTime lastUpdateDateTime, String eventType, String contractStatus,
-				Integer origQuantity, Integer openQuantity, Double rate, Double price) {
+				Integer origQuantity, Integer openQuantity, Double rate, Double effectiveRate, Double price) {
 			super();
 			this.lastUpdateDateTime = lastUpdateDateTime;
 			this.eventType = eventType;
@@ -110,6 +116,7 @@ public class SearchContractHistoryTask implements Runnable {
 			this.origQuantity = origQuantity;
 			this.openQuantity = openQuantity;
 			this.rate = rate;
+			this.effectiveRate = effectiveRate;
 			this.price = price;
 		}
 
@@ -131,7 +138,8 @@ public class SearchContractHistoryTask implements Runnable {
 		System.out.print(ConsoleOutputUtil.padSpaces("Status", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("Orig Quantity", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Open Quantity", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("Rate", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("Rate", 10));
+		System.out.print(ConsoleOutputUtil.padSpaces("Effective Rate", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Price", 15));
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("-----------", 30));
@@ -139,8 +147,9 @@ public class SearchContractHistoryTask implements Runnable {
 		System.out.print(ConsoleOutputUtil.padSpaces("------", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("-------------", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("-------------", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("----", 10));
+		System.out.print(ConsoleOutputUtil.padSpaces("--------------", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("-----", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("----", 15));
 		System.out.println();
 	}
 }

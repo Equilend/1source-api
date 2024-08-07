@@ -18,8 +18,15 @@ public class DelegationConsole extends AbstractConsole {
 		this.delegation = delegation;
 	}
 
-	protected void prompt() {
+	protected boolean prompt() {
+		
+		if (delegation == null) {
+			System.out.println("Delegation not available");
+			return false;
+		}
+		
 		System.out.print("/delegations/" + delegation.getDelegationId() + " > ");
+		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {

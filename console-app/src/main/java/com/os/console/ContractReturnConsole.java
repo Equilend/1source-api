@@ -11,7 +11,9 @@ import com.os.client.model.ModelReturn;
 import com.os.client.model.ReturnAcknowledgement;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.AcknowledgeReturnTask;
+import com.os.console.api.tasks.CancelReturnTask;
 import com.os.console.api.tasks.SearchContractReturnTask;
+import com.os.console.api.tasks.SearchContractTask;
 import com.os.console.api.tasks.UpdateReturnSettlementStatusTask;
 import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.PayloadUtil;
@@ -28,8 +30,19 @@ public class ContractReturnConsole extends AbstractConsole {
 		this.modelReturn = modelReturn;
 	}
 
-	protected void prompt() {
+	protected boolean prompt() {
+		
+		if (contract == null) {
+			System.out.println("Contract not available");
+			return false;
+		} else if (modelReturn == null) {
+			System.out.println("Return not available");
+			return false;
+		}
+
 		System.out.print("/contracts/" + contract.getContractId() + "/returns/" + modelReturn.getReturnId() + " > ");
+		
+		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
@@ -97,6 +110,30 @@ public class ContractReturnConsole extends AbstractConsole {
 			} catch (Exception u) {
 				System.out.println("Invalid acknowledgement message");
 			}
+		} else if (args[0].equals("C")) {
+			System.out.print("Searching for contract " + modelReturn.getContractId() + "...");
+
+			SearchContractTask searchContractTask = new SearchContractTask(webClient, modelReturn.getContractId());
+			Thread taskT = new Thread(searchContractTask);
+			taskT.run();
+			try {
+				taskT.join();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			if (searchContractTask.getContract() != null) {
+				System.out.print("Canceling return...");
+				CancelReturnTask cancelReturnTask = new CancelReturnTask(webClient, modelReturn);
+				Thread taskS = new Thread(cancelReturnTask);
+				taskS.run();
+				try {
+					taskS.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				refreshModelReturn(webClient);
+			}
 		} else if (args[0].equals("U")) {
 			System.out.print("Updating settlement status to SETTLED...");
 			UpdateReturnSettlementStatusTask updateReturnSettlementStatusTask = new UpdateReturnSettlementStatusTask(
@@ -136,6 +173,7 @@ public class ContractReturnConsole extends AbstractConsole {
 		System.out.println();
 		System.out.println("P <Message>   - Positively acknowledge with optional message");
 		System.out.println("N <Message>   - Negatively acknowledge with optional message");
+		System.out.println("C             - Cancel");
 		System.out.println();
 		System.out.println("U             - Update settlement status to SETTLED");
 		System.out.println();

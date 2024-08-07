@@ -10,8 +10,9 @@ import com.os.console.api.tasks.SearchRecallsTask;
 
 public class RecallsConsole extends AbstractConsole {
 
-	protected void prompt() {
+	protected boolean prompt() {
 		System.out.print("/recalls > ");
+		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
@@ -63,6 +64,7 @@ public class RecallsConsole extends AbstractConsole {
 		System.out.println("-----------------------");
 		System.out.println("L             - List all recalls");
 		System.out.println("S <Recall Id> - Load a recall by Id");
+		System.out.println();
 		System.out.println("X             - Go back");
 	}
 

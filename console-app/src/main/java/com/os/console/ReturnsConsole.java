@@ -10,8 +10,9 @@ import com.os.console.api.tasks.SearchReturnsTask;
 
 public class ReturnsConsole extends AbstractConsole {
 
-	protected void prompt() {
+	protected boolean prompt() {
 		System.out.print("/returns > ");
+		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {

@@ -21,6 +21,7 @@ import com.os.client.model.DelegationAuthorizationType;
 import com.os.client.model.DelegationProposal;
 import com.os.client.model.FeeRate;
 import com.os.client.model.FixedRate;
+import com.os.client.model.FixedRateDef;
 import com.os.client.model.FloatingRate;
 import com.os.client.model.FloatingRateDef;
 import com.os.client.model.Instrument;
@@ -279,27 +280,48 @@ public class PayloadUtil {
 		
 		if (contract.getTrade().getRate() instanceof FeeRate) {
 			
-			((FeeRate) contract.getTrade().getRate()).getFee().setBaseRate(rerate);
-			((FeeRate) contract.getTrade().getRate()).getFee().setEffectiveDate(rerateDate);
-
-			proposal.setRate(((FeeRate) contract.getTrade().getRate()));
+			FeeRate feeRate = new FeeRate();
+			
+			FixedRateDef fixedRateDef = new FixedRateDef();
+			fixedRateDef.setBaseRate(rerate);
+			fixedRateDef.setEffectiveDate(rerateDate);
+			feeRate.setFee(fixedRateDef);
+			
+			proposal.setRate(feeRate);
 
 		} else if (contract.getTrade().getRate() instanceof RebateRate) {
-			
+
+			RebateRate rebateRate = new RebateRate();
+
 			if (((RebateRate) contract.getTrade().getRate()).getRebate() instanceof FixedRate) {
 			
-				((FixedRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFixed().setBaseRate(rerate);
-				((FixedRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFixed().setEffectiveDate(rerateDate);
+				FixedRate fixedRate = new FixedRate();
+				FixedRateDef fixedRateDef = new FixedRateDef();
+				fixedRateDef.setBaseRate(rerate);
+				fixedRateDef.setEffectiveDate(rerateDate);
+				fixedRate.setFixed(fixedRateDef);
 				
-				proposal.setRate(((RebateRate) contract.getTrade().getRate()));
-
+				rebateRate.setRebate(fixedRate);
+				
 			} else if (((RebateRate) contract.getTrade().getRate()).getRebate() instanceof FloatingRate) {
 				
-				((FloatingRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFloating().setSpread(rerate);
-				((FloatingRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFloating().setEffectiveDate(rerateDate);
-
-				proposal.setRate(((RebateRate) contract.getTrade().getRate()));
+				FloatingRateDef origRate = ((FloatingRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFloating();
+				
+				FloatingRate floatingRate = new FloatingRate();
+				FloatingRateDef floatingRateDef = new FloatingRateDef();
+				floatingRateDef.setBenchmark(origRate.getBenchmark());
+				floatingRateDef.setIsAutoRerate(origRate.isIsAutoRerate());
+				if (!floatingRateDef.isIsAutoRerate()) {
+					floatingRateDef.setBaseRate(origRate.getBaseRate());
+				}
+				floatingRateDef.setSpread(rerate);
+				floatingRateDef.setEffectiveDate(rerateDate);
+				floatingRate.setFloating(floatingRateDef);
+				
+				rebateRate.setRebate(floatingRate);
 			}
+
+			proposal.setRate(rebateRate);
 		}
 
 		return proposal;
