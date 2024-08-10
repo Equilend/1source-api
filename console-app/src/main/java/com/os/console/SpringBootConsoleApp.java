@@ -63,6 +63,8 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 		}
 		
 		System.out.println();
+		System.out.println("\"?\" or \"help\" to see menu");
+		System.out.println();
 		String command = null;
 		System.out.print("> ");
 

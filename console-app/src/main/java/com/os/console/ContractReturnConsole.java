@@ -124,7 +124,7 @@ public class ContractReturnConsole extends AbstractConsole {
 
 			if (searchContractTask.getContract() != null) {
 				System.out.print("Canceling return...");
-				CancelReturnTask cancelReturnTask = new CancelReturnTask(webClient, modelReturn);
+				CancelReturnTask cancelReturnTask = new CancelReturnTask(webClient, modelReturn.getContractId(), modelReturn.getReturnId());
 				Thread taskS = new Thread(cancelReturnTask);
 				taskS.run();
 				try {
