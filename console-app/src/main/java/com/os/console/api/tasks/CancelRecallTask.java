@@ -4,20 +4,20 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.console.util.RESTUtil;
 
-public class CancelReturnTask implements Runnable {
+public class CancelRecallTask implements Runnable {
 
 	private WebClient webClient;
 	private String contractId;
-	private String returnId;
+	private String recallId;
 
-	public CancelReturnTask(WebClient webClient, String contractId, String returnId) {
+	public CancelRecallTask(WebClient webClient, String contractId, String recallId) {
 		this.webClient = webClient;
 		this.contractId = contractId;
-		this.returnId = returnId;
+		this.recallId = recallId;
 	}
 
 	@Override
 	public void run() {
-		RESTUtil.postRequest(webClient, "/contracts/" + contractId + "/returns/" + returnId + "/cancel");
+		RESTUtil.postRequest(webClient, "/contracts/" + contractId + "/recalls/" + recallId + "/cancel");
 	}
 }
