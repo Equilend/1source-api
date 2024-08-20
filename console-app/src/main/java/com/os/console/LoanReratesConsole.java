@@ -12,16 +12,16 @@ import com.os.console.api.tasks.ApproveRerateTask;
 import com.os.console.api.tasks.CancelRerateTask;
 import com.os.console.api.tasks.DeclineRerateTask;
 import com.os.console.api.tasks.ProposeRerateTask;
-import com.os.console.api.tasks.SearchContractRerateTask;
-import com.os.console.api.tasks.SearchContractReratesTask;
+import com.os.console.api.tasks.SearchLoanRerateTask;
+import com.os.console.api.tasks.SearchLoanReratesTask;
 import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.PayloadUtil;
 
-public class ContractReratesConsole extends AbstractConsole {
+public class LoanReratesConsole extends AbstractConsole {
 
 	Contract contract;
 
-	public ContractReratesConsole(Contract contract) {
+	public LoanReratesConsole(Contract contract) {
 		this.contract = contract;
 	}
 
@@ -40,7 +40,7 @@ public class ContractReratesConsole extends AbstractConsole {
 
 		if (args[0].equals("L")) {
 			System.out.print("Listing all rerates...");
-			SearchContractReratesTask searchContractReratesTask = new SearchContractReratesTask(webClient, contract);
+			SearchLoanReratesTask searchContractReratesTask = new SearchLoanReratesTask(webClient, contract);
 			Thread taskT = new Thread(searchContractReratesTask);
 			taskT.run();
 			try {
@@ -56,7 +56,7 @@ public class ContractReratesConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(rerateId).toString().equals(rerateId)) {
 						System.out.print("Retrieving rerate " + rerateId + "...");
-						SearchContractRerateTask searchContractRerateTask = new SearchContractRerateTask(webClient,
+						SearchLoanRerateTask searchContractRerateTask = new SearchLoanRerateTask(webClient,
 								contract.getContractId(), rerateId);
 						Thread taskT = new Thread(searchContractRerateTask);
 						taskT.run();
@@ -66,7 +66,7 @@ public class ContractReratesConsole extends AbstractConsole {
 							e.printStackTrace();
 						}
 						if (searchContractRerateTask.getRerate() != null) {
-							ContractRerateConsole contractRerateConsole = new ContractRerateConsole(contract,
+							LoanRerateConsole contractRerateConsole = new LoanRerateConsole(contract,
 									searchContractRerateTask.getRerate());
 							contractRerateConsole.execute(consoleIn, webClient);
 						}

@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.FeeRate;
 import com.os.client.model.FixedRate;
 import com.os.client.model.FixedRateDef;
@@ -21,46 +21,46 @@ import com.os.client.model.RebateRate;
 import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.RESTUtil;
 
-public class SearchContractRateHistoryTask implements Runnable {
+public class SearchLoanRateHistoryTask implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(SearchContractRateHistoryTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SearchLoanRateHistoryTask.class);
 
 	private WebClient webClient;
-	private Contract contract;
+	private Loan loan;
 
-	public SearchContractRateHistoryTask(WebClient webClient, Contract contract) {
+	public SearchLoanRateHistoryTask(WebClient webClient, Loan loan) {
 		this.webClient = webClient;
-		this.contract = contract;
+		this.loan = loan;
 	}
 
 	@Override
 	public void run() {
 
 		Rates rates = (Rates) RESTUtil.getRequest(webClient,
-				"/contracts/" + contract.getContractId() + "/ratehistory", Rates.class);
+				"/loans/" + loan.getLoanId() + "/ratehistory", Rates.class);
 
 		if (rates == null || rates.getRates() == null || rates.getRates().size() == 0) {
-			logger.warn("Invalid contract rate history object or no contract rate history");
-			System.out.println("no contract rate history found");
+			logger.warn("Invalid loan rate history object or no loan rate history");
+			System.out.println("no loan rate history found");
 			printHeader();
 		} else {
 			System.out.println("complete");
 			System.out.print("sorting...");
-			ArrayList<ContractRateHistory> history = new ArrayList<>();
-			for (Rate contractRate : rates.getRates()) {
+			ArrayList<LoanRateHistory> history = new ArrayList<>();
+			for (Rate loanRate : rates.getRates()) {
 				
-				if (contractRate instanceof RebateRate) {
-					OneOfRebateRateRebate oneOfRebateRateRebate = ((RebateRate) contractRate).getRebate();
+				if (loanRate instanceof RebateRate) {
+					OneOfRebateRateRebate oneOfRebateRateRebate = ((RebateRate) loanRate).getRebate();
 					if (oneOfRebateRateRebate instanceof FloatingRate) {
 						FloatingRateDef def = ((FloatingRate) oneOfRebateRateRebate).getFloating();
-						history.add(new ContractRateHistory(def.getEffectiveDate(), "REBATE FLOATING", def.getSpread(), def.getEffectiveRate(), def.getBenchmark().toString(), def.getBaseRate()));
+						history.add(new LoanRateHistory(def.getEffectiveDate(), "REBATE FLOATING", def.getSpread(), def.getEffectiveRate(), def.getBenchmark().toString(), def.getBaseRate()));
 					} else if (oneOfRebateRateRebate instanceof FixedRate) {
 						FixedRateDef def = ((FixedRate) oneOfRebateRateRebate).getFixed();
-						history.add(new ContractRateHistory(def.getEffectiveDate(), "REBATE FIXED", null, def.getEffectiveRate(), null, def.getBaseRate()));
+						history.add(new LoanRateHistory(def.getEffectiveDate(), "REBATE FIXED", null, def.getEffectiveRate(), null, def.getBaseRate()));
 					}
-				} else if (contractRate instanceof FeeRate) {
-					FixedRateDef def = ((FeeRate) contractRate).getFee();
-					history.add(new ContractRateHistory(def.getEffectiveDate(), "FEE FIXED", null, def.getEffectiveRate(), null, def.getBaseRate()));
+				} else if (loanRate instanceof FeeRate) {
+					FixedRateDef def = ((FeeRate) loanRate).getFee();
+					history.add(new LoanRateHistory(def.getEffectiveDate(), "FEE FIXED", null, def.getEffectiveRate(), null, def.getBaseRate()));
 				}
 			}
 
@@ -70,18 +70,18 @@ public class SearchContractRateHistoryTask implements Runnable {
 
 			printHeader();
 			int rows = 1;
-			for (ContractRateHistory contractRateHistory : history) {
+			for (LoanRateHistory loanRateHistory : history) {
 
 				if (rows % 15 == 0) {
 					printHeader();
 				}
 
-				System.out.print(ConsoleOutputUtil.padSpaces(contractRateHistory.effectiveDate, 30));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractRateHistory.rateType, 30));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractRateHistory.spread, 12));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractRateHistory.effectiveRate, 15));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractRateHistory.benchmark, 10));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractRateHistory.baseRate, 10));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanRateHistory.effectiveDate, 30));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanRateHistory.rateType, 30));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanRateHistory.spread, 12));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanRateHistory.effectiveRate, 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanRateHistory.benchmark, 10));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanRateHistory.baseRate, 10));
 				System.out.println();
 
 				rows++;
@@ -90,7 +90,7 @@ public class SearchContractRateHistoryTask implements Runnable {
 		}
 	}
 
-	class ContractRateHistory implements Comparable<ContractRateHistory> {
+	class LoanRateHistory implements Comparable<LoanRateHistory> {
 		
 		LocalDate effectiveDate;
 		String rateType;
@@ -99,7 +99,7 @@ public class SearchContractRateHistoryTask implements Runnable {
 		String benchmark;
 		Double baseRate;
 
-		public ContractRateHistory(LocalDate effectiveDate, String rateType, Double spread, Double effectiveRate,
+		public LoanRateHistory(LocalDate effectiveDate, String rateType, Double spread, Double effectiveRate,
 				String benchmark, Double baseRate) {
 			super();
 			this.effectiveDate = effectiveDate;
@@ -112,7 +112,7 @@ public class SearchContractRateHistoryTask implements Runnable {
 
 
 		@Override
-		public int compareTo(ContractRateHistory o) {
+		public int compareTo(LoanRateHistory o) {
 			if (o.effectiveDate == null) {
 				return 1;
 			} else if (this.effectiveDate == null) {

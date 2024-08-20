@@ -20,6 +20,6 @@ public class AcknowledgeReturnTask implements Runnable {
 
 	@Override
 	public void run() {
-		RESTUtil.postRequest(webClient, "/contracts/" + modelReturn.getContractId() + "/returns/" + modelReturn.getReturnId() + "/acknowledge", returnAcknowledgement);
+		RESTUtil.postRequest(webClient, "/loans/" + modelReturn.getLoanId() + "/returns/" + modelReturn.getReturnId() + "/acknowledge", returnAcknowledgement);
 	}
 }

@@ -2,7 +2,7 @@ package com.os.console.api.tasks;
 
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.Party;
 import com.os.client.model.RerateProposal;
 import com.os.client.model.TransactingParties;
@@ -12,13 +12,13 @@ import com.os.console.util.RESTUtil;
 public class ProposeRerateTask implements Runnable {
 
 	private WebClient webClient;
-	private Contract contract;
+	private Loan loan;
 	private RerateProposal rerateProposal;
 	private Party actingParty;
 
-	public ProposeRerateTask(WebClient webClient, Contract contract, RerateProposal rerateProposal, Party actingParty) {
+	public ProposeRerateTask(WebClient webClient, Loan loan, RerateProposal rerateProposal, Party actingParty) {
 		this.webClient = webClient;
-		this.contract = contract;
+		this.loan = loan;
 		this.rerateProposal = rerateProposal;
 		this.actingParty = actingParty;
 	}
@@ -26,7 +26,7 @@ public class ProposeRerateTask implements Runnable {
 	@Override
 	public void run() {
 
-		TransactingParties parties = contract.getTrade().getTransactingParties();
+		TransactingParties parties = loan.getTrade().getTransactingParties();
 		boolean canAct = false;
 		for (TransactingParty transactingParty : parties) {
 			if (actingParty.equals(transactingParty.getParty())) {
@@ -40,7 +40,7 @@ public class ProposeRerateTask implements Runnable {
 			return;
 		}
 
-		RESTUtil.postRequest(webClient, "/contracts/" + contract.getContractId() + "/rerates", rerateProposal);
+		RESTUtil.postRequest(webClient, "/loans/" + loan.getLoanId() + "/rerates", rerateProposal);
 
 	}
 }

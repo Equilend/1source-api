@@ -5,37 +5,37 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.console.api.ConsoleConfig;
-import com.os.console.api.tasks.ApproveContractTask;
-import com.os.console.api.tasks.CancelContractTask;
-import com.os.console.api.tasks.DeclineContractTask;
-import com.os.console.api.tasks.SearchContractHistoryTask;
-import com.os.console.api.tasks.SearchContractRateHistoryTask;
-import com.os.console.api.tasks.SearchContractTask;
-import com.os.console.api.tasks.UpdateContractVenueKeyTask;
-import com.os.console.api.tasks.UpdateContractSettlementStatusTask;
+import com.os.console.api.tasks.ApproveLoanTask;
+import com.os.console.api.tasks.CancelLoanTask;
+import com.os.console.api.tasks.DeclineLoanTask;
+import com.os.console.api.tasks.SearchLoanHistoryTask;
+import com.os.console.api.tasks.SearchLoanRateHistoryTask;
+import com.os.console.api.tasks.SearchLoanTask;
+import com.os.console.api.tasks.UpdateLoanVenueKeyTask;
+import com.os.console.api.tasks.UpdateLoanSettlementStatusTask;
 import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.PayloadUtil;
 
-public class ContractConsole extends AbstractConsole {
+public class LoanConsole extends AbstractConsole {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractConsole.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoanConsole.class);
 
-	Contract contract;
+	Loan loan;
 
-	public ContractConsole(Contract contract) {
-		this.contract = contract;
+	public LoanConsole(Loan loan) {
+		this.loan = loan;
 	}
 
 	protected boolean prompt() {
 		
-		if (contract == null) {
-			System.out.println("Contract not available");
+		if (loan == null) {
+			System.out.println("Loan not available");
 			return false;
 		}
 		
-		System.out.print("/contracts/" + contract.getContractId() + " > ");
+		System.out.print("/loans/" + loan.getLoanId() + " > ");
 		
 		return true;
 	}
@@ -43,13 +43,13 @@ public class ContractConsole extends AbstractConsole {
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 
 		if (args[0].equals("J")) {
-			ConsoleOutputUtil.printObject(contract);
+			ConsoleOutputUtil.printObject(loan);
 		} else if (args[0].equals("F")) {
-			refreshContract(webClient);
+			refreshLoan(webClient);
 		} else if (args[0].equals("H")) {
 			System.out.print("Listing full history...");
-			SearchContractHistoryTask searchContractHistoryTask = new SearchContractHistoryTask(webClient, contract);
-			Thread taskT = new Thread(searchContractHistoryTask);
+			SearchLoanHistoryTask searchLoanHistoryTask = new SearchLoanHistoryTask(webClient, loan);
+			Thread taskT = new Thread(searchLoanHistoryTask);
 			taskT.run();
 			try {
 				taskT.join();
@@ -58,8 +58,8 @@ public class ContractConsole extends AbstractConsole {
 			}
 		} else if (args[0].equals("Y")) {
 			System.out.print("Listing rate change history...");
-			SearchContractRateHistoryTask searchContractRateHistoryTask = new SearchContractRateHistoryTask(webClient, contract);
-			Thread taskT = new Thread(searchContractRateHistoryTask);
+			SearchLoanRateHistoryTask searchLoanRateHistoryTask = new SearchLoanRateHistoryTask(webClient, loan);
+			Thread taskT = new Thread(searchLoanRateHistoryTask);
 			taskT.run();
 			try {
 				taskT.join();
@@ -68,43 +68,43 @@ public class ContractConsole extends AbstractConsole {
 			}
 		} else if (args[0].equals("A")) {
 		
-			System.out.print("Approving contract...");
-			ApproveContractTask approveContractTask = new ApproveContractTask(webClient, contract,
-					PayloadUtil.createContractProposalApproval());
-			Thread taskT = new Thread(approveContractTask);
+			System.out.print("Approving loan...");
+			ApproveLoanTask approveLoanTask = new ApproveLoanTask(webClient, loan,
+					PayloadUtil.createLoanProposalApproval());
+			Thread taskT = new Thread(approveLoanTask);
 			taskT.run();
 			try {
 				taskT.join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			refreshContract(webClient);
+			refreshLoan(webClient);
 		} else if (args[0].equals("C")) {
-			System.out.print("Canceling contract...");
-			CancelContractTask cancelContractTask = new CancelContractTask(webClient, contract.getContractId());
-			Thread taskT = new Thread(cancelContractTask);
+			System.out.print("Canceling loan...");
+			CancelLoanTask cancelLoanTask = new CancelLoanTask(webClient, loan.getLoanId());
+			Thread taskT = new Thread(cancelLoanTask);
 			taskT.run();
 			try {
 				taskT.join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			refreshContract(webClient);
+			refreshLoan(webClient);
 		} else if (args[0].equals("D")) {
-			System.out.print("Declining contract...");
-			DeclineContractTask declineContractTask = new DeclineContractTask(webClient, contract.getContractId());
-			Thread taskT = new Thread(declineContractTask);
+			System.out.print("Declining loan...");
+			DeclineLoanTask declineLoanTask = new DeclineLoanTask(webClient, loan.getLoanId());
+			Thread taskT = new Thread(declineLoanTask);
 			taskT.run();
 			try {
 				taskT.join();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			refreshContract(webClient);
+			refreshLoan(webClient);
 		} else if (args[0].equals("U")) {
 			System.out.print("Updating settlement status to SETTLED...");
-			UpdateContractSettlementStatusTask updateSettlementStatusTask = new UpdateContractSettlementStatusTask(
-					webClient, contract, ConsoleConfig.ACTING_PARTY);
+			UpdateLoanSettlementStatusTask updateSettlementStatusTask = new UpdateLoanSettlementStatusTask(
+					webClient, loan, ConsoleConfig.ACTING_PARTY);
 			Thread taskT = new Thread(updateSettlementStatusTask);
 			taskT.run();
 			try {
@@ -112,7 +112,7 @@ public class ContractConsole extends AbstractConsole {
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
-			refreshContract(webClient);
+			refreshLoan(webClient);
 		} else if (args[0].equals("V")) {
 			if (args.length != 2 || args[1].length() == 0 || args[1].length() > 50) {
 				System.out.println("Invalid reference key");
@@ -120,50 +120,50 @@ public class ContractConsole extends AbstractConsole {
 				String venueRefKey = args[1];
 				try {
 					System.out.print("Assigning venue reference " + venueRefKey + "...");
-					UpdateContractVenueKeyTask updateContractVenueKeyTask = new UpdateContractVenueKeyTask(webClient,
-							contract.getContractId(), venueRefKey);
-					Thread taskT = new Thread(updateContractVenueKeyTask);
+					UpdateLoanVenueKeyTask updateLoanVenueKeyTask = new UpdateLoanVenueKeyTask(webClient,
+							loan.getLoanId(), venueRefKey);
+					Thread taskT = new Thread(updateLoanVenueKeyTask);
 					taskT.run();
 					try {
 						taskT.join();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					refreshContract(webClient);
+					refreshLoan(webClient);
 				} catch (Exception u) {
 					System.out.println("Invalid reference key");
 				}
 			}
 		} else if (args[0].equals("R")) {
-			ContractReturnsConsole contractReturnsConsole = new ContractReturnsConsole(contract);
-			contractReturnsConsole.execute(consoleIn, webClient);
+			LoanReturnsConsole loanReturnsConsole = new LoanReturnsConsole(loan);
+			loanReturnsConsole.execute(consoleIn, webClient);
 		} else if (args[0].equals("E")) {
-			ContractRecallsConsole contractRecallsConsole = new ContractRecallsConsole(contract);
-			contractRecallsConsole.execute(consoleIn, webClient);
+			LoanRecallsConsole loanRecallsConsole = new LoanRecallsConsole(loan);
+			loanRecallsConsole.execute(consoleIn, webClient);
 		} else if (args[0].equals("T")) {
-			ContractReratesConsole contractReratesConsole = new ContractReratesConsole(contract);
-			contractReratesConsole.execute(consoleIn, webClient);
+			LoanReratesConsole loanReratesConsole = new LoanReratesConsole(loan);
+			loanReratesConsole.execute(consoleIn, webClient);
 		} else {
 			System.out.println("Unknown command");
 		}
 	}
 
-	private void refreshContract(WebClient webClient) {
+	private void refreshLoan(WebClient webClient) {
 
-		System.out.print("Refreshing contract " + contract.getContractId() + "...");
-		SearchContractTask searchContractTask = new SearchContractTask(webClient, contract.getContractId());
-		Thread taskT = new Thread(searchContractTask);
+		System.out.print("Refreshing loan " + loan.getLoanId() + "...");
+		SearchLoanTask searchLoanTask = new SearchLoanTask(webClient, loan.getLoanId());
+		Thread taskT = new Thread(searchLoanTask);
 		taskT.run();
 		try {
 			taskT.join();
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
-		contract = searchContractTask.getContract();
+		loan = searchLoanTask.getLoan();
 	}
 
 	protected void printMenu() {
-		System.out.println("Contract Menu");
+		System.out.println("Loan Menu");
 		System.out.println("-----------------------");
 		System.out.println("J                   - Print JSON");
 		System.out.println("F                   - Refresh");

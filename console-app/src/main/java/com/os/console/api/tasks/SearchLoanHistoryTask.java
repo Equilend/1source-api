@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
-import com.os.client.model.Contracts;
+import com.os.client.model.Loan;
+import com.os.client.model.Loans;
 import com.os.client.model.FeeRate;
 import com.os.client.model.FixedRate;
 import com.os.client.model.FloatingRate;
@@ -19,38 +19,38 @@ import com.os.client.model.RebateRate;
 import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.RESTUtil;
 
-public class SearchContractHistoryTask implements Runnable {
+public class SearchLoanHistoryTask implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(SearchContractHistoryTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SearchLoanHistoryTask.class);
 
 	private WebClient webClient;
-	private Contract contract;
+	private Loan loan;
 
-	public SearchContractHistoryTask(WebClient webClient, Contract contract) {
+	public SearchLoanHistoryTask(WebClient webClient, Loan loan) {
 		this.webClient = webClient;
-		this.contract = contract;
+		this.loan = loan;
 	}
 
 	@Override
 	public void run() {
 
-		Contracts contracts = (Contracts) RESTUtil.getRequest(webClient,
-				"/contracts/" + contract.getContractId() + "/history", Contracts.class);
+		Loans loans = (Loans) RESTUtil.getRequest(webClient,
+				"/loans/" + loan.getLoanId() + "/history", Loans.class);
 
-		if (contracts == null || contracts.size() == 0) {
-			logger.warn("Invalid contract history object or no contract history");
-			System.out.println("no contract history found");
+		if (loans == null || loans.size() == 0) {
+			logger.warn("Invalid loan history object or no loan history");
+			System.out.println("no loan history found");
 			printHeader();
 		} else {
 			System.out.println("complete");
 			System.out.print("sorting...");
-			ArrayList<ContractHistory> history = new ArrayList<>();
-			for (Contract contract : contracts) {
+			ArrayList<LoanHistory> history = new ArrayList<>();
+			for (Loan loan : loans) {
 				Double rate = null;
 				Double effectiveRate = null;
-				Rate contractRate = contract.getTrade().getRate();
-				if (contractRate instanceof RebateRate) {
-					OneOfRebateRateRebate oneOfRebateRateRebate = ((RebateRate) contractRate).getRebate();
+				Rate loanRate = loan.getTrade().getRate();
+				if (loanRate instanceof RebateRate) {
+					OneOfRebateRateRebate oneOfRebateRateRebate = ((RebateRate) loanRate).getRebate();
 					if (oneOfRebateRateRebate instanceof FloatingRate) {
 						rate = ((FloatingRate) oneOfRebateRateRebate).getFloating().getSpread();
 						effectiveRate = ((FloatingRate) oneOfRebateRateRebate).getFloating().getEffectiveRate();
@@ -58,15 +58,15 @@ public class SearchContractHistoryTask implements Runnable {
 						rate = ((FixedRate) oneOfRebateRateRebate).getFixed().getBaseRate();
 						effectiveRate = ((FloatingRate) oneOfRebateRateRebate).getFloating().getEffectiveRate();
 					}
-				} else if (contractRate instanceof FeeRate) {
-					rate = ((FeeRate) contractRate).getFee().getBaseRate();
-					effectiveRate = ((FeeRate) contractRate).getFee().getEffectiveRate();
+				} else if (loanRate instanceof FeeRate) {
+					rate = ((FeeRate) loanRate).getFee().getBaseRate();
+					effectiveRate = ((FeeRate) loanRate).getFee().getEffectiveRate();
 				}
 
-				history.add(new ContractHistory(contract.getLastUpdateDateTime(),
-						contract.getLastEvent().getEventType().toString(), contract.getContractStatus().toString(),
-						contract.getTrade().getQuantity(), contract.getTrade().getOpenQuantity(), rate, effectiveRate,
-						contract.getTrade().getCollateral().getContractPrice()));
+				history.add(new LoanHistory(loan.getLastUpdateDateTime(),
+						loan.getLastEvent().getEventType().toString(), loan.getLoanStatus().toString(),
+						loan.getTrade().getQuantity(), loan.getTrade().getOpenQuantity(), rate, effectiveRate,
+						loan.getTrade().getCollateral().getContractPrice()));
 			}
 
 			Collections.sort(history);
@@ -75,20 +75,20 @@ public class SearchContractHistoryTask implements Runnable {
 
 			printHeader();
 			int rows = 1;
-			for (ContractHistory contractHistory : history) {
+			for (LoanHistory loanHistory : history) {
 
 				if (rows % 15 == 0) {
 					printHeader();
 				}
 
-				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.lastUpdateDateTime, 30));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.eventType, 30));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.contractStatus, 12));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.origQuantity, 15));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.openQuantity, 15));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.rate, 10));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.effectiveRate, 15));
-				System.out.print(ConsoleOutputUtil.padSpaces(contractHistory.price, 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanHistory.lastUpdateDateTime, 30));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanHistory.eventType, 30));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanHistory.loanStatus, 12));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanHistory.origQuantity, 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanHistory.openQuantity, 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanHistory.rate, 10));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanHistory.effectiveRate, 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(loanHistory.price, 15));
 				System.out.println();
 
 				rows++;
@@ -97,22 +97,22 @@ public class SearchContractHistoryTask implements Runnable {
 		}
 	}
 
-	class ContractHistory implements Comparable<ContractHistory> {
+	class LoanHistory implements Comparable<LoanHistory> {
 		OffsetDateTime lastUpdateDateTime;
 		String eventType;
-		String contractStatus;
+		String loanStatus;
 		Integer origQuantity;
 		Integer openQuantity;
 		Double rate;
 		Double effectiveRate;
 		Double price;
 
-		public ContractHistory(OffsetDateTime lastUpdateDateTime, String eventType, String contractStatus,
+		public LoanHistory(OffsetDateTime lastUpdateDateTime, String eventType, String loanStatus,
 				Integer origQuantity, Integer openQuantity, Double rate, Double effectiveRate, Double price) {
 			super();
 			this.lastUpdateDateTime = lastUpdateDateTime;
 			this.eventType = eventType;
-			this.contractStatus = contractStatus;
+			this.loanStatus = loanStatus;
 			this.origQuantity = origQuantity;
 			this.openQuantity = openQuantity;
 			this.rate = rate;
@@ -121,7 +121,7 @@ public class SearchContractHistoryTask implements Runnable {
 		}
 
 		@Override
-		public int compareTo(ContractHistory o) {
+		public int compareTo(LoanHistory o) {
 			if (o.lastUpdateDateTime == null) {
 				return 1;
 			} else if (this.lastUpdateDateTime == null) {

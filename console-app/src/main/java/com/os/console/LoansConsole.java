@@ -7,20 +7,20 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.PartyRole;
 import com.os.console.api.ConsoleConfig;
-import com.os.console.api.tasks.ApproveContractTask;
-import com.os.console.api.tasks.CancelContractTask;
-import com.os.console.api.tasks.DeclineContractTask;
-import com.os.console.api.tasks.SearchContractHistoryTask;
-import com.os.console.api.tasks.SearchContractRateHistoryTask;
-import com.os.console.api.tasks.SearchContractTask;
-import com.os.console.api.tasks.SearchContractsTask;
+import com.os.console.api.tasks.ApproveLoanTask;
+import com.os.console.api.tasks.CancelLoanTask;
+import com.os.console.api.tasks.DeclineLoanTask;
+import com.os.console.api.tasks.SearchLoanHistoryTask;
+import com.os.console.api.tasks.SearchLoanRateHistoryTask;
+import com.os.console.api.tasks.SearchLoanTask;
+import com.os.console.api.tasks.SearchLoansTask;
 import com.os.console.api.tasks.SearchPartyTask;
-import com.os.console.api.tasks.UpdateContractSettlementStatusTask;
+import com.os.console.api.tasks.UpdateLoanSettlementStatusTask;
 import com.os.console.util.PayloadUtil;
 
-public class ContractsConsole extends AbstractConsole {
+public class LoansConsole extends AbstractConsole {
 
-	public ContractsConsole() {
+	public LoansConsole() {
 
 	}
 
@@ -33,7 +33,7 @@ public class ContractsConsole extends AbstractConsole {
 
 		if (args[0].equals("L")) {
 			System.out.print("Listing all contracts...");
-			SearchContractsTask searchContractsTask = new SearchContractsTask(webClient);
+			SearchLoansTask searchContractsTask = new SearchLoansTask(webClient);
 			Thread taskT = new Thread(searchContractsTask);
 			taskT.run();
 			try {
@@ -49,7 +49,7 @@ public class ContractsConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
 						System.out.print("Searching for contract " + contractId + "...");
-						SearchContractTask searchContractTask = new SearchContractTask(webClient, contractId);
+						SearchLoanTask searchContractTask = new SearchLoanTask(webClient, contractId);
 						Thread taskT = new Thread(searchContractTask);
 						taskT.run();
 						try {
@@ -58,7 +58,7 @@ public class ContractsConsole extends AbstractConsole {
 							e.printStackTrace();
 						}
 						if (searchContractTask.getContract() != null) {
-							ContractConsole contractConsole = new ContractConsole(searchContractTask.getContract());
+							LoanConsole contractConsole = new LoanConsole(searchContractTask.getContract());
 							contractConsole.execute(consoleIn, webClient);
 						}
 					} else {
@@ -76,7 +76,7 @@ public class ContractsConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
 						System.out.print("Searching for contract " + contractId + "...");
-						SearchContractTask searchContractTask = new SearchContractTask(webClient, contractId);
+						SearchLoanTask searchContractTask = new SearchLoanTask(webClient, contractId);
 						Thread taskT = new Thread(searchContractTask);
 						taskT.run();
 						try {
@@ -86,7 +86,7 @@ public class ContractsConsole extends AbstractConsole {
 						}
 						if (searchContractTask.getContract() != null) {
 							System.out.print("Listing contract full history " + contractId + "...");
-							SearchContractHistoryTask searchContractHistoryTask = new SearchContractHistoryTask(webClient, searchContractTask.getContract());
+							SearchLoanHistoryTask searchContractHistoryTask = new SearchLoanHistoryTask(webClient, searchContractTask.getContract());
 							Thread taskS = new Thread(searchContractHistoryTask);
 							taskS.run();
 							try {
@@ -110,7 +110,7 @@ public class ContractsConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
 						System.out.print("Searching for contract " + contractId + "...");
-						SearchContractTask searchContractTask = new SearchContractTask(webClient, contractId);
+						SearchLoanTask searchContractTask = new SearchLoanTask(webClient, contractId);
 						Thread taskT = new Thread(searchContractTask);
 						taskT.run();
 						try {
@@ -120,7 +120,7 @@ public class ContractsConsole extends AbstractConsole {
 						}
 						if (searchContractTask.getContract() != null) {
 							System.out.print("Listing contract rate change history " + contractId + "...");
-							SearchContractRateHistoryTask searchContractRateHistoryTask = new SearchContractRateHistoryTask(webClient, searchContractTask.getContract());
+							SearchLoanRateHistoryTask searchContractRateHistoryTask = new SearchLoanRateHistoryTask(webClient, searchContractTask.getContract());
 							Thread taskS = new Thread(searchContractRateHistoryTask);
 							taskS.run();
 							try {
@@ -144,7 +144,7 @@ public class ContractsConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
 						System.out.print("Searching for contract " + contractId + "...");
-						SearchContractTask searchContractTask = new SearchContractTask(webClient, contractId);
+						SearchLoanTask searchContractTask = new SearchLoanTask(webClient, contractId);
 						Thread taskT = new Thread(searchContractTask);
 						taskT.run();
 						try {
@@ -154,7 +154,7 @@ public class ContractsConsole extends AbstractConsole {
 						}
 						if (searchContractTask.getContract() != null) {
 							System.out.print("Approving contract " + contractId + "...");
-							ApproveContractTask approveContractTask = new ApproveContractTask(webClient,
+							ApproveLoanTask approveContractTask = new ApproveLoanTask(webClient,
 									searchContractTask.getContract(), PayloadUtil.createContractProposalApproval());
 							Thread taskS = new Thread(approveContractTask);
 							taskS.run();
@@ -179,7 +179,7 @@ public class ContractsConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
 						System.out.print("Canceling contract " + contractId + "...");
-						CancelContractTask cancelContractTask = new CancelContractTask(webClient, contractId);
+						CancelLoanTask cancelContractTask = new CancelLoanTask(webClient, contractId);
 						Thread taskT = new Thread(cancelContractTask);
 						taskT.run();
 						try {
@@ -202,7 +202,7 @@ public class ContractsConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
 						System.out.print("Declining contract " + contractId + "...");
-						DeclineContractTask declineContractTask = new DeclineContractTask(webClient, contractId);
+						DeclineLoanTask declineContractTask = new DeclineLoanTask(webClient, contractId);
 						Thread taskT = new Thread(declineContractTask);
 						taskT.run();
 						try {
@@ -227,7 +227,7 @@ public class ContractsConsole extends AbstractConsole {
 
 						System.out.print("Retrieving contract " + contractId + "...");
 
-						SearchContractTask searchContractTask = new SearchContractTask(webClient, contractId);
+						SearchLoanTask searchContractTask = new SearchLoanTask(webClient, contractId);
 						Thread taskT = new Thread(searchContractTask);
 						taskT.run();
 						try {
@@ -238,7 +238,7 @@ public class ContractsConsole extends AbstractConsole {
 
 						if (searchContractTask.getContract() != null) {
 							System.out.print("Updating contract " + contractId + " settlement status to SETTLED...");
-							UpdateContractSettlementStatusTask updateSettlementStatusTask = new UpdateContractSettlementStatusTask(
+							UpdateLoanSettlementStatusTask updateSettlementStatusTask = new UpdateLoanSettlementStatusTask(
 									webClient, searchContractTask.getContract(), ConsoleConfig.ACTING_PARTY);
 							Thread taskU = new Thread(updateSettlementStatusTask);
 							taskU.run();
@@ -274,7 +274,7 @@ public class ContractsConsole extends AbstractConsole {
 						e.printStackTrace();
 					}
 					if (searchPartyTask.getParty() != null) {
-						ContractProposalConsole contractProposalConsole = new ContractProposalConsole(
+						LoanProposalConsole contractProposalConsole = new LoanProposalConsole(
 								(PartyRole.BORROWER.equals(ConsoleConfig.ACTING_AS) ? ConsoleConfig.ACTING_PARTY
 										: searchPartyTask.getParty()),
 								(PartyRole.LENDER.equals(ConsoleConfig.ACTING_AS) ? ConsoleConfig.ACTING_PARTY

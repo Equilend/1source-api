@@ -7,17 +7,17 @@ import com.os.console.util.RESTUtil;
 public class CancelRerateTask implements Runnable {
 
 	private WebClient webClient;
-	private String contractId;
+	private String loanId;
 	private String rerateId;
 
-	public CancelRerateTask(WebClient webClient, String contractId, String rerateId) {
+	public CancelRerateTask(WebClient webClient, String loanId, String rerateId) {
 		this.webClient = webClient;
-		this.contractId = contractId;
+		this.loanId = loanId;
 		this.rerateId = rerateId;
 	}
 
 	@Override
 	public void run() {
-		RESTUtil.postRequest(webClient, "/contracts/" + contractId + "/rerates/" + rerateId + "/cancel");
+		RESTUtil.postRequest(webClient, "/loans/" + loanId + "/rerates/" + rerateId + "/cancel");
 	}
 }

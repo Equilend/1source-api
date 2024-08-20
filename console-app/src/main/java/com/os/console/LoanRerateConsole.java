@@ -11,17 +11,17 @@ import com.os.client.model.Rerate;
 import com.os.console.api.tasks.ApproveRerateTask;
 import com.os.console.api.tasks.CancelRerateTask;
 import com.os.console.api.tasks.DeclineRerateTask;
-import com.os.console.api.tasks.SearchContractRerateTask;
+import com.os.console.api.tasks.SearchLoanRerateTask;
 import com.os.console.util.ConsoleOutputUtil;
 
-public class ContractRerateConsole extends AbstractConsole {
+public class LoanRerateConsole extends AbstractConsole {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractRerateConsole.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoanRerateConsole.class);
 
 	Contract contract;
 	Rerate rerate;
 
-	public ContractRerateConsole(Contract contract, Rerate rerate) {
+	public LoanRerateConsole(Contract contract, Rerate rerate) {
 		this.contract = contract;
 		this.rerate = rerate;
 	}
@@ -90,7 +90,7 @@ public class ContractRerateConsole extends AbstractConsole {
 	private void refreshRerate(WebClient webClient, Contract contract) {
 
 		System.out.print("Refreshing rerate " + rerate.getRerateId() + "...");
-		SearchContractRerateTask searchContractRerateTask = new SearchContractRerateTask(webClient,
+		SearchLoanRerateTask searchContractRerateTask = new SearchLoanRerateTask(webClient,
 				contract.getContractId(), rerate.getRerateId());
 		Thread taskT = new Thread(searchContractRerateTask);
 		taskT.run();
