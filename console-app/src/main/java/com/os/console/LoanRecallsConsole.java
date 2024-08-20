@@ -10,16 +10,16 @@ import com.os.client.model.RecallProposal;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.CancelRecallTask;
 import com.os.console.api.tasks.ProposeRecallTask;
-import com.os.console.api.tasks.SearchContractRecallTask;
-import com.os.console.api.tasks.SearchContractRecallsTask;
+import com.os.console.api.tasks.SearchLoanRecallTask;
+import com.os.console.api.tasks.SearchLoanRecallsTask;
 import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.PayloadUtil;
 
-public class ContractRecallsConsole extends AbstractConsole {
+public class LoanRecallsConsole extends AbstractConsole {
 
 	Contract contract;
 
-	public ContractRecallsConsole(Contract contract) {
+	public LoanRecallsConsole(Contract contract) {
 		this.contract = contract;
 	}
 
@@ -37,7 +37,7 @@ public class ContractRecallsConsole extends AbstractConsole {
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 		if (args[0].equals("L")) {
 			System.out.print("Listing all recalls...");
-			SearchContractRecallsTask searchContractRecallsTask = new SearchContractRecallsTask(webClient, contract);
+			SearchLoanRecallsTask searchContractRecallsTask = new SearchLoanRecallsTask(webClient, contract);
 			Thread taskT = new Thread(searchContractRecallsTask);
 			taskT.run();
 			try {
@@ -53,7 +53,7 @@ public class ContractRecallsConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(recallId).toString().equals(recallId)) {
 						System.out.print("Retrieving recall " + recallId + "...");
-						SearchContractRecallTask searchContractRecallTask = new SearchContractRecallTask(webClient,
+						SearchLoanRecallTask searchContractRecallTask = new SearchLoanRecallTask(webClient,
 								contract.getContractId(), recallId);
 						Thread taskT = new Thread(searchContractRecallTask);
 						taskT.run();
@@ -63,7 +63,7 @@ public class ContractRecallsConsole extends AbstractConsole {
 							e.printStackTrace();
 						}
 						if (searchContractRecallTask.getRecall() != null) {
-							ContractRecallConsole contractRecallConsole = new ContractRecallConsole(contract,
+							LoanRecallConsole contractRecallConsole = new LoanRecallConsole(contract,
 									searchContractRecallTask.getRecall());
 							contractRecallConsole.execute(consoleIn, webClient);
 						}

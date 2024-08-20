@@ -12,9 +12,9 @@ import com.os.client.model.AcknowledgementType;
 import com.os.client.model.BenchmarkCd;
 import com.os.client.model.Collateral;
 import com.os.client.model.CollateralType;
-import com.os.client.model.Contract;
-import com.os.client.model.ContractProposal;
-import com.os.client.model.ContractProposalApproval;
+import com.os.client.model.Loan;
+import com.os.client.model.LoanProposal;
+import com.os.client.model.LoanProposalApproval;
 import com.os.client.model.CurrencyCd;
 import com.os.client.model.DelegationAuthorization;
 import com.os.client.model.DelegationAuthorizationType;
@@ -46,12 +46,12 @@ import com.os.console.api.ConsoleConfig;
 
 public class PayloadUtil {
 
-	public static ContractProposal createContractProposal(Party borrowerParty, Party lenderParty,
+	public static LoanProposal createLoanProposal(Party borrowerParty, Party lenderParty,
 			PartyRole proposingPartyRole) {
 
 		Random random = new Random();
 
-		ContractProposal contractProposal = new ContractProposal();
+		LoanProposal loanProposal = new LoanProposal();
 
 		TradeAgreement trade = new TradeAgreement();
 
@@ -153,21 +153,21 @@ public class PayloadUtil {
 
 		trade.setCollateral(collateral);
 
-		contractProposal.setTrade(trade);
+		loanProposal.setTrade(trade);
 
-		contractProposal.setSettlement(Collections.singletonList(ConsoleConfig.SETTLEMENT_INSTRUCTIONS));
+		loanProposal.setSettlement(Collections.singletonList(ConsoleConfig.SETTLEMENT_INSTRUCTIONS));
 
-		return contractProposal;
+		return loanProposal;
 	}
 
-	public static ContractProposalApproval createContractProposalApproval() {
+	public static LoanProposalApproval createLoanProposalApproval() {
 
-		ContractProposalApproval proposalApproval = new ContractProposalApproval();
+		LoanProposalApproval proposalApproval = new LoanProposalApproval();
 
 		proposalApproval.setInternalRefId(UUID.randomUUID().toString());
 
 		if (PartyRole.LENDER.equals(ConsoleConfig.ACTING_AS)) {
-			proposalApproval.setRoundingRule(10d);
+			proposalApproval.setRoundingRule(10);
 			proposalApproval.setRoundingMode(RoundingMode.ALWAYSUP);
 		}
 
@@ -176,7 +176,7 @@ public class PayloadUtil {
 		return proposalApproval;
 	}
 
-	public static ReturnProposal createReturnProposal(Contract contract, Integer quantity) {
+	public static ReturnProposal createReturnProposal(Loan loan, Integer quantity) {
 
 		ReturnProposal proposal = new ReturnProposal();
 
@@ -199,7 +199,7 @@ public class PayloadUtil {
 		proposal.setSettlementType(SettlementType.DVP);
 
 		BigDecimal collateralValue = BigDecimal
-				.valueOf(quantity.doubleValue() * contract.getTrade().getCollateral().getContractPrice().doubleValue() * 1.02);
+				.valueOf(quantity.doubleValue() * loan.getTrade().getCollateral().getContractPrice().doubleValue() * 1.02);
 		collateralValue = collateralValue.setScale(2, java.math.RoundingMode.HALF_UP);
 		proposal.setCollateralValue(collateralValue.doubleValue());
 
@@ -266,7 +266,7 @@ public class PayloadUtil {
 		return proposal;
 	}
 
-	public static RerateProposal createRerateProposal(Contract contract, Double rerate) {
+	public static RerateProposal createRerateProposal(Loan loan, Double rerate) {
 
 		RerateProposal proposal = new RerateProposal();
 
@@ -278,7 +278,7 @@ public class PayloadUtil {
 
 		LocalDate rerateDate = LocalDate.now(ZoneId.of("UTC"));
 		
-		if (contract.getTrade().getRate() instanceof FeeRate) {
+		if (loan.getTrade().getRate() instanceof FeeRate) {
 			
 			FeeRate feeRate = new FeeRate();
 			
@@ -289,11 +289,11 @@ public class PayloadUtil {
 			
 			proposal.setRate(feeRate);
 
-		} else if (contract.getTrade().getRate() instanceof RebateRate) {
+		} else if (loan.getTrade().getRate() instanceof RebateRate) {
 
 			RebateRate rebateRate = new RebateRate();
 
-			if (((RebateRate) contract.getTrade().getRate()).getRebate() instanceof FixedRate) {
+			if (((RebateRate) loan.getTrade().getRate()).getRebate() instanceof FixedRate) {
 			
 				FixedRate fixedRate = new FixedRate();
 				FixedRateDef fixedRateDef = new FixedRateDef();
@@ -303,9 +303,9 @@ public class PayloadUtil {
 				
 				rebateRate.setRebate(fixedRate);
 				
-			} else if (((RebateRate) contract.getTrade().getRate()).getRebate() instanceof FloatingRate) {
+			} else if (((RebateRate) loan.getTrade().getRate()).getRebate() instanceof FloatingRate) {
 				
-				FloatingRateDef origRate = ((FloatingRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFloating();
+				FloatingRateDef origRate = ((FloatingRate)((RebateRate) loan.getTrade().getRate()).getRebate()).getFloating();
 				
 				FloatingRate floatingRate = new FloatingRate();
 				FloatingRateDef floatingRateDef = new FloatingRateDef();

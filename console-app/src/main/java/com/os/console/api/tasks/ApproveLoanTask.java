@@ -2,29 +2,29 @@ package com.os.console.api.tasks;
 
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
-import com.os.client.model.ContractProposalApproval;
+import com.os.client.model.Loan;
+import com.os.client.model.LoanProposalApproval;
 import com.os.client.model.TransactingParties;
 import com.os.client.model.TransactingParty;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.util.RESTUtil;
 
-public class ApproveContractTask implements Runnable {
+public class ApproveLoanTask implements Runnable {
 
 	private WebClient webClient;
-	private Contract contract;
-	private ContractProposalApproval contractProposalApproval;
+	private Loan loan;
+	private LoanProposalApproval loanProposalApproval;
 
-	public ApproveContractTask(WebClient webClient, Contract contract, ContractProposalApproval contractProposalApproval) {
+	public ApproveLoanTask(WebClient webClient, Loan loan, LoanProposalApproval loanProposalApproval) {
 		this.webClient = webClient;
-		this.contract = contract;
-		this.contractProposalApproval = contractProposalApproval;
+		this.loan = loan;
+		this.loanProposalApproval = loanProposalApproval;
 	}
 
 	@Override
 	public void run() {
 
-		TransactingParties parties = contract.getTrade().getTransactingParties();
+		TransactingParties parties = loan.getTrade().getTransactingParties();
 		boolean canAct = false;
 		for (TransactingParty transactingParty : parties) {
 			if (ConsoleConfig.ACTING_PARTY.equals(transactingParty.getParty())) {
@@ -38,7 +38,7 @@ public class ApproveContractTask implements Runnable {
 			return;
 		}
 
-		RESTUtil.postRequest(webClient, "/contracts/" + contract.getContractId() + "/approve", contractProposalApproval);
+		RESTUtil.postRequest(webClient, "/loans/" + loan.getLoanId() + "/approve", loanProposalApproval);
 		
 	}
 }

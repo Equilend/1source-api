@@ -9,8 +9,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.os.client.model.Contract;
 import com.os.client.model.Recall;
 import com.os.console.api.tasks.CancelRecallTask;
-import com.os.console.api.tasks.SearchContractRecallTask;
-import com.os.console.api.tasks.SearchContractTask;
+import com.os.console.api.tasks.SearchLoanRecallTask;
+import com.os.console.api.tasks.SearchLoanTask;
 import com.os.console.util.ConsoleOutputUtil;
 
 public class RecallConsole extends AbstractConsole {
@@ -44,7 +44,7 @@ public class RecallConsole extends AbstractConsole {
 		} else if (args[0].equals("C")) {
 			System.out.print("Searching for contract " + recall.getContractId() + "...");
 
-			SearchContractTask searchContractTask = new SearchContractTask(webClient, recall.getContractId());
+			SearchLoanTask searchContractTask = new SearchLoanTask(webClient, recall.getContractId());
 			Thread taskT = new Thread(searchContractTask);
 			taskT.run();
 			try {
@@ -73,7 +73,7 @@ public class RecallConsole extends AbstractConsole {
 	private void refreshRecall(WebClient webClient, Contract contract) {
 
 		System.out.print("Refreshing recall " + recall.getRecallId() + "...");
-		SearchContractRecallTask searchContractRecallTask = new SearchContractRecallTask(webClient, contract.getContractId(),
+		SearchLoanRecallTask searchContractRecallTask = new SearchLoanRecallTask(webClient, contract.getContractId(),
 				recall.getRecallId());
 		Thread taskT = new Thread(searchContractRecallTask);
 		taskT.run();

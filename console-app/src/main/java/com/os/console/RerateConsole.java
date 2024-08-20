@@ -11,8 +11,8 @@ import com.os.client.model.Rerate;
 import com.os.console.api.tasks.ApproveRerateTask;
 import com.os.console.api.tasks.CancelRerateTask;
 import com.os.console.api.tasks.DeclineRerateTask;
-import com.os.console.api.tasks.SearchContractRerateTask;
-import com.os.console.api.tasks.SearchContractTask;
+import com.os.console.api.tasks.SearchLoanRerateTask;
+import com.os.console.api.tasks.SearchLoanTask;
 import com.os.console.util.ConsoleOutputUtil;
 
 public class RerateConsole extends AbstractConsole {
@@ -44,7 +44,7 @@ public class RerateConsole extends AbstractConsole {
 		} else if (args[0].equals("A")) {
 			System.out.print("Searching for contract " + rerate.getContractId() + "...");
 
-			SearchContractTask searchContractTask = new SearchContractTask(webClient, rerate.getContractId());
+			SearchLoanTask searchContractTask = new SearchLoanTask(webClient, rerate.getContractId());
 			Thread taskT = new Thread(searchContractTask);
 			taskT.run();
 			try {
@@ -69,7 +69,7 @@ public class RerateConsole extends AbstractConsole {
 		} else if (args[0].equals("C")) {
 			System.out.print("Searching for contract " + rerate.getContractId() + "...");
 
-			SearchContractTask searchContractTask = new SearchContractTask(webClient, rerate.getContractId());
+			SearchLoanTask searchContractTask = new SearchLoanTask(webClient, rerate.getContractId());
 			Thread taskT = new Thread(searchContractTask);
 			taskT.run();
 			try {
@@ -93,7 +93,7 @@ public class RerateConsole extends AbstractConsole {
 		} else if (args[0].equals("D")) {
 			System.out.print("Searching for contract " + rerate.getContractId() + "...");
 
-			SearchContractTask searchContractTask = new SearchContractTask(webClient, rerate.getContractId());
+			SearchLoanTask searchContractTask = new SearchLoanTask(webClient, rerate.getContractId());
 			Thread taskT = new Thread(searchContractTask);
 			taskT.run();
 			try {
@@ -122,7 +122,7 @@ public class RerateConsole extends AbstractConsole {
 	private void refreshRerate(WebClient webClient, Contract contract) {
 
 		System.out.print("Refreshing rerate " + rerate.getRerateId() + "...");
-		SearchContractRerateTask searchContractRerateTask = new SearchContractRerateTask(webClient, contract.getContractId(),
+		SearchLoanRerateTask searchContractRerateTask = new SearchLoanRerateTask(webClient, contract.getContractId(),
 				rerate.getRerateId());
 		Thread taskT = new Thread(searchContractRerateTask);
 		taskT.run();

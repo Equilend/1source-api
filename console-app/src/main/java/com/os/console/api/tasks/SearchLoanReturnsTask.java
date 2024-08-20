@@ -4,28 +4,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.ModelReturn;
 import com.os.client.model.Returns;
 import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.RESTUtil;
 
-public class SearchContractReturnsTask implements Runnable {
+public class SearchLoanReturnsTask implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(SearchContractReturnsTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SearchLoanReturnsTask.class);
 
 	private WebClient webClient;
-	private Contract contract;
+	private Loan loan;
 	
-	public SearchContractReturnsTask(WebClient webClient, Contract contract) {
+	public SearchLoanReturnsTask(WebClient webClient, Loan loan) {
 		this.webClient = webClient;
-		this.contract = contract;
+		this.loan = loan;
 	}
 
 	@Override
 	public void run() {
 
-		Returns returns = (Returns) RESTUtil.getRequest(webClient, "/contracts/" + contract.getContractId() + "/returns", Returns.class);
+		Returns returns = (Returns) RESTUtil.getRequest(webClient, "/loans/" + loan.getLoanId() + "/returns", Returns.class);
 
 		if (returns == null || returns.size() == 0) {
 			logger.warn("Invalid returns object or no returns");			

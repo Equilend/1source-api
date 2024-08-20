@@ -76,7 +76,7 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
 					System.exit(0);
 				} else if (command.equalsIgnoreCase("c")) {
-					ContractsConsole contractsConsole = new ContractsConsole();
+					LoansConsole contractsConsole = new LoansConsole();
 					contractsConsole.execute(consoleIn, restWebClient);
 				} else if (command.equalsIgnoreCase("r")) {
 					ReturnsConsole returnsConsole = new ReturnsConsole();

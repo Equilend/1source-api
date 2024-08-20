@@ -4,28 +4,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.Recall;
 import com.os.client.model.Recalls;
 import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.RESTUtil;
 
-public class SearchContractRecallsTask implements Runnable {
+public class SearchLoanRecallsTask implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(SearchContractRecallsTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SearchLoanRecallsTask.class);
 
 	private WebClient webClient;
-	private Contract contract;
+	private Loan loan;
 	
-	public SearchContractRecallsTask(WebClient webClient, Contract contract) {
+	public SearchLoanRecallsTask(WebClient webClient, Loan loan) {
 		this.webClient = webClient;
-		this.contract = contract;
+		this.loan = loan;
 	}
 
 	@Override
 	public void run() {
 		
-		Recalls recalls = (Recalls) RESTUtil.getRequest(webClient, "/contracts/" + contract.getContractId() + "/recalls", Recalls.class);
+		Recalls recalls = (Recalls) RESTUtil.getRequest(webClient, "/loans/" + loan.getLoanId() + "/recalls", Recalls.class);
 
 		if (recalls == null || recalls.size() == 0) {
 			logger.warn("Invalid recalls object or no recalls");			

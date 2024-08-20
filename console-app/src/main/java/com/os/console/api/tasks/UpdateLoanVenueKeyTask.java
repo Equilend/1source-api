@@ -5,15 +5,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.os.client.model.VenueReferenceKeyUpdate;
 import com.os.console.util.RESTUtil;
 
-public class UpdateContractVenueKeyTask implements Runnable {
+public class UpdateLoanVenueKeyTask implements Runnable {
 
 	private WebClient webClient;
-	private String contractId;
+	private String loanId;
 	private String venueRefKey;
 
-	public UpdateContractVenueKeyTask(WebClient webClient, String contractId, String venueRefKey) {
+	public UpdateLoanVenueKeyTask(WebClient webClient, String loanId, String venueRefKey) {
 		this.webClient = webClient;
-		this.contractId = contractId;
+		this.loanId = loanId;
 		this.venueRefKey = venueRefKey;
 	}
 
@@ -24,7 +24,7 @@ public class UpdateContractVenueKeyTask implements Runnable {
 
 		venueReferenceKeyUpdate.setVenueRefKey(venueRefKey);
 
-		RESTUtil.patchRequest(webClient, "/contracts/" + contractId, venueReferenceKeyUpdate);
+		RESTUtil.patchRequest(webClient, "/loans/" + loanId, venueReferenceKeyUpdate);
 
 	}
 }

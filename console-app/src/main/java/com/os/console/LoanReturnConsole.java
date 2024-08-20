@@ -12,20 +12,20 @@ import com.os.client.model.ReturnAcknowledgement;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.AcknowledgeReturnTask;
 import com.os.console.api.tasks.CancelReturnTask;
-import com.os.console.api.tasks.SearchContractReturnTask;
-import com.os.console.api.tasks.SearchContractTask;
+import com.os.console.api.tasks.SearchLoanReturnTask;
+import com.os.console.api.tasks.SearchLoanTask;
 import com.os.console.api.tasks.UpdateReturnSettlementStatusTask;
 import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.PayloadUtil;
 
-public class ContractReturnConsole extends AbstractConsole {
+public class LoanReturnConsole extends AbstractConsole {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractReturnConsole.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoanReturnConsole.class);
 
 	Contract contract;
 	ModelReturn modelReturn;
 
-	public ContractReturnConsole(Contract contract, ModelReturn modelReturn) {
+	public LoanReturnConsole(Contract contract, ModelReturn modelReturn) {
 		this.contract = contract;
 		this.modelReturn = modelReturn;
 	}
@@ -113,7 +113,7 @@ public class ContractReturnConsole extends AbstractConsole {
 		} else if (args[0].equals("C")) {
 			System.out.print("Searching for contract " + modelReturn.getContractId() + "...");
 
-			SearchContractTask searchContractTask = new SearchContractTask(webClient, modelReturn.getContractId());
+			SearchLoanTask searchContractTask = new SearchLoanTask(webClient, modelReturn.getContractId());
 			Thread taskT = new Thread(searchContractTask);
 			taskT.run();
 			try {
@@ -154,7 +154,7 @@ public class ContractReturnConsole extends AbstractConsole {
 	private void refreshModelReturn(WebClient webClient) {
 
 		System.out.print("Refreshing return " + modelReturn.getReturnId() + "...");
-		SearchContractReturnTask searchContractReturnTask = new SearchContractReturnTask(webClient, contract,
+		SearchLoanReturnTask searchContractReturnTask = new SearchLoanReturnTask(webClient, contract,
 				modelReturn.getReturnId());
 		Thread taskT = new Thread(searchContractReturnTask);
 		taskT.run();

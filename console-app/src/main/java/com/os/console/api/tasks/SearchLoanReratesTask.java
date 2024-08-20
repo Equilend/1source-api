@@ -4,28 +4,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.Rerate;
 import com.os.client.model.Rerates;
 import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.RESTUtil;
 
-public class SearchContractReratesTask implements Runnable {
+public class SearchLoanReratesTask implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(SearchContractReratesTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SearchLoanReratesTask.class);
 
 	private WebClient webClient;
-	private Contract contract;
+	private Loan loan;
 	
-	public SearchContractReratesTask(WebClient webClient, Contract contract) {
+	public SearchLoanReratesTask(WebClient webClient, Loan loan) {
 		this.webClient = webClient;
-		this.contract = contract;
+		this.loan = loan;
 	}
 
 	@Override
 	public void run() {
 
-		Rerates rerates = (Rerates) RESTUtil.getRequest(webClient, "/contracts/" + contract.getContractId() + "/rerates", Rerates.class);
+		Rerates rerates = (Rerates) RESTUtil.getRequest(webClient, "/loans/" + loan.getLoanId() + "/rerates", Rerates.class);
 
 		if (rerates == null || rerates.size() == 0) {
 			logger.warn("Invalid rerates object or no rerates");			

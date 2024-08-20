@@ -7,26 +7,26 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.os.client.model.Recall;
 import com.os.console.util.RESTUtil;
 
-public class SearchContractRecallTask implements Runnable {
+public class SearchLoanRecallTask implements Runnable {
 
-	private static final Logger logger = LoggerFactory.getLogger(SearchContractRecallTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(SearchLoanRecallTask.class);
 
 	private WebClient webClient;
-	private String contractId;
+	private String loanId;
 	private String recallId;
 
 	private Recall recall;
 	
-	public SearchContractRecallTask(WebClient webClient, String contractId, String recallId) {
+	public SearchLoanRecallTask(WebClient webClient, String loanId, String recallId) {
 		this.webClient = webClient;
-		this.contractId = contractId;
+		this.loanId = loanId;
 		this.recallId = recallId;
 	}
 
 	@Override
 	public void run() {
 
-		recall = (Recall) RESTUtil.getRequest(webClient, "/contracts/" + contractId + "/recalls/" + recallId, Recall.class);
+		recall = (Recall) RESTUtil.getRequest(webClient, "/loans/" + loanId + "/recalls/" + recallId, Recall.class);
 		
 		if (recall == null) {
 			logger.warn("Invalid recall object or recall not found");

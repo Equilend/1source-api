@@ -2,7 +2,7 @@ package com.os.console.api.tasks;
 
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.Party;
 import com.os.client.model.PartyRole;
 import com.os.client.model.RecallProposal;
@@ -13,13 +13,13 @@ import com.os.console.util.RESTUtil;
 public class ProposeRecallTask implements Runnable {
 
 	private WebClient webClient;
-	private Contract contract;
+	private Loan loan;
 	private RecallProposal recallProposal;
 	private Party actingParty;
 
-	public ProposeRecallTask(WebClient webClient, Contract contract, RecallProposal recallProposal, Party actingParty) {
+	public ProposeRecallTask(WebClient webClient, Loan loan, RecallProposal recallProposal, Party actingParty) {
 		this.webClient = webClient;
-		this.contract = contract;
+		this.loan = loan;
 		this.recallProposal = recallProposal;
 		this.actingParty = actingParty;
 	}
@@ -27,7 +27,7 @@ public class ProposeRecallTask implements Runnable {
 	@Override
 	public void run() {
 
-		TransactingParties parties = contract.getTrade().getTransactingParties();
+		TransactingParties parties = loan.getTrade().getTransactingParties();
 		boolean canAct = false;
 		for (TransactingParty transactingParty : parties) {
 			if (PartyRole.LENDER.equals(transactingParty.getPartyRole())
@@ -42,7 +42,7 @@ public class ProposeRecallTask implements Runnable {
 			return;
 		}
 
-		RESTUtil.postRequest(webClient, "/contracts/" + contract.getContractId() + "/recalls", recallProposal);
+		RESTUtil.postRequest(webClient, "/loans/" + loan.getLoanId() + "/recalls", recallProposal);
 
 	}
 }

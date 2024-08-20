@@ -37,7 +37,7 @@ public class SearchRecallsTask implements Runnable {
 					printHeader();
 				}
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getRecallId(), 40));
-				System.out.print(ConsoleOutputUtil.padSpaces(recall.getContractId(), 40));
+				System.out.print(ConsoleOutputUtil.padSpaces(recall.getLoanId(), 40));
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getStatus().toString(), 12));
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getLastUpdateDatetime(), 30));
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getRecallDate(), 15));
@@ -53,7 +53,7 @@ public class SearchRecallsTask implements Runnable {
 	public void printHeader() {
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("Recall Id", 40));
-		System.out.print(ConsoleOutputUtil.padSpaces("Contract Id", 40));
+		System.out.print(ConsoleOutputUtil.padSpaces("Loan Id", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("Status", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("Last Update DateTime", 30));
 		System.out.print(ConsoleOutputUtil.padSpaces("Recall Date", 15));

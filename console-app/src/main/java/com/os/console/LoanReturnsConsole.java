@@ -10,16 +10,16 @@ import com.os.client.model.ReturnProposal;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.CancelReturnTask;
 import com.os.console.api.tasks.ProposeReturnTask;
-import com.os.console.api.tasks.SearchContractReturnTask;
-import com.os.console.api.tasks.SearchContractReturnsTask;
+import com.os.console.api.tasks.SearchLoanReturnTask;
+import com.os.console.api.tasks.SearchLoanReturnsTask;
 import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.PayloadUtil;
 
-public class ContractReturnsConsole extends AbstractConsole {
+public class LoanReturnsConsole extends AbstractConsole {
 
 	Contract contract;
 
-	public ContractReturnsConsole(Contract contract) {
+	public LoanReturnsConsole(Contract contract) {
 		this.contract = contract;
 	}
 
@@ -39,7 +39,7 @@ public class ContractReturnsConsole extends AbstractConsole {
 
 		if (args[0].equals("L")) {
 			System.out.print("Listing all returns...");
-			SearchContractReturnsTask searchContractReturnsTask = new SearchContractReturnsTask(webClient, contract);
+			SearchLoanReturnsTask searchContractReturnsTask = new SearchLoanReturnsTask(webClient, contract);
 			Thread taskT = new Thread(searchContractReturnsTask);
 			taskT.run();
 			try {
@@ -55,7 +55,7 @@ public class ContractReturnsConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(returnId).toString().equals(returnId)) {
 						System.out.print("Retrieving return " + returnId + "...");
-						SearchContractReturnTask searchContractReturnTask = new SearchContractReturnTask(webClient,
+						SearchLoanReturnTask searchContractReturnTask = new SearchLoanReturnTask(webClient,
 								contract, returnId);
 						Thread taskT = new Thread(searchContractReturnTask);
 						taskT.run();
@@ -65,7 +65,7 @@ public class ContractReturnsConsole extends AbstractConsole {
 							e.printStackTrace();
 						}
 						if (searchContractReturnTask.getReturn() != null) {
-							ContractReturnConsole contractReturnConsole = new ContractReturnConsole(contract,
+							LoanReturnConsole contractReturnConsole = new LoanReturnConsole(contract,
 									searchContractReturnTask.getReturn());
 							contractReturnConsole.execute(consoleIn, webClient);
 						}
