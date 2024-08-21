@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.AcknowledgementType;
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.ModelReturn;
 import com.os.client.model.ReturnAcknowledgement;
 import com.os.console.api.ConsoleConfig;
@@ -105,10 +105,10 @@ public class ReturnConsole extends AbstractConsole {
 				System.out.println("Invalid acknowledgement message");
 			}
 		} else if (args[0].equals("C")) {
-			System.out.print("Searching for contract " + modelReturn.getContractId() + "...");
+			System.out.print("Searching for loan " + modelReturn.getLoanId() + "...");
 
-			SearchLoanTask searchContractTask = new SearchLoanTask(webClient, modelReturn.getContractId());
-			Thread taskT = new Thread(searchContractTask);
+			SearchLoanTask searchLoanTask = new SearchLoanTask(webClient, modelReturn.getLoanId());
+			Thread taskT = new Thread(searchLoanTask);
 			taskT.run();
 			try {
 				taskT.join();
@@ -116,9 +116,9 @@ public class ReturnConsole extends AbstractConsole {
 				e.printStackTrace();
 			}
 
-			if (searchContractTask.getContract() != null) {
+			if (searchLoanTask.getLoan() != null) {
 				System.out.print("Canceling return...");
-				CancelReturnTask cancelReturnTask = new CancelReturnTask(webClient, modelReturn.getContractId(), modelReturn.getReturnId());
+				CancelReturnTask cancelReturnTask = new CancelReturnTask(webClient, modelReturn.getLoanId(), modelReturn.getReturnId());
 				Thread taskS = new Thread(cancelReturnTask);
 				taskS.run();
 				try {
@@ -126,13 +126,13 @@ public class ReturnConsole extends AbstractConsole {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				refreshModelReturn(webClient, searchContractTask.getContract());
+				refreshModelReturn(webClient, searchLoanTask.getLoan());
 			}
 		} else if (args[0].equals("U")) {
-			System.out.print("Searching for contract " + modelReturn.getContractId() + "...");
+			System.out.print("Searching for loan " + modelReturn.getLoanId() + "...");
 
-			SearchLoanTask searchContractTask = new SearchLoanTask(webClient, modelReturn.getContractId());
-			Thread taskT = new Thread(searchContractTask);
+			SearchLoanTask searchLoanTask = new SearchLoanTask(webClient, modelReturn.getLoanId());
+			Thread taskT = new Thread(searchLoanTask);
 			taskT.run();
 			try {
 				taskT.join();
@@ -140,11 +140,11 @@ public class ReturnConsole extends AbstractConsole {
 				e.printStackTrace();
 			}
 
-			if (searchContractTask.getContract() != null) {
+			if (searchLoanTask.getLoan() != null) {
 
 				System.out.print("Updating Return settlement status to SETTLED...");
 				UpdateReturnSettlementStatusTask updateReturnSettlementStatusTask = new UpdateReturnSettlementStatusTask(
-						webClient, searchContractTask.getContract(), modelReturn, ConsoleConfig.ACTING_PARTY);
+						webClient, searchLoanTask.getLoan(), modelReturn, ConsoleConfig.ACTING_PARTY);
 				Thread taskS = new Thread(updateReturnSettlementStatusTask);
 				taskS.run();
 				try {
@@ -152,26 +152,26 @@ public class ReturnConsole extends AbstractConsole {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-				refreshModelReturn(webClient, searchContractTask.getContract());
+				refreshModelReturn(webClient, searchLoanTask.getLoan());
 			}
 		} else {
 			System.out.println("Unknown command");
 		}
 	}
 
-	private void refreshModelReturn(WebClient webClient, Contract contract) {
+	private void refreshModelReturn(WebClient webClient, Loan loan) {
 
 		System.out.print("Refreshing return " + modelReturn.getReturnId() + "...");
-		SearchLoanReturnTask searchContractReturnTask = new SearchLoanReturnTask(webClient, contract,
+		SearchLoanReturnTask searchLoanReturnTask = new SearchLoanReturnTask(webClient, loan,
 				modelReturn.getReturnId());
-		Thread taskT = new Thread(searchContractReturnTask);
+		Thread taskT = new Thread(searchLoanReturnTask);
 		taskT.run();
 		try {
 			taskT.join();
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
-		modelReturn = searchContractReturnTask.getReturn();
+		modelReturn = searchLoanReturnTask.getReturn();
 	}
 
 	protected void printMenu() {

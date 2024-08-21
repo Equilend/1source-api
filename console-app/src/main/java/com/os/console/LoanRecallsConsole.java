@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.RecallProposal;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.CancelRecallTask;
@@ -17,28 +17,28 @@ import com.os.console.util.PayloadUtil;
 
 public class LoanRecallsConsole extends AbstractConsole {
 
-	Contract contract;
+	Loan loan;
 
-	public LoanRecallsConsole(Contract contract) {
-		this.contract = contract;
+	public LoanRecallsConsole(Loan loan) {
+		this.loan = loan;
 	}
 
 	protected boolean prompt() {
 		
-		if (contract == null) {
-			System.out.println("Contract not available");
+		if (loan == null) {
+			System.out.println("Loan not available");
 			return false;
 		}
 		
-		System.out.print("/contracts/" + contract.getContractId() + "/recalls > ");
+		System.out.print("/loans/" + loan.getLoanId() + "/recalls > ");
 		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
-		if (args[0].equals("L")) {
+		if (args[0].equals("I")) {
 			System.out.print("Listing all recalls...");
-			SearchLoanRecallsTask searchContractRecallsTask = new SearchLoanRecallsTask(webClient, contract);
-			Thread taskT = new Thread(searchContractRecallsTask);
+			SearchLoanRecallsTask searchLoanRecallsTask = new SearchLoanRecallsTask(webClient, loan);
+			Thread taskT = new Thread(searchLoanRecallsTask);
 			taskT.run();
 			try {
 				taskT.join();
@@ -53,19 +53,19 @@ public class LoanRecallsConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(recallId).toString().equals(recallId)) {
 						System.out.print("Retrieving recall " + recallId + "...");
-						SearchLoanRecallTask searchContractRecallTask = new SearchLoanRecallTask(webClient,
-								contract.getContractId(), recallId);
-						Thread taskT = new Thread(searchContractRecallTask);
+						SearchLoanRecallTask searchLoanRecallTask = new SearchLoanRecallTask(webClient,
+								loan.getLoanId(), recallId);
+						Thread taskT = new Thread(searchLoanRecallTask);
 						taskT.run();
 						try {
 							taskT.join();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						if (searchContractRecallTask.getRecall() != null) {
-							LoanRecallConsole contractRecallConsole = new LoanRecallConsole(contract,
-									searchContractRecallTask.getRecall());
-							contractRecallConsole.execute(consoleIn, webClient);
+						if (searchLoanRecallTask.getRecall() != null) {
+							LoanRecallConsole loanRecallConsole = new LoanRecallConsole(loan,
+									searchLoanRecallTask.getRecall());
+							loanRecallConsole.execute(consoleIn, webClient);
 						}
 					} else {
 						System.out.println("Invalid UUID");
@@ -86,7 +86,7 @@ public class LoanRecallsConsole extends AbstractConsole {
 
 					ConsoleOutputUtil.printObject(recallProposal);
 
-					ProposeRecallTask proposeRecallTask = new ProposeRecallTask(webClient, contract, recallProposal,
+					ProposeRecallTask proposeRecallTask = new ProposeRecallTask(webClient, loan, recallProposal,
 							ConsoleConfig.ACTING_PARTY);
 					Thread taskT = new Thread(proposeRecallTask);
 					taskT.run();
@@ -107,7 +107,7 @@ public class LoanRecallsConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(recallId).toString().equals(recallId)) {
 						System.out.print("Cancelling recall " + recallId + "...");
-						CancelRecallTask cancelRecallTask = new CancelRecallTask(webClient, contract.getContractId(),
+						CancelRecallTask cancelRecallTask = new CancelRecallTask(webClient, loan.getLoanId(),
 								recallId);
 						Thread taskT = new Thread(cancelRecallTask);
 						taskT.run();
@@ -129,9 +129,9 @@ public class LoanRecallsConsole extends AbstractConsole {
 	}
 
 	protected void printMenu() {
-		System.out.println("Contract Recalls Menu");
+		System.out.println("Loan Recalls Menu");
 		System.out.println("-----------------------");
-		System.out.println("L                   - List all recalls");
+		System.out.println("I                   - List all recalls");
 		System.out.println("S <Recall ID>       - Load recall by Id");
 		System.out.println();
 		System.out.println("R <Quantity>        - Notify recall");

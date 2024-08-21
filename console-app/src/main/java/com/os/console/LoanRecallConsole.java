@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.Recall;
 import com.os.console.api.tasks.CancelRecallTask;
 import com.os.console.api.tasks.SearchLoanRecallTask;
@@ -17,25 +17,25 @@ public class LoanRecallConsole extends AbstractConsole {
 
 	private static final Logger logger = LoggerFactory.getLogger(LoanRecallConsole.class);
 
-	private Contract contract;
+	private Loan loan;
 	private Recall recall;
 
-	public LoanRecallConsole(Contract contract, Recall recall) {
-		this.contract = contract;
+	public LoanRecallConsole(Loan loan, Recall recall) {
+		this.loan = loan;
 		this.recall = recall;
 	}
 
 	protected boolean prompt() {
 
-		if (contract == null) {
-			System.out.println("Contract not available");
+		if (loan == null) {
+			System.out.println("Loan not available");
 			return false;
 		} else if (recall == null) {
 			System.out.println("Recall not available");
 			return false;
 		}
 
-		System.out.print("/contracts/" + contract.getContractId() + "/recalls/" + recall.getRecallId() + " > ");
+		System.out.print("/loans/" + loan.getLoanId() + "/recalls/" + recall.getRecallId() + " > ");
 		return true;
 	}
 
@@ -44,10 +44,10 @@ public class LoanRecallConsole extends AbstractConsole {
 		if (args[0].equals("J")) {
 			ConsoleOutputUtil.printObject(recall);
 		} else if (args[0].equals("C")) {
-			System.out.print("Searching for contract " + recall.getContractId() + "...");
+			System.out.print("Searching for loan " + recall.getLoanId() + "...");
 
-			SearchLoanTask searchContractTask = new SearchLoanTask(webClient, recall.getContractId());
-			Thread taskT = new Thread(searchContractTask);
+			SearchLoanTask searchLoanTask = new SearchLoanTask(webClient, recall.getLoanId());
+			Thread taskT = new Thread(searchLoanTask);
 			taskT.run();
 			try {
 				taskT.join();
@@ -55,9 +55,9 @@ public class LoanRecallConsole extends AbstractConsole {
 				e.printStackTrace();
 			}
 
-			if (searchContractTask.getContract() != null) {
+			if (searchLoanTask.getLoan() != null) {
 				System.out.print("Canceling recall...");
-				CancelRecallTask cancelRecallTask = new CancelRecallTask(webClient, recall.getContractId(), recall.getRecallId());
+				CancelRecallTask cancelRecallTask = new CancelRecallTask(webClient, recall.getLoanId(), recall.getRecallId());
 				Thread taskS = new Thread(cancelRecallTask);
 				taskS.run();
 				try {
@@ -75,20 +75,20 @@ public class LoanRecallConsole extends AbstractConsole {
 	private void refreshRecall(WebClient webClient) {
 
 		System.out.print("Refreshing recall " + recall.getRecallId() + "...");
-		SearchLoanRecallTask searchContractRecallTask = new SearchLoanRecallTask(webClient, contract.getContractId(),
+		SearchLoanRecallTask searchLoanRecallTask = new SearchLoanRecallTask(webClient, loan.getLoanId(),
 				recall.getRecallId());
-		Thread taskT = new Thread(searchContractRecallTask);
+		Thread taskT = new Thread(searchLoanRecallTask);
 		taskT.run();
 		try {
 			taskT.join();
 		} catch (InterruptedException e) {
 			logger.error(e.getMessage(), e);
 		}
-		recall = searchContractRecallTask.getRecall();
+		recall = searchLoanRecallTask.getRecall();
 	}
 
 	protected void printMenu() {
-		System.out.println("Contract Recall Menu");
+		System.out.println("Loan Recall Menu");
 		System.out.println("-----------------------");
 		System.out.println("J             - Print JSON");
 		System.out.println();

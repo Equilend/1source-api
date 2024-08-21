@@ -21,7 +21,7 @@ public class ReratesConsole extends AbstractConsole {
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 
-		if (args[0].equals("L")) {
+		if (args[0].equals("I")) {
 			System.out.print("Listing all rerates...");
 			SearchReratesTask searchReratesTask = new SearchReratesTask(webClient);
 			Thread taskT = new Thread(searchReratesTask);
@@ -77,7 +77,7 @@ public class ReratesConsole extends AbstractConsole {
 						if (searchRerateTask.getRerate() != null) {
 							Rerate rerate = searchRerateTask.getRerate();
 							System.out.print("Approving rerate...");
-							ApproveRerateTask approveRerateTask = new ApproveRerateTask(webClient, rerate.getContractId(), rerate.getRerateId());
+							ApproveRerateTask approveRerateTask = new ApproveRerateTask(webClient, rerate.getLoanId(), rerate.getRerateId());
 							Thread taskS = new Thread(approveRerateTask);
 							taskS.run();
 							try {
@@ -112,7 +112,7 @@ public class ReratesConsole extends AbstractConsole {
 						if (searchRerateTask.getRerate() != null) {
 							Rerate rerate = searchRerateTask.getRerate();
 							System.out.print("Canceling rerate...");
-							CancelRerateTask cancelRerateTask = new CancelRerateTask(webClient, rerate.getContractId(), rerate.getRerateId());
+							CancelRerateTask cancelRerateTask = new CancelRerateTask(webClient, rerate.getLoanId(), rerate.getRerateId());
 							Thread taskS = new Thread(cancelRerateTask);
 							taskS.run();
 							try {
@@ -147,7 +147,7 @@ public class ReratesConsole extends AbstractConsole {
 						if (searchRerateTask.getRerate() != null) {
 							Rerate rerate = searchRerateTask.getRerate();
 							System.out.print("Declining rerate...");
-							DeclineRerateTask declineRerateTask = new DeclineRerateTask(webClient, rerate.getContractId(), rerate.getRerateId());
+							DeclineRerateTask declineRerateTask = new DeclineRerateTask(webClient, rerate.getLoanId(), rerate.getRerateId());
 							Thread taskS = new Thread(declineRerateTask);
 							taskS.run();
 							try {
@@ -171,7 +171,7 @@ public class ReratesConsole extends AbstractConsole {
 	protected void printMenu() {
 		System.out.println("Rerates Menu");
 		System.out.println("-----------------------");
-		System.out.println("L             - List all rerates");
+		System.out.println("I             - List all rerates");
 		System.out.println("S <Rerate Id> - Load a rerate by Id");
 		System.out.println();
 		System.out.println("A <Rerate Id> - Approve a rerate by Id");

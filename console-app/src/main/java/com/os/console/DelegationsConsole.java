@@ -26,7 +26,7 @@ public class DelegationsConsole extends AbstractConsole {
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 
-		if (args[0].equals("L")) {
+		if (args[0].equals("I")) {
 			System.out.print("Listing all delegations...");
 			SearchDelegationsTask searchDelegationsTask = new SearchDelegationsTask(webClient);
 			Thread taskT = new Thread(searchDelegationsTask);
@@ -170,7 +170,7 @@ public class DelegationsConsole extends AbstractConsole {
 	protected void printMenu() {
 		System.out.println("Delegations Menu");
 		System.out.println("-----------------------");
-		System.out.println("L                 - List all delegations");
+		System.out.println("I                 - List all delegations");
 		System.out.println("S <Delegation Id> - Load a delegation by Id");
 		System.out.println();
 		System.out.println("A <Delegation Id> - Approve delegation by Id");

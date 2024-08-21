@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.RerateProposal;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.ApproveRerateTask;
@@ -19,29 +19,29 @@ import com.os.console.util.PayloadUtil;
 
 public class LoanReratesConsole extends AbstractConsole {
 
-	Contract contract;
+	Loan loan;
 
-	public LoanReratesConsole(Contract contract) {
-		this.contract = contract;
+	public LoanReratesConsole(Loan loan) {
+		this.loan = loan;
 	}
 
 	protected boolean prompt() {
 
-		if (contract == null) {
-			System.out.println("Contract not available");
+		if (loan == null) {
+			System.out.println("Loan not available");
 			return false;
 		}
 
-		System.out.print("/contracts/" + contract.getContractId() + "/rerates > ");
+		System.out.print("/loans/" + loan.getLoanId() + "/rerates > ");
 		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 
-		if (args[0].equals("L")) {
+		if (args[0].equals("I")) {
 			System.out.print("Listing all rerates...");
-			SearchLoanReratesTask searchContractReratesTask = new SearchLoanReratesTask(webClient, contract);
-			Thread taskT = new Thread(searchContractReratesTask);
+			SearchLoanReratesTask searchLoanReratesTask = new SearchLoanReratesTask(webClient, loan);
+			Thread taskT = new Thread(searchLoanReratesTask);
 			taskT.run();
 			try {
 				taskT.join();
@@ -56,19 +56,19 @@ public class LoanReratesConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(rerateId).toString().equals(rerateId)) {
 						System.out.print("Retrieving rerate " + rerateId + "...");
-						SearchLoanRerateTask searchContractRerateTask = new SearchLoanRerateTask(webClient,
-								contract.getContractId(), rerateId);
-						Thread taskT = new Thread(searchContractRerateTask);
+						SearchLoanRerateTask searchLoanRerateTask = new SearchLoanRerateTask(webClient,
+								loan.getLoanId(), rerateId);
+						Thread taskT = new Thread(searchLoanRerateTask);
 						taskT.run();
 						try {
 							taskT.join();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						if (searchContractRerateTask.getRerate() != null) {
-							LoanRerateConsole contractRerateConsole = new LoanRerateConsole(contract,
-									searchContractRerateTask.getRerate());
-							contractRerateConsole.execute(consoleIn, webClient);
+						if (searchLoanRerateTask.getRerate() != null) {
+							LoanRerateConsole loanRerateConsole = new LoanRerateConsole(loan,
+									searchLoanRerateTask.getRerate());
+							loanRerateConsole.execute(consoleIn, webClient);
 						}
 					} else {
 						System.out.println("Invalid UUID");
@@ -78,7 +78,7 @@ public class LoanReratesConsole extends AbstractConsole {
 				}
 			}
 		} else if (args[0].equals("J")) {
-			ConsoleOutputUtil.printObject(contract.getTrade().getRate());
+			ConsoleOutputUtil.printObject(loan.getTrade().getRate());
 		} else if (args[0].equals("P")) {
 			if (args.length != 2 || args[1].length() == 0 || args[1].length() > 15) {
 				System.out.println("Invalid spread/fee");
@@ -87,11 +87,11 @@ public class LoanReratesConsole extends AbstractConsole {
 				try {
 					System.out.print("Proposing rerate...");
 
-					RerateProposal rerateProposal = PayloadUtil.createRerateProposal(contract, rerate);
+					RerateProposal rerateProposal = PayloadUtil.createRerateProposal(loan, rerate);
 
 					ConsoleOutputUtil.printObject(rerateProposal);
 
-					ProposeRerateTask proposeRerateTask = new ProposeRerateTask(webClient, contract, rerateProposal,
+					ProposeRerateTask proposeRerateTask = new ProposeRerateTask(webClient, loan, rerateProposal,
 							ConsoleConfig.ACTING_PARTY);
 					Thread taskT = new Thread(proposeRerateTask);
 					taskT.run();
@@ -112,7 +112,7 @@ public class LoanReratesConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(rerateId).toString().equals(rerateId)) {
 						System.out.print("Approving rerate...");
-						ApproveRerateTask approveRerateTask = new ApproveRerateTask(webClient, contract.getContractId(),
+						ApproveRerateTask approveRerateTask = new ApproveRerateTask(webClient, loan.getLoanId(),
 								rerateId);
 						Thread taskS = new Thread(approveRerateTask);
 						taskS.run();
@@ -136,7 +136,7 @@ public class LoanReratesConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(rerateId).toString().equals(rerateId)) {
 						System.out.print("Cancelling rerate " + rerateId + "...");
-						CancelRerateTask cancelRerateTask = new CancelRerateTask(webClient, contract.getContractId(),
+						CancelRerateTask cancelRerateTask = new CancelRerateTask(webClient, loan.getLoanId(),
 								rerateId);
 						Thread taskT = new Thread(cancelRerateTask);
 						taskT.run();
@@ -160,7 +160,7 @@ public class LoanReratesConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(rerateId).toString().equals(rerateId)) {
 						System.out.print("Declining rerate...");
-						DeclineRerateTask declineRerateTask = new DeclineRerateTask(webClient, contract.getContractId(),
+						DeclineRerateTask declineRerateTask = new DeclineRerateTask(webClient, loan.getLoanId(),
 								rerateId);
 						Thread taskS = new Thread(declineRerateTask);
 						taskS.run();
@@ -182,9 +182,9 @@ public class LoanReratesConsole extends AbstractConsole {
 	}
 
 	protected void printMenu() {
-		System.out.println("Contract Rerates Menu");
+		System.out.println("Loan Rerates Menu");
 		System.out.println("-----------------------");
-		System.out.println("L                   - List all rerates");
+		System.out.println("I                   - List all rerates");
 		System.out.println("S <Rerate ID>       - Search rerate by Id");
 		System.out.println("J                   - Show current rate");
 		System.out.println();
