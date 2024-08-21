@@ -5,7 +5,7 @@ import java.util.UUID;
 
 import org.springframework.web.reactive.function.client.WebClient;
 
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.ReturnProposal;
 import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.CancelReturnTask;
@@ -17,30 +17,30 @@ import com.os.console.util.PayloadUtil;
 
 public class LoanReturnsConsole extends AbstractConsole {
 
-	Contract contract;
+	Loan loan;
 
-	public LoanReturnsConsole(Contract contract) {
-		this.contract = contract;
+	public LoanReturnsConsole(Loan loan) {
+		this.loan = loan;
 	}
 
 	protected boolean prompt() {
 		
-		if (contract == null) {
-			System.out.println("Contract not available");
+		if (loan == null) {
+			System.out.println("Loan not available");
 			return false;
 		}
 		
-		System.out.print("/contracts/" + contract.getContractId() + "/returns > ");
+		System.out.print("/loans/" + loan.getLoanId() + "/returns > ");
 		
 		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 
-		if (args[0].equals("L")) {
+		if (args[0].equals("I")) {
 			System.out.print("Listing all returns...");
-			SearchLoanReturnsTask searchContractReturnsTask = new SearchLoanReturnsTask(webClient, contract);
-			Thread taskT = new Thread(searchContractReturnsTask);
+			SearchLoanReturnsTask searchLoanReturnsTask = new SearchLoanReturnsTask(webClient, loan);
+			Thread taskT = new Thread(searchLoanReturnsTask);
 			taskT.run();
 			try {
 				taskT.join();
@@ -55,19 +55,19 @@ public class LoanReturnsConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(returnId).toString().equals(returnId)) {
 						System.out.print("Retrieving return " + returnId + "...");
-						SearchLoanReturnTask searchContractReturnTask = new SearchLoanReturnTask(webClient,
-								contract, returnId);
-						Thread taskT = new Thread(searchContractReturnTask);
+						SearchLoanReturnTask searchLoanReturnTask = new SearchLoanReturnTask(webClient,
+								loan, returnId);
+						Thread taskT = new Thread(searchLoanReturnTask);
 						taskT.run();
 						try {
 							taskT.join();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						if (searchContractReturnTask.getReturn() != null) {
-							LoanReturnConsole contractReturnConsole = new LoanReturnConsole(contract,
-									searchContractReturnTask.getReturn());
-							contractReturnConsole.execute(consoleIn, webClient);
+						if (searchLoanReturnTask.getReturn() != null) {
+							LoanReturnConsole loanReturnConsole = new LoanReturnConsole(loan,
+									searchLoanReturnTask.getReturn());
+							loanReturnConsole.execute(consoleIn, webClient);
 						}
 					} else {
 						System.out.println("Invalid UUID");
@@ -84,11 +84,11 @@ public class LoanReturnsConsole extends AbstractConsole {
 				try {
 					System.out.print("Notifying return...");
 
-					ReturnProposal returnProposal = PayloadUtil.createReturnProposal(contract, quantity);
+					ReturnProposal returnProposal = PayloadUtil.createReturnProposal(loan, quantity);
 
 					ConsoleOutputUtil.printObject(returnProposal);
 
-					ProposeReturnTask proposeReturnTask = new ProposeReturnTask(webClient, contract, returnProposal,
+					ProposeReturnTask proposeReturnTask = new ProposeReturnTask(webClient, loan, returnProposal,
 							ConsoleConfig.ACTING_PARTY);
 					Thread taskT = new Thread(proposeReturnTask);
 					taskT.run();
@@ -109,7 +109,7 @@ public class LoanReturnsConsole extends AbstractConsole {
 				try {
 					if (UUID.fromString(returnId).toString().equals(returnId)) {
 						System.out.print("Cancelling return " + returnId + "...");
-						CancelReturnTask cancelReturnTask = new CancelReturnTask(webClient, contract.getContractId(),
+						CancelReturnTask cancelReturnTask = new CancelReturnTask(webClient, loan.getLoanId(),
 								returnId);
 						Thread taskT = new Thread(cancelReturnTask);
 						taskT.run();
@@ -131,9 +131,9 @@ public class LoanReturnsConsole extends AbstractConsole {
 	}
 
 	protected void printMenu() {
-		System.out.println("Contract Returns Menu");
+		System.out.println("Loan Returns Menu");
 		System.out.println("-----------------------");
-		System.out.println("L                   - List all returns");
+		System.out.println("I                   - List all returns");
 		System.out.println("S <Return ID>       - Load return by Id");
 		System.out.println();
 		System.out.println("R <Quantity>        - Notify return");

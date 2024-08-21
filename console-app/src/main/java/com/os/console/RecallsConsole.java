@@ -19,7 +19,7 @@ public class RecallsConsole extends AbstractConsole {
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 
-		if (args[0].equals("L")) {
+		if (args[0].equals("I")) {
 			System.out.print("Listing all recalls...");
 			SearchRecallsTask searchRecallsTask = new SearchRecallsTask(webClient);
 			Thread taskT = new Thread(searchRecallsTask);
@@ -75,7 +75,7 @@ public class RecallsConsole extends AbstractConsole {
 						if (searchRecallTask.getRecall() != null) {
 							Recall recall = searchRecallTask.getRecall();
 							System.out.print("Canceling recall...");
-							CancelRecallTask cancelRecallTask = new CancelRecallTask(webClient, recall.getContractId(), recall.getRecallId());
+							CancelRecallTask cancelRecallTask = new CancelRecallTask(webClient, recall.getLoanId(), recall.getRecallId());
 							Thread taskS = new Thread(cancelRecallTask);
 							taskS.run();
 							try {
@@ -99,7 +99,7 @@ public class RecallsConsole extends AbstractConsole {
 	protected void printMenu() {
 		System.out.println("Recalls Menu");
 		System.out.println("-----------------------");
-		System.out.println("L             - List all recalls");
+		System.out.println("I             - List all recalls");
 		System.out.println("S <Recall Id> - Load a recall by Id");
 		System.out.println();
 		System.out.println("C <Recall Id> - Cancel a recall by Id");

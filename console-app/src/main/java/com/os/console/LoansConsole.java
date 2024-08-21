@@ -25,16 +25,16 @@ public class LoansConsole extends AbstractConsole {
 	}
 
 	protected boolean prompt() {
-		System.out.print("/contracts > ");
+		System.out.print("/loans > ");
 		return true;
 	}
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 
-		if (args[0].equals("L")) {
-			System.out.print("Listing all contracts...");
-			SearchLoansTask searchContractsTask = new SearchLoansTask(webClient);
-			Thread taskT = new Thread(searchContractsTask);
+		if (args[0].equals("I")) {
+			System.out.print("Listing all loans...");
+			SearchLoansTask searchLoansTask = new SearchLoansTask(webClient);
+			Thread taskT = new Thread(searchLoansTask);
 			taskT.run();
 			try {
 				taskT.join();
@@ -45,21 +45,21 @@ public class LoansConsole extends AbstractConsole {
 			if (args.length != 2 || args[1].length() != 36) {
 				System.out.println("Invalid UUID");
 			} else {
-				String contractId = args[1].toLowerCase();
+				String loanId = args[1].toLowerCase();
 				try {
-					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
-						System.out.print("Searching for contract " + contractId + "...");
-						SearchLoanTask searchContractTask = new SearchLoanTask(webClient, contractId);
-						Thread taskT = new Thread(searchContractTask);
+					if (UUID.fromString(loanId).toString().equalsIgnoreCase(loanId)) {
+						System.out.print("Searching for loan " + loanId + "...");
+						SearchLoanTask searchLoanTask = new SearchLoanTask(webClient, loanId);
+						Thread taskT = new Thread(searchLoanTask);
 						taskT.run();
 						try {
 							taskT.join();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						if (searchContractTask.getContract() != null) {
-							LoanConsole contractConsole = new LoanConsole(searchContractTask.getContract());
-							contractConsole.execute(consoleIn, webClient);
+						if (searchLoanTask.getLoan() != null) {
+							LoanConsole loanConsole = new LoanConsole(searchLoanTask.getLoan());
+							loanConsole.execute(consoleIn, webClient);
 						}
 					} else {
 						System.out.println("Invalid UUID");
@@ -72,22 +72,22 @@ public class LoansConsole extends AbstractConsole {
 			if (args.length != 2 || args[1].length() != 36) {
 				System.out.println("Invalid UUID");
 			} else {
-				String contractId = args[1].toLowerCase();
+				String loanId = args[1].toLowerCase();
 				try {
-					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
-						System.out.print("Searching for contract " + contractId + "...");
-						SearchLoanTask searchContractTask = new SearchLoanTask(webClient, contractId);
-						Thread taskT = new Thread(searchContractTask);
+					if (UUID.fromString(loanId).toString().equalsIgnoreCase(loanId)) {
+						System.out.print("Searching for loan " + loanId + "...");
+						SearchLoanTask searchLoanTask = new SearchLoanTask(webClient, loanId);
+						Thread taskT = new Thread(searchLoanTask);
 						taskT.run();
 						try {
 							taskT.join();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						if (searchContractTask.getContract() != null) {
-							System.out.print("Listing contract full history " + contractId + "...");
-							SearchLoanHistoryTask searchContractHistoryTask = new SearchLoanHistoryTask(webClient, searchContractTask.getContract());
-							Thread taskS = new Thread(searchContractHistoryTask);
+						if (searchLoanTask.getLoan() != null) {
+							System.out.print("Listing loan full history " + loanId + "...");
+							SearchLoanHistoryTask searchLoanHistoryTask = new SearchLoanHistoryTask(webClient, searchLoanTask.getLoan());
+							Thread taskS = new Thread(searchLoanHistoryTask);
 							taskS.run();
 							try {
 								taskS.join();
@@ -106,22 +106,22 @@ public class LoansConsole extends AbstractConsole {
 			if (args.length != 2 || args[1].length() != 36) {
 				System.out.println("Invalid UUID");
 			} else {
-				String contractId = args[1].toLowerCase();
+				String loanId = args[1].toLowerCase();
 				try {
-					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
-						System.out.print("Searching for contract " + contractId + "...");
-						SearchLoanTask searchContractTask = new SearchLoanTask(webClient, contractId);
-						Thread taskT = new Thread(searchContractTask);
+					if (UUID.fromString(loanId).toString().equalsIgnoreCase(loanId)) {
+						System.out.print("Searching for loan " + loanId + "...");
+						SearchLoanTask searchLoanTask = new SearchLoanTask(webClient, loanId);
+						Thread taskT = new Thread(searchLoanTask);
 						taskT.run();
 						try {
 							taskT.join();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						if (searchContractTask.getContract() != null) {
-							System.out.print("Listing contract rate change history " + contractId + "...");
-							SearchLoanRateHistoryTask searchContractRateHistoryTask = new SearchLoanRateHistoryTask(webClient, searchContractTask.getContract());
-							Thread taskS = new Thread(searchContractRateHistoryTask);
+						if (searchLoanTask.getLoan() != null) {
+							System.out.print("Listing loan rate change history " + loanId + "...");
+							SearchLoanRateHistoryTask searchLoanRateHistoryTask = new SearchLoanRateHistoryTask(webClient, searchLoanTask.getLoan());
+							Thread taskS = new Thread(searchLoanRateHistoryTask);
 							taskS.run();
 							try {
 								taskS.join();
@@ -140,23 +140,23 @@ public class LoansConsole extends AbstractConsole {
 			if (args.length != 2 || args[1].length() != 36) {
 				System.out.println("Invalid UUID");
 			} else {
-				String contractId = args[1].toLowerCase();
+				String loanId = args[1].toLowerCase();
 				try {
-					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
-						System.out.print("Searching for contract " + contractId + "...");
-						SearchLoanTask searchContractTask = new SearchLoanTask(webClient, contractId);
-						Thread taskT = new Thread(searchContractTask);
+					if (UUID.fromString(loanId).toString().equalsIgnoreCase(loanId)) {
+						System.out.print("Searching for loan " + loanId + "...");
+						SearchLoanTask searchLoanTask = new SearchLoanTask(webClient, loanId);
+						Thread taskT = new Thread(searchLoanTask);
 						taskT.run();
 						try {
 							taskT.join();
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						if (searchContractTask.getContract() != null) {
-							System.out.print("Approving contract " + contractId + "...");
-							ApproveLoanTask approveContractTask = new ApproveLoanTask(webClient,
-									searchContractTask.getContract(), PayloadUtil.createContractProposalApproval());
-							Thread taskS = new Thread(approveContractTask);
+						if (searchLoanTask.getLoan() != null) {
+							System.out.print("Approving loan " + loanId + "...");
+							ApproveLoanTask approveLoanTask = new ApproveLoanTask(webClient,
+									searchLoanTask.getLoan(), PayloadUtil.createLoanProposalApproval());
+							Thread taskS = new Thread(approveLoanTask);
 							taskS.run();
 							try {
 								taskS.join();
@@ -175,12 +175,12 @@ public class LoansConsole extends AbstractConsole {
 			if (args.length != 2 || args[1].length() != 36) {
 				System.out.println("Invalid UUID");
 			} else {
-				String contractId = args[1].toLowerCase();
+				String loanId = args[1].toLowerCase();
 				try {
-					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
-						System.out.print("Canceling contract " + contractId + "...");
-						CancelLoanTask cancelContractTask = new CancelLoanTask(webClient, contractId);
-						Thread taskT = new Thread(cancelContractTask);
+					if (UUID.fromString(loanId).toString().equalsIgnoreCase(loanId)) {
+						System.out.print("Canceling loan " + loanId + "...");
+						CancelLoanTask cancelLoanTask = new CancelLoanTask(webClient, loanId);
+						Thread taskT = new Thread(cancelLoanTask);
 						taskT.run();
 						try {
 							taskT.join();
@@ -198,12 +198,12 @@ public class LoansConsole extends AbstractConsole {
 			if (args.length != 2 || args[1].length() != 36) {
 				System.out.println("Invalid UUID");
 			} else {
-				String contractId = args[1].toLowerCase();
+				String loanId = args[1].toLowerCase();
 				try {
-					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
-						System.out.print("Declining contract " + contractId + "...");
-						DeclineLoanTask declineContractTask = new DeclineLoanTask(webClient, contractId);
-						Thread taskT = new Thread(declineContractTask);
+					if (UUID.fromString(loanId).toString().equalsIgnoreCase(loanId)) {
+						System.out.print("Declining loan " + loanId + "...");
+						DeclineLoanTask declineLoanTask = new DeclineLoanTask(webClient, loanId);
+						Thread taskT = new Thread(declineLoanTask);
 						taskT.run();
 						try {
 							taskT.join();
@@ -221,14 +221,14 @@ public class LoansConsole extends AbstractConsole {
 			if (args.length != 2 || args[1].length() != 36) {
 				System.out.println("Invalid UUID");
 			} else {
-				String contractId = args[1].toLowerCase();
+				String loanId = args[1].toLowerCase();
 				try {
-					if (UUID.fromString(contractId).toString().equalsIgnoreCase(contractId)) {
+					if (UUID.fromString(loanId).toString().equalsIgnoreCase(loanId)) {
 
-						System.out.print("Retrieving contract " + contractId + "...");
+						System.out.print("Retrieving loan " + loanId + "...");
 
-						SearchLoanTask searchContractTask = new SearchLoanTask(webClient, contractId);
-						Thread taskT = new Thread(searchContractTask);
+						SearchLoanTask searchLoanTask = new SearchLoanTask(webClient, loanId);
+						Thread taskT = new Thread(searchLoanTask);
 						taskT.run();
 						try {
 							taskT.join();
@@ -236,10 +236,10 @@ public class LoansConsole extends AbstractConsole {
 							e.printStackTrace();
 						}
 
-						if (searchContractTask.getContract() != null) {
-							System.out.print("Updating contract " + contractId + " settlement status to SETTLED...");
+						if (searchLoanTask.getLoan() != null) {
+							System.out.print("Updating loan " + loanId + " settlement status to SETTLED...");
 							UpdateLoanSettlementStatusTask updateSettlementStatusTask = new UpdateLoanSettlementStatusTask(
-									webClient, searchContractTask.getContract(), ConsoleConfig.ACTING_PARTY);
+									webClient, searchLoanTask.getLoan(), ConsoleConfig.ACTING_PARTY);
 							Thread taskU = new Thread(updateSettlementStatusTask);
 							taskU.run();
 							try {
@@ -259,7 +259,7 @@ public class LoansConsole extends AbstractConsole {
 			if (args.length != 2 || args[1].length() > 30) {
 				System.out.println("Invalid Party Id");
 			} else if (ConsoleConfig.ACTING_PARTY.getPartyId().equals(args[1])) {
-				System.out.println("You cannot propose a contract to yourself");
+				System.out.println("You cannot propose a loan to yourself");
 			} else {
 
 				String partyId = args[1];
@@ -274,13 +274,13 @@ public class LoansConsole extends AbstractConsole {
 						e.printStackTrace();
 					}
 					if (searchPartyTask.getParty() != null) {
-						LoanProposalConsole contractProposalConsole = new LoanProposalConsole(
+						LoanProposalConsole loanProposalConsole = new LoanProposalConsole(
 								(PartyRole.BORROWER.equals(ConsoleConfig.ACTING_AS) ? ConsoleConfig.ACTING_PARTY
 										: searchPartyTask.getParty()),
 								(PartyRole.LENDER.equals(ConsoleConfig.ACTING_AS) ? ConsoleConfig.ACTING_PARTY
 										: searchPartyTask.getParty()),
 								ConsoleConfig.ACTING_AS);
-						contractProposalConsole.execute(consoleIn, webClient);
+						loanProposalConsole.execute(consoleIn, webClient);
 					}
 				} catch (Exception u) {
 					System.out.println("Invalid party id");
@@ -293,22 +293,22 @@ public class LoansConsole extends AbstractConsole {
 	}
 
 	protected void printMenu() {
-		System.out.println("Contracts Menu");
+		System.out.println("Loans Menu");
 		System.out.println("-----------------------");
-		System.out.println("L               - List all contracts");
-		System.out.println("S <Contract Id> - Search a contract by Id");
-		System.out.println("H <Contract Id> - Show full history for contract Id");
-		System.out.println("Y <Contract Id> - Show rate change history for contract Id");
+		System.out.println("I            - List all loans");
+		System.out.println("S <Loan Id>  - Search a loan by Id");
+		System.out.println("H <Loan Id>  - Show full history for loan Id");
+		System.out.println("Y <Loan Id>  - Show rate change history for loan Id");
 		System.out.println();
-		System.out.println("A <Contract Id> - Approve a contract by Id");
-		System.out.println("C <Contract Id> - Cancel a contract by Id");
-		System.out.println("D <Contract Id> - Decline a contract by Id");
+		System.out.println("A <Loan Id>  - Approve a loan by Id");
+		System.out.println("C <Loan Id>  - Cancel a loan by Id");
+		System.out.println("D <Loan Id>  - Decline a loan by Id");
 		System.out.println();
-		System.out.println("U <Contract Id> - Update settlement status to SETTLED");
+		System.out.println("U <Loan Id>  - Update settlement status to SETTLED");
 		System.out.println();
-		System.out.println("P <Party ID>    - Propose a contract to Party Id");
+		System.out.println("P <Party ID> - Propose a loan to Party Id");
 		System.out.println();
-		System.out.println("X               - Go back");
+		System.out.println("X            - Go back");
 	}
 
 }

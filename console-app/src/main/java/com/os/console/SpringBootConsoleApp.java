@@ -76,8 +76,8 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
 					System.exit(0);
 				} else if (command.equalsIgnoreCase("c")) {
-					LoansConsole contractsConsole = new LoansConsole();
-					contractsConsole.execute(consoleIn, restWebClient);
+					LoansConsole loansConsole = new LoansConsole();
+					loansConsole.execute(consoleIn, restWebClient);
 				} else if (command.equalsIgnoreCase("r")) {
 					ReturnsConsole returnsConsole = new ReturnsConsole();
 					returnsConsole.execute(consoleIn, restWebClient);
@@ -106,7 +106,7 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 		System.out.println();
 		System.out.println("Main Menu");
 		System.out.println("-----------------------");
-		System.out.println("C - Contracts");
+		System.out.println("L - Loans");
 		System.out.println("R - Returns");
 		System.out.println("E - Recalls");
 		System.out.println("T - Rerates");
