@@ -44,7 +44,7 @@
 		<dependency>
 			<groupId>com.os</groupId>
 			<artifactId>1source-api-client</artifactId>
-			<version>1.0.5.1</version>
+			<version>1.0.5.2</version>
 		</dependency>
 
 		<dependency>
