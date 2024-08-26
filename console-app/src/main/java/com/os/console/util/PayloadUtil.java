@@ -47,7 +47,7 @@ import com.os.console.api.ConsoleConfig;
 public class PayloadUtil {
 
 	public static LoanProposal createLoanProposal(Party borrowerParty, Party lenderParty,
-			PartyRole proposingPartyRole) {
+			PartyRole proposingPartyRole, Instrument instrument) {
 
 		Random random = new Random();
 
@@ -94,8 +94,6 @@ public class PayloadUtil {
 		venues.add(venue);
 
 		trade.setVenues(venues);
-
-		Instrument instrument = InstrumentUtil.getRandomInstrument();
 
 		trade.setInstrument(instrument);
 

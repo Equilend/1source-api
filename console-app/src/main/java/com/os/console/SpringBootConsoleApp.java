@@ -46,12 +46,12 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 			logger.info("args[{}]: {}", i, args[i]);
 		}
 
-		Console console = System.console();
-		
-		if (console == null) {
-			logger.warn("No console available");
-			return;
-		}
+//		Console console = System.console();
+//		
+//		if (console == null) {
+//			logger.warn("No console available");
+//			return;
+//		}
 
 		BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in));
 
@@ -75,7 +75,7 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 					printMainHelp();
 				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
 					System.exit(0);
-				} else if (command.equalsIgnoreCase("c")) {
+				} else if (command.equalsIgnoreCase("l")) {
 					LoansConsole loansConsole = new LoansConsole();
 					loansConsole.execute(consoleIn, restWebClient);
 				} else if (command.equalsIgnoreCase("r")) {
