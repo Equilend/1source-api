@@ -52,7 +52,7 @@ public class ScheduledPushEvents {
     public ScheduledPushEvents(SimpMessagingTemplate simpMessagingTemplate) {
         this.simpMessagingTemplate = simpMessagingTemplate;
 		gson = new GsonBuilder()
-			    .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
+//			    .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
 			    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeAdapter())
 			    .create();
     }
