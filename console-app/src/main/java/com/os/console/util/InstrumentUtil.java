@@ -1,8 +1,9 @@
 package com.os.console.util;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,14 +26,17 @@ public class InstrumentUtil {
 	Random r = new Random();
 	int cnt = 1;
 
-	private String instrumentsFile = "src/main/resources/instruments.csv";
+	private String instrumentsFile = "/instruments.csv";
 
 	private InstrumentUtil() {
 
 		BufferedReader reader = null;
 
 		try {
-			reader = new BufferedReader(new FileReader(instrumentsFile));
+			
+			InputStream in = this.getClass().getResourceAsStream(instrumentsFile);
+			
+			reader = new BufferedReader(new InputStreamReader(in));
 
 			String nextLine;
 			while ((nextLine = reader.readLine()) != null) {
