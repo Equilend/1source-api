@@ -1,4 +1,4 @@
-package com.os.contractexport.model;
+package com.os.contractexport.config;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -9,32 +9,32 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import io.swagger.client.model.BenchmarkCd;
-import io.swagger.client.model.FeeRate;
-import io.swagger.client.model.FixedRate;
-import io.swagger.client.model.FixedRateDef;
-import io.swagger.client.model.FloatingRate;
-import io.swagger.client.model.FloatingRateDef;
-import io.swagger.client.model.OneOfVenueTradeAgreementRate;
-import io.swagger.client.model.RebateRate;
+import com.os.client.model.BenchmarkCd;
+import com.os.client.model.FeeRate;
+import com.os.client.model.FixedRate;
+import com.os.client.model.FixedRateDef;
+import com.os.client.model.FloatingRate;
+import com.os.client.model.FloatingRateDef;
+import com.os.client.model.Rate;
+import com.os.client.model.RebateRate;
 
-public class VenueTradeAgreementRateDeserializer extends StdDeserializer<OneOfVenueTradeAgreementRate> {
+public class RateDeserializer extends StdDeserializer<Rate> {
 
 	private static final long serialVersionUID = 9024714383266337284L;
 
-	public VenueTradeAgreementRateDeserializer() {
+	public RateDeserializer() {
 		this(null);
 	}
 
-	protected VenueTradeAgreementRateDeserializer(Class<?> vc) {
+	protected RateDeserializer(Class<?> vc) {
 		super(vc);
 	}
 
 	@Override
-	public OneOfVenueTradeAgreementRate deserialize(JsonParser p, DeserializationContext ctxt)
+	public Rate deserialize(JsonParser p, DeserializationContext ctxt)
 			throws IOException, JsonProcessingException {
 		
-		OneOfVenueTradeAgreementRate impl = null;
+		Rate impl = null;
 		
 		JsonNode nodeRate = p.readValueAsTree();
 		
@@ -97,11 +97,6 @@ public class VenueTradeAgreementRateDeserializer extends StdDeserializer<OneOfVe
 					JsonNode nodeIsAutoRerate = nodeRateRebateFloating.get("isAutoRerate");
 					if (nodeIsAutoRerate != null) {
 						floatingRateDef.setIsAutoRerate(nodeIsAutoRerate.asBoolean());
-					}
-
-					JsonNode nodeEffectiveDateDelay = nodeRateRebateFloating.get("effectiveDateDelay");
-					if (nodeEffectiveDateDelay != null) {
-						floatingRateDef.setEffectiveDateDelay(nodeEffectiveDateDelay.intValue());
 					}
 
 					JsonNode nodeEffectiveRate = nodeRateRebateFloating.get("effectiveRate");
