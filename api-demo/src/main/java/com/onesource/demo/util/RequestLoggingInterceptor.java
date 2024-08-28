@@ -16,9 +16,8 @@ public class RequestLoggingInterceptor implements ClientHttpRequestInterceptor {
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body,
                                         ClientHttpRequestExecution execution) throws IOException {
-        System.out.println("Request Method: " + request.getMethod());
-        System.out.println("Request URI: " + request.getURI());
-        System.out.println("Request Headers: " + request.getHeaders());
+        System.out.println("Request URI: " +request.getMethod() + " " + request.getURI());
+//        System.out.println("Request Headers: " + request.getHeaders());
         System.out.println("Request Body: " + new String(body, StandardCharsets.UTF_8));
 
         return execution.execute(request, body);
