@@ -28,9 +28,9 @@ import com.os.workflow.WorkflowConfig;
 
 import reactor.core.publisher.Mono;
 
-public class ContractSettlementStatusUpdateTask implements Tasklet, StepExecutionListener {
+public class LoanSettlementStatusUpdateTask implements Tasklet, StepExecutionListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractSettlementStatusUpdateTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoanSettlementStatusUpdateTask.class);
 
 	private AuthToken ledgerToken;
 
@@ -60,7 +60,7 @@ public class ContractSettlementStatusUpdateTask implements Tasklet, StepExecutio
 		String json = gson.toJson(update);
 		logger.debug(json);
 
-		LedgerResponse ledgerResponse = restWebClient.patch().uri("/contracts/" + workflowConfig.getContract_id()).contentType(MediaType.APPLICATION_JSON)
+		LedgerResponse ledgerResponse = restWebClient.patch().uri("/loans/" + workflowConfig.getLoan_id()).contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(json).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					return Mono.empty();

@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 import com.os.client.model.BenchmarkCd;
 import com.os.client.model.Collateral;
 import com.os.client.model.CollateralType;
-import com.os.client.model.Contract;
-import com.os.client.model.ContractProposal;
+import com.os.client.model.Loan;
+import com.os.client.model.LoanProposal;
 import com.os.client.model.CurrencyCd;
 import com.os.client.model.FloatingRate;
 import com.os.client.model.FloatingRateDef;
@@ -36,13 +36,13 @@ import com.os.client.model.Venue;
 import com.os.client.model.VenueType;
 import com.os.client.model.Venues;
 
-public class ContractProposalUtil {
+public class LoanProposalUtil {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractProposalUtil.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoanProposalUtil.class);
 
-	public ContractProposal createContractProposal(LedgerRecord ledgerRecord) {
+	public LoanProposal createLoanProposal(LedgerRecord ledgerRecord) {
 
-		ContractProposal contractProposal = new ContractProposal();
+		LoanProposal loanProposal = new LoanProposal();
 
 		Party party = new Party();
 		party.setPartyId(ledgerRecord.getOneSourcePartyId());
@@ -216,7 +216,7 @@ public class ContractProposalUtil {
 
 		trade.setCollateral(collateral);
 
-		contractProposal.setTrade(trade);
+		loanProposal.setTrade(trade);
 
 		PartySettlementInstruction partySettlementInstruction = new PartySettlementInstruction();
 		partySettlementInstruction.setPartyRole(PartyRole.fromValue(ledgerRecord.getBorrowLoan()));
@@ -235,19 +235,19 @@ public class ContractProposalUtil {
 		instruction.setDtcParticipantNumber(ledgerRecord.getDtcParticipantNum());
 		instruction.setCdsCustomerUnitId(ledgerRecord.getCdsParticipantNum());
 
-		contractProposal.setSettlement(Collections.singletonList(partySettlementInstruction));
+		loanProposal.setSettlement(Collections.singletonList(partySettlementInstruction));
 
-		return contractProposal;
+		return loanProposal;
 	}
 
 	public String parseResourceUri(String uri) {
 
-		String contractId = uri.substring(uri.lastIndexOf("/") + 1);
+		String loanId = uri.substring(uri.lastIndexOf("/") + 1);
 
-		return contractId;
+		return loanId;
 	}
 
-	public boolean actingAsLender(Contract contract, String partyId) {
+	public boolean actingAsLender(Loan loan, String partyId) {
 		return false;
 	}
 }
