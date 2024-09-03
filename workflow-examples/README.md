@@ -13,8 +13,8 @@ Each example is controlled through property sets in application.properties. Unco
 \#com.os.auth.grant_type=password  
 \#com.os.auth.client_id=canton-participant1-client  
 \#com.os.auth.client_secret=c0a05c2d-ac70-472a-ac4f-38b80dba28d8  
-\#com.os.auth.username=TestLender1User  
-\#com.os.auth.password=fjmxVeKzpzUDg3YJ  
+\#com.os.auth.username=  
+\#com.os.auth.password=  
 \#com.os.auth.loan_id=  
 \#spring.batch.job.name=loanProposal  
 \#############################  
@@ -25,8 +25,8 @@ Here is the section for the Return Proposal Example
 com.os.auth.grant_type=password  
 com.os.auth.client_id=canton-participant1-client  
 com.os.auth.client_secret=c0a05c2d-ac70-472a-ac4f-38b80dba28d8  
-com.os.auth.username=QABorrower1User  
-com.os.auth.password=T5XwEEFazCPWqFcL  
+com.os.auth.username=  
+com.os.auth.password=  
 com.os.auth.loan_id=02009e4c-bdf3-47b8-96e1-937043850382  
 spring.batch.job.name=returnNotification  
 /#############################  
