@@ -48,7 +48,7 @@ public class ReturnQueryTask implements Tasklet, StepExecutionListener {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		returns = restWebClient.get().uri("/contracts/" + workflowConfig.getContract_id() + "/returns")
+		returns = restWebClient.get().uri("/loans/" + workflowConfig.getLoan_id() + "/returns")
 				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());

@@ -48,7 +48,7 @@ public class RerateQueryTask implements Tasklet, StepExecutionListener {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		rerates = restWebClient.get().uri("/contracts/" + workflowConfig.getContract_id() + "/rerates")
+		rerates = restWebClient.get().uri("/loans/" + workflowConfig.getLoan_id() + "/rerates")
 				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());

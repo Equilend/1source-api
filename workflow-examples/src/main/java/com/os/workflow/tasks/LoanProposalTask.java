@@ -22,11 +22,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.os.client.model.ContractProposal;
+import com.os.client.model.LoanProposal;
 import com.os.client.model.CurrencyCd;
 import com.os.client.model.LedgerResponse;
 import com.os.workflow.AuthToken;
-import com.os.workflow.ContractProposalUtil;
+import com.os.workflow.LoanProposalUtil;
 import com.os.workflow.LedgerRecord;
 import com.os.workflow.LocalDateTypeGsonAdapter;
 import com.os.workflow.OffsetDateTimeTypeGsonAdapter;
@@ -34,9 +34,9 @@ import com.os.workflow.WorkflowConfig;
 
 import reactor.core.publisher.Mono;
 
-public class ContractProposalTask implements Tasklet, StepExecutionListener {
+public class LoanProposalTask implements Tasklet, StepExecutionListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractProposalTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoanProposalTask.class);
 
 	private AuthToken ledgerToken;
 
@@ -54,11 +54,11 @@ public class ContractProposalTask implements Tasklet, StepExecutionListener {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		ContractProposalUtil contractUtil = new ContractProposalUtil();
+		LoanProposalUtil loanUtil = new LoanProposalUtil();
 
 		LedgerRecord ledgerRecord = buildLedgerRecord();
 
-		ContractProposal proposal = contractUtil.createContractProposal(ledgerRecord);
+		LoanProposal proposal = loanUtil.createLoanProposal(ledgerRecord);
 
 		Gson gson = new GsonBuilder()
 			    .registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
@@ -69,7 +69,7 @@ public class ContractProposalTask implements Tasklet, StepExecutionListener {
 		
 		logger.debug(json);
 
-		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts").contentType(MediaType.APPLICATION_JSON)
+		LedgerResponse ledgerResponse = restWebClient.post().uri("/loans").contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(json).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					return Mono.empty();

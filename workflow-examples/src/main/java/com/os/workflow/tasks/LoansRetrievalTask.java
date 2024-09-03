@@ -18,8 +18,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.os.client.model.Contract;
-import com.os.client.model.Contracts;
+import com.os.client.model.Loan;
+import com.os.client.model.Loans;
 import com.os.workflow.AuthToken;
 import com.os.workflow.LocalDateTypeGsonAdapter;
 import com.os.workflow.OffsetDateTimeTypeGsonAdapter;
@@ -27,9 +27,9 @@ import com.os.workflow.WorkflowConfig;
 
 import reactor.core.publisher.Mono;
 
-public class ContractsRetrievalTask implements Tasklet, StepExecutionListener {
+public class LoansRetrievalTask implements Tasklet, StepExecutionListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractsRetrievalTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoansRetrievalTask.class);
 
 	private AuthToken ledgerToken;
 	
@@ -47,25 +47,25 @@ public class ContractsRetrievalTask implements Tasklet, StepExecutionListener {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		
-		Contracts contracts= restWebClient.get().uri("/contracts")
+		Loans loans= restWebClient.get().uri("/loans")
 				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());
 					return Mono.empty();
-				}).bodyToMono(Contracts.class).block();
+				}).bodyToMono(Loans.class).block();
 
 		Gson gson = new GsonBuilder()
 			    .registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
 			    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
 			    .create();
 
-		if (contracts == null || contracts.size() == 0) {
-			logger.warn("Invalid contracts object or no contracts");			
+		if (loans == null || loans.size() == 0) {
+			logger.warn("Invalid loans object or no loans");			
 		} else {
-			for (Contract contract : contracts) {
-				logger.debug(gson.toJson(contract));
+			for (Loan loan : loans) {
+				logger.debug(gson.toJson(loan));
 
-				logger.debug(contract.toString());
+				logger.debug(loan.toString());
 			}
 		}
 

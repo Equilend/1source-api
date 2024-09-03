@@ -18,7 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.os.client.model.ContractProposalApproval;
+import com.os.client.model.LoanProposalApproval;
 import com.os.client.model.LedgerResponse;
 import com.os.client.model.PartyRole;
 import com.os.client.model.PartySettlementInstruction;
@@ -30,9 +30,9 @@ import com.os.workflow.WorkflowConfig;
 
 import reactor.core.publisher.Mono;
 
-public class ContractApprovalTask implements Tasklet, StepExecutionListener {
+public class LoanApprovalTask implements Tasklet, StepExecutionListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractApprovalTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoanApprovalTask.class);
 
 	private AuthToken ledgerToken;
 
@@ -50,7 +50,7 @@ public class ContractApprovalTask implements Tasklet, StepExecutionListener {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		ContractProposalApproval proposal = new ContractProposalApproval();
+		LoanProposalApproval proposal = new LoanProposalApproval();
 
 		proposal.setInternalRefId("b_int_ref_z0001");
 		
@@ -77,7 +77,7 @@ public class ContractApprovalTask implements Tasklet, StepExecutionListener {
 		
 		logger.debug(json);
 
-		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts/" + workflowConfig.getContract_id() + "/approve").contentType(MediaType.APPLICATION_JSON)
+		LedgerResponse ledgerResponse = restWebClient.post().uri("/loans/" + workflowConfig.getLoan_id() + "/approve").contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(json).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					return Mono.empty();

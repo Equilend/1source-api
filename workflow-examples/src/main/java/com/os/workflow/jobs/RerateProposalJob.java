@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.os.workflow.tasks.AuthTask;
-import com.os.workflow.tasks.ContractRetrievalTask;
+import com.os.workflow.tasks.LoanRetrievalTask;
 import com.os.workflow.tasks.RerateProposalTask;
 
 @Configuration
@@ -20,7 +20,7 @@ public class RerateProposalJob {
 	public Job rerateProposal(JobRepository jobRepository, ResourcelessTransactionManager transactionManager) {
 		return new JobBuilder("rerateProposal", jobRepository)
 				.start(rerateProposalAuthStep(jobRepository, transactionManager))
-				.next(rerateContractRetrievalStep(jobRepository, transactionManager))
+				.next(rerateLoanRetrievalStep(jobRepository, transactionManager))
 				.next(rerateProposalStep(jobRepository, transactionManager))
 				.build();
 	}
@@ -37,14 +37,14 @@ public class RerateProposalJob {
 	}
 
 	@Bean
-	public ContractRetrievalTask rerateContractRetrievalTask() {
-		return new ContractRetrievalTask();
+	public LoanRetrievalTask rerateLoanRetrievalTask() {
+		return new LoanRetrievalTask();
 	}
 
 	@Bean
-	public Step rerateContractRetrievalStep(JobRepository jobRepository, ResourcelessTransactionManager transactionManager) {
-		return new StepBuilder("rerateContractRetrievalStep", jobRepository).allowStartIfComplete(true)
-				.tasklet(rerateContractRetrievalTask(), transactionManager).build();
+	public Step rerateLoanRetrievalStep(JobRepository jobRepository, ResourcelessTransactionManager transactionManager) {
+		return new StepBuilder("rerateLoanRetrievalStep", jobRepository).allowStartIfComplete(true)
+				.tasklet(rerateLoanRetrievalTask(), transactionManager).build();
 	}
 
 	@Bean

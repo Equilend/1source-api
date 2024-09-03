@@ -70,7 +70,7 @@ public class ReturnNotificationTask implements Tasklet, StepExecutionListener {
 		String json = gson.toJson(proposal);
 		logger.debug(json);
 
-		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts/" + workflowConfig.getContract_id() + "/returns").contentType(MediaType.APPLICATION_JSON)
+		LedgerResponse ledgerResponse = restWebClient.post().uri("/loans/" + workflowConfig.getLoan_id() + "/returns").contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(json).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					return Mono.empty();

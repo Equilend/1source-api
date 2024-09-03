@@ -20,7 +20,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.FeeRate;
 import com.os.client.model.FixedRate;
 import com.os.client.model.FloatingRate;
@@ -35,12 +35,12 @@ import com.os.workflow.WorkflowConfig;
 
 import reactor.core.publisher.Mono;
 
-public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
+public class LoanRetrievalTask implements Tasklet, StepExecutionListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractRetrievalTask.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoanRetrievalTask.class);
 
 	private AuthToken ledgerToken;
-	private Contract contract;
+	private Loan loan;
 	
 	@Autowired
 	WebClient restWebClient;
@@ -56,39 +56,39 @@ public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 		
-		contract = restWebClient.get().uri("/contracts/" + workflowConfig.getContract_id())
+		loan = restWebClient.get().uri("/loans/" + workflowConfig.getLoan_id())
 				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode.valueOf(404)::equals, response -> {
 					logger.error(HttpStatus.NOT_FOUND.toString());
 					return Mono.empty();
-				}).bodyToMono(Contract.class).block();
+				}).bodyToMono(Loan.class).block();
 
 		Gson gson = new GsonBuilder()
 			    .registerTypeAdapter(LocalDate.class, new LocalDateTypeGsonAdapter())
 			    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeGsonAdapter())
 			    .create();
 
-		logger.debug(gson.toJson(contract));
+		logger.debug(gson.toJson(loan));
 
-		logger.debug(contract.toString());
+		logger.debug(loan.toString());
 
-		if (contract == null || contract.getTrade() == null) {
-			logger.warn("Invalid contract object or contract not found");
+		if (loan == null || loan.getTrade() == null) {
+			logger.warn("Invalid loan object or loan not found");
 		} else {
-			if (contract.isIsInitiator() == null) {
-				logger.warn("Contract initiator unknown");
-			} else if (contract.isIsInitiator()) {
-				logger.debug("My party is initiator: " + contract.getContractId());
+			if (loan.isIsInitiator() == null) {
+				logger.warn("Loan initiator unknown");
+			} else if (loan.isIsInitiator()) {
+				logger.debug("My party is initiator: " + loan.getLoanId());
 			}
 
 			String myBorrowLoan = null;
 			String counterparty = null;
 
-			if (contract.getTrade().getTransactingParties() == null
-					|| contract.getTrade().getTransactingParties().size() == 0) {
-				logger.warn("Transacting party information missing: " + contract);
+			if (loan.getTrade().getTransactingParties() == null
+					|| loan.getTrade().getTransactingParties().size() == 0) {
+				logger.warn("Transacting party information missing: " + loan);
 			} else {
-				TransactingParties transactingParties = contract.getTrade().getTransactingParties();
+				TransactingParties transactingParties = loan.getTrade().getTransactingParties();
 				for (TransactingParty party : transactingParties) {
 					if (PartyRole.BORROWER.equals(party.getPartyRole())) {
 						if (party.getParty().getPartyId().equals(workflowConfig.getParty_id())) {
@@ -108,38 +108,38 @@ public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
 			logger.debug(myBorrowLoan + ":" + counterparty);
 			
 			
-			if (contract.getTrade().getQuantity() == null) {
+			if (loan.getTrade().getQuantity() == null) {
 				logger.warn("Quantity information missing");
 			}
 
-			if (contract.getTrade().getInstrument() == null || contract.getTrade().getInstrument().getFigi() == null) {
+			if (loan.getTrade().getInstrument() == null || loan.getTrade().getInstrument().getFigi() == null) {
 				logger.warn("Instrument FIGI missing");
 			}
 
-			if (contract.getTrade().getRate() == null) {
+			if (loan.getTrade().getRate() == null) {
 				logger.warn("Rate information missing");
 			}
 
-			if (contract.getTrade().getTradeDate() == null) {
+			if (loan.getTrade().getTradeDate() == null) {
 				logger.warn("Trade date information missing");
 			}
 
 			if (myBorrowLoan == null) {
 				logger.warn("Not a transacting party");
 			} else {
-//				String figi = contract.getTrade().getInstrument().getFigi();
-//				Long quantity = contract.getTrade().getQuantity().longValue();
+//				String figi = loan.getTrade().getInstrument().getFigi();
+//				Long quantity = loan.getTrade().getQuantity().longValue();
 				BigDecimal rate = null;
-				if (contract.getTrade().getRate() instanceof FeeRate) {
-					rate = BigDecimal.valueOf(((FeeRate) contract.getTrade().getRate()).getFee().getBaseRate());
-				} else if (contract.getTrade().getRate() instanceof RebateRate) {
-					if (((RebateRate) contract.getTrade().getRate()).getRebate() instanceof FixedRate) {
+				if (loan.getTrade().getRate() instanceof FeeRate) {
+					rate = BigDecimal.valueOf(((FeeRate) loan.getTrade().getRate()).getFee().getBaseRate());
+				} else if (loan.getTrade().getRate() instanceof RebateRate) {
+					if (((RebateRate) loan.getTrade().getRate()).getRebate() instanceof FixedRate) {
 						rate = BigDecimal
-								.valueOf(((FixedRate) (((RebateRate) contract.getTrade().getRate()).getRebate()))
+								.valueOf(((FixedRate) (((RebateRate) loan.getTrade().getRate()).getRebate()))
 										.getFixed().getBaseRate());
-					} else if (((RebateRate) contract.getTrade().getRate()).getRebate() instanceof FloatingRate) {
+					} else if (((RebateRate) loan.getTrade().getRate()).getRebate() instanceof FloatingRate) {
 						rate = BigDecimal
-								.valueOf(((FloatingRate) (((RebateRate) contract.getTrade().getRate()).getRebate()))
+								.valueOf(((FloatingRate) (((RebateRate) loan.getTrade().getRate()).getRebate()))
 										.getFloating().getEffectiveRate());
 					}
 				}
@@ -155,7 +155,7 @@ public class ContractRetrievalTask implements Tasklet, StepExecutionListener {
 
 	@Override
 	public ExitStatus afterStep(StepExecution stepExecution) {
-		stepExecution.getJobExecution().getExecutionContext().put("contract", this.contract);
+		stepExecution.getJobExecution().getExecutionContext().put("loan", this.loan);
 		return ExitStatus.COMPLETED;
 	}
 

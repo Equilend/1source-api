@@ -41,7 +41,7 @@ public class RerateApproveProposalTask implements Tasklet, StepExecutionListener
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts/" + workflowConfig.getContract_id() + "/rerates/" + workflowConfig.getRerate_id() + "/approve").contentType(MediaType.APPLICATION_JSON)
+		LedgerResponse ledgerResponse = restWebClient.post().uri("/loans/" + workflowConfig.getLoan_id() + "/rerates/" + workflowConfig.getRerate_id() + "/approve").contentType(MediaType.APPLICATION_JSON)
 				//.bodyValue(json)
 				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {

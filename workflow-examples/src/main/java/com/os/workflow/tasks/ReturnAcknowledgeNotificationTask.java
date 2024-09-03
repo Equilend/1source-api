@@ -77,7 +77,7 @@ public class ReturnAcknowledgeNotificationTask implements Tasklet, StepExecution
 		
 		logger.debug(json);
 
-		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts/" + workflowConfig.getContract_id() + "/returns/" + workflowConfig.getReturn_id() + "/acknowledge").contentType(MediaType.APPLICATION_JSON)
+		LedgerResponse ledgerResponse = restWebClient.post().uri("/loans/" + workflowConfig.getLoan_id() + "/returns/" + workflowConfig.getReturn_id() + "/acknowledge").contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(json)
 				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
