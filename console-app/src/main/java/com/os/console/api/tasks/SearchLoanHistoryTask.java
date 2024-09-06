@@ -56,7 +56,7 @@ public class SearchLoanHistoryTask implements Runnable {
 						effectiveRate = ((FloatingRate) oneOfRebateRateRebate).getFloating().getEffectiveRate();
 					} else if (oneOfRebateRateRebate instanceof FixedRate) {
 						rate = ((FixedRate) oneOfRebateRateRebate).getFixed().getBaseRate();
-						effectiveRate = ((FloatingRate) oneOfRebateRateRebate).getFloating().getEffectiveRate();
+						effectiveRate = ((FixedRate) oneOfRebateRateRebate).getFixed().getEffectiveRate();
 					}
 				} else if (loanRate instanceof FeeRate) {
 					rate = ((FeeRate) loanRate).getFee().getBaseRate();

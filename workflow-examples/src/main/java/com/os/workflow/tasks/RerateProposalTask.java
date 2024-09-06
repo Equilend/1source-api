@@ -28,6 +28,8 @@ import com.os.client.model.FloatingRate;
 import com.os.client.model.LedgerResponse;
 import com.os.client.model.RebateRate;
 import com.os.client.model.RerateProposal;
+import com.os.client.model.Venue;
+import com.os.client.model.VenueType;
 import com.os.workflow.AuthToken;
 import com.os.workflow.LocalDateTypeGsonAdapter;
 import com.os.workflow.OffsetDateTimeTypeGsonAdapter;
@@ -58,6 +60,12 @@ public class RerateProposalTask implements Tasklet, StepExecutionListener {
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
 		RerateProposal rerateProposal = new RerateProposal();
+
+		Venue venue = new Venue();
+		venue.setType(VenueType.OFFPLATFORM);
+		venue.setVenueRefKey("CONSOLE" + System.currentTimeMillis());
+
+		rerateProposal.setExecutionVenue(venue);
 
 		LocalDate rerateDate = LocalDate.now(ZoneId.of("UTC"));
 		

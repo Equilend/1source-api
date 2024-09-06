@@ -98,11 +98,11 @@ public class LoanProposalTask implements Tasklet, StepExecutionListener {
 		ledgerRecord.setSpreadRate(new BigDecimal(random.nextInt((100-1) + 100)));
 
 		ledgerRecord.setOneSourcePartyId("TLEN-US");
-		ledgerRecord.setOneSourcePartyName("Test Lender 1");
+		//ledgerRecord.setOneSourcePartyName("Test Lender 1");
 		ledgerRecord.setOneSourcePartyGleifLei("KTB500SKZSDI75VSFU40");
 
 		ledgerRecord.setOneSourceCounterpartyId("TBORR-US");
-		ledgerRecord.setOneSourceCounterpartyName("Test Borrower 1");
+		//ledgerRecord.setOneSourceCounterpartyName("Test Borrower 1");
 		ledgerRecord.setOneSourceCounterpartyGleifLei("KTB500SKZSDI75VSFU40");
 		
 		ledgerRecord.setSsiInternalAcctCd("stl_1234");
