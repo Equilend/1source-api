@@ -8,44 +8,42 @@ import java.util.Collections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.os.client.model.BenchmarkCd;
+import com.os.client.model.Collateral;
+import com.os.client.model.CollateralType;
+import com.os.client.model.CurrencyCd;
+import com.os.client.model.FloatingRate;
+import com.os.client.model.FloatingRateDef;
+import com.os.client.model.Instrument;
+import com.os.client.model.InternalReference;
+import com.os.client.model.Loan;
+import com.os.client.model.LoanProposal;
+import com.os.client.model.Party;
+import com.os.client.model.PartyRole;
+import com.os.client.model.PartySettlementInstruction;
+import com.os.client.model.Price;
+import com.os.client.model.PriceUnit;
+import com.os.client.model.RebateRate;
+import com.os.client.model.RoundingMode;
+import com.os.client.model.SettlementInstruction;
+import com.os.client.model.SettlementStatus;
+import com.os.client.model.SettlementType;
+import com.os.client.model.TermType;
+import com.os.client.model.TradeAgreement;
+import com.os.client.model.TransactingParties;
+import com.os.client.model.TransactingParty;
+import com.os.client.model.Venue;
+import com.os.client.model.VenueType;
+import com.os.client.model.Venues;
 import com.os.replay.model.LedgerRecord;
-import io.swagger.client.model.BenchmarkCd;
-import io.swagger.client.model.Collateral;
-import io.swagger.client.model.CollateralType;
-import io.swagger.client.model.Contract;
-import io.swagger.client.model.ContractProposal;
-import io.swagger.client.model.CurrencyCd;
-import io.swagger.client.model.FloatingRate;
-import io.swagger.client.model.FloatingRateDef;
-import io.swagger.client.model.Instrument;
-import io.swagger.client.model.InternalReference;
-import io.swagger.client.model.Party;
-import io.swagger.client.model.PartyRole;
-import io.swagger.client.model.PartySettlementInstruction;
-import io.swagger.client.model.Price;
-import io.swagger.client.model.PriceUnit;
-import io.swagger.client.model.RebateRate;
-import io.swagger.client.model.RoundingMode;
-import io.swagger.client.model.SettlementInstruction;
-import io.swagger.client.model.SettlementStatus;
-import io.swagger.client.model.SettlementType;
-import io.swagger.client.model.TermType;
-import io.swagger.client.model.TradeAgreement;
-import io.swagger.client.model.TransactingParties;
-import io.swagger.client.model.TransactingParty;
-import io.swagger.client.model.Venue;
-import io.swagger.client.model.VenueParties;
-import io.swagger.client.model.VenueParty;
-import io.swagger.client.model.VenueType;
-import io.swagger.client.model.Venues;
 
-public class ContractProposalUtil {
+public class LoanProposalUtil {
 
-	private static final Logger logger = LoggerFactory.getLogger(ContractProposalUtil.class);
+	private static final Logger logger = LoggerFactory.getLogger(LoanProposalUtil.class);
 
-	public ContractProposal createContractProposal(LedgerRecord ledgerRecord) {
+	public LoanProposal createLoanProposal(LedgerRecord ledgerRecord) {
 
-		ContractProposal contractProposal = new ContractProposal();
+		LoanProposal loanProposal = new LoanProposal();
 
 		Party party = new Party();
 		party.setPartyId(ledgerRecord.getOneSourcePartyId());
@@ -98,23 +96,6 @@ public class ContractProposalUtil {
 		Venue venue = new Venue();
 		venue.setType(VenueType.OFFPLATFORM);
 		venue.setTransactionDatetime(OffsetDateTime.now());
-
-		VenueParties venueParties = new VenueParties();
-		venue.setVenueParties(venueParties);
-
-		if (PartyRole.BORROWER.toString().equals(ledgerRecord.getBorrowLoan())) {
-
-			VenueParty borrowerVenueParty = new VenueParty();
-			borrowerVenueParty.setPartyRole(PartyRole.BORROWER);
-			venueParties.add(borrowerVenueParty);
-
-		} else if (PartyRole.LENDER.toString().equals(ledgerRecord.getBorrowLoan())) {
-
-			VenueParty lenderVenueParty = new VenueParty();
-			lenderVenueParty.setPartyRole(PartyRole.LENDER);
-			venueParties.add(lenderVenueParty);
-
-		}
 
 		venues.add(venue);
 
@@ -216,7 +197,7 @@ public class ContractProposalUtil {
 
 			trade.setCollateral(collateral);
 
-			contractProposal.setTrade(trade);
+			loanProposal.setTrade(trade);
 
 			PartySettlementInstruction partySettlementInstruction = new PartySettlementInstruction();
 			partySettlementInstruction.setPartyRole(PartyRole.fromValue(ledgerRecord.getBorrowLoan()));
@@ -235,9 +216,9 @@ public class ContractProposalUtil {
 			instruction.setDtcParticipantNumber(ledgerRecord.getDtcParticipantNum());
 			instruction.setCdsCustomerUnitId(ledgerRecord.getCdsParticipantNum());
 
-			contractProposal.setSettlement(Collections.singletonList(partySettlementInstruction));
+			loanProposal.setSettlement(Collections.singletonList(partySettlementInstruction));
 
-			return contractProposal;
+			return loanProposal;
 	}
 	
 	public String parseResourceUri(String uri) {
@@ -247,7 +228,7 @@ public class ContractProposalUtil {
 		return contractId;
 	}
 	
-	public boolean actingAsLender(Contract contract, String partyId) {
+	public boolean actingAsLender(Loan loan, String partyId) {
 		return false;
 	}
 }

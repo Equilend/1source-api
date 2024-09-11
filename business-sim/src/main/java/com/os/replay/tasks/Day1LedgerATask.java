@@ -20,15 +20,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.os.client.model.LedgerResponse;
+import com.os.client.model.LoanProposal;
 import com.os.replay.ReplayDBDao;
 import com.os.replay.model.AuthToken;
 import com.os.replay.model.LedgerRecord;
-import com.os.replay.util.ContractProposalUtil;
+import com.os.replay.util.LoanProposalUtil;
 import com.os.replay.util.LocalDateTypeAdapter;
 import com.os.replay.util.OffsetDateTimeTypeAdapter;
 
-import io.swagger.client.model.ContractProposal;
-import io.swagger.client.model.LedgerResponse;
 import reactor.core.publisher.Mono;
 
 public class Day1LedgerATask extends RecordReader implements Tasklet, StepExecutionListener {
@@ -36,7 +36,7 @@ public class Day1LedgerATask extends RecordReader implements Tasklet, StepExecut
 	private static final Logger logger = LoggerFactory.getLogger(Day1LedgerATask.class);
 
 	private AuthToken ledgerAToken;
-	private String ledgerAParty;
+	//private String ledgerAParty;
 	private String ledgerAName;
 	private LocalDate ledgerAStartDate;
 	
@@ -49,7 +49,7 @@ public class Day1LedgerATask extends RecordReader implements Tasklet, StepExecut
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		ledgerAToken = (AuthToken) stepExecution.getJobExecution().getExecutionContext().get("ledgerAToken");
-		ledgerAParty = (String) stepExecution.getJobExecution().getExecutionContext().get("ledgerAParty");
+		//ledgerAParty = (String) stepExecution.getJobExecution().getExecutionContext().get("ledgerAParty");
 		ledgerAName = (String) stepExecution.getJobExecution().getExecutionContext().get("ledgerAName");
 		ledgerAStartDate = (LocalDate) stepExecution.getJobExecution().getExecutionContext().get("ledgerAStartDate");
 	}
@@ -60,25 +60,25 @@ public class Day1LedgerATask extends RecordReader implements Tasklet, StepExecut
 		//1. Query for new loans on startDate
 		List<LedgerRecord> ledgerRecords = dao.getLedgerRecords(ledgerAStartDate, ledgerAName);
 		
-		//2. Submit each as contract proposals to the API
+		//2. Submit each as loan proposals to the API
 		if (ledgerRecords != null && ledgerRecords.size() > 0) {
 			
-			int submittedContracts = 0;
+			int submittedLoans = 0;
 			
 			Gson gson = new GsonBuilder()
 				    .registerTypeAdapter(LocalDate.class, new LocalDateTypeAdapter())
 				    .registerTypeAdapter(OffsetDateTime.class, new OffsetDateTimeTypeAdapter())
 				    .create();
 			
-			ContractProposalUtil contractUtil = new ContractProposalUtil();
+			LoanProposalUtil loanUtil = new LoanProposalUtil();
 			
 			for (LedgerRecord record : ledgerRecords) {
-				ContractProposal proposal = contractUtil.createContractProposal(record);
+				LoanProposal proposal = loanUtil.createLoanProposal(record);
 				
 				logger.debug(gson.toJson(proposal));
 				
 				LedgerResponse ledgerResponse = restWebClient.post()
-			      .uri("/contracts")
+			      .uri("/loans")
 			      .contentType(MediaType.APPLICATION_JSON)
 			      .bodyValue(proposal)
 			      .headers(h -> h.setBearerAuth(ledgerAToken.getAccess_token()))
@@ -91,12 +91,12 @@ public class Day1LedgerATask extends RecordReader implements Tasklet, StepExecut
 				logger.debug("Ledger Response: " + ledgerResponse);
 				
 				if (HttpStatus.CREATED.value() == Integer.parseInt(ledgerResponse.getCode())) {
-					dao.updateOSContractId(ledgerAName, record.getInternalRefId(), contractUtil.parseResourceUri(ledgerResponse.getResourceUri()));
-					submittedContracts++;
+					dao.updateOSLoanId(ledgerAName, record.getInternalRefId(), loanUtil.parseResourceUri(ledgerResponse.getResourceUri()));
+					submittedLoans++;
 				}
 				
 				//TODO - remove this limiter
-				if (submittedContracts >= 5) {
+				if (submittedLoans >= 5) {
 					break;
 				}
 			}

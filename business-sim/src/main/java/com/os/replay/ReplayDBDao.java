@@ -9,8 +9,6 @@ import java.sql.Types;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,8 +22,6 @@ import com.os.replay.model.OpenFigiV3ResponseDataItem;
 
 @Component
 public class ReplayDBDao {
-
-	private static final Logger logger = LoggerFactory.getLogger(ReplayDBDao.class);
 
 	@Autowired
 	@Qualifier("mdJdbcTemplate")
@@ -193,14 +189,14 @@ public class ReplayDBDao {
 		return ledgerRecords;
 	}
 
-	public void updateOSContractId(String ledgerName, String referenceId, String osContractId) {
+	public void updateOSLoanId(String ledgerName, String referenceId, String osLoanId) {
 		jdbcTemplate.update("update ledger_" + ledgerName + " set os_contract_id = ? where reference_id = ?",
 				new PreparedStatementSetter() {
 
 					@Override
 					public void setValues(PreparedStatement ps) throws SQLException {
 						int var = 1;
-						ps.setString(var++, osContractId);
+						ps.setString(var++, osLoanId);
 						ps.setString(var++, referenceId);
 					}
 
