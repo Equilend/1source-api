@@ -2,6 +2,7 @@ package com.os.replay.model;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+
 import org.springframework.jdbc.core.RowMapper;
 
 public class LedgerRecordMapper implements RowMapper<LedgerRecord> {
@@ -36,8 +37,8 @@ public class LedgerRecordMapper implements RowMapper<LedgerRecord> {
 		record.setOneSourceCounterpartyId(rs.getString("os_counterparty_id"));
 		record.setOneSourceCounterpartyName(rs.getString("os_counterparty_name"));
 		record.setOneSourceCounterpartyGleifLei(rs.getString("os_counterparty_gleif_lei"));
-		record.setOneSourceContractId(rs.getString("os_contract_id"));
-		record.setOneSourceContractStatus(rs.getString("os_status"));
+		record.setOneSourceLoanId(rs.getString("os_contract_id"));
+		record.setOneSourceLoanStatus(rs.getString("os_status"));
 		
 		record.setSsiInternalAcctCd(rs.getString("ssi_internal_acct_cd"));
 		record.setSsiSettlementBic(rs.getString("ssi_settlement_bic"));
