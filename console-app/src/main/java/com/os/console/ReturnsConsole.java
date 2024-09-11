@@ -19,7 +19,7 @@ public class ReturnsConsole extends AbstractConsole {
 
 	public void handleArgs(String args[], BufferedReader consoleIn, WebClient webClient) {
 
-		if (args[0].equals("L")) {
+		if (args[0].equals("I")) {
 			System.out.print("Listing all returns...");
 			SearchReturnsTask searchReturnsTask = new SearchReturnsTask(webClient);
 			Thread taskT = new Thread(searchReturnsTask);
@@ -75,7 +75,7 @@ public class ReturnsConsole extends AbstractConsole {
 						if (searchReturnTask.getReturn() != null) {
 							ModelReturn modelReturn = searchReturnTask.getReturn();
 							System.out.print("Canceling return...");
-							CancelReturnTask cancelReturnTask = new CancelReturnTask(webClient, modelReturn.getContractId(), modelReturn.getReturnId());
+							CancelReturnTask cancelReturnTask = new CancelReturnTask(webClient, modelReturn.getLoanId(), modelReturn.getReturnId());
 							Thread taskS = new Thread(cancelReturnTask);
 							taskS.run();
 							try {
@@ -99,7 +99,7 @@ public class ReturnsConsole extends AbstractConsole {
 	protected void printMenu() {
 		System.out.println("Returns Menu");
 		System.out.println("-----------------------");
-		System.out.println("L             - List all returns");
+		System.out.println("I             - List all returns");
 		System.out.println("S <Return Id> - Load a return by Id");
 		System.out.println();
 		System.out.println("C <Return Id> - Cancel a return by Id");

@@ -9,12 +9,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
+import com.os.replay.tasks.Day0LedgerAInitTask;
+import com.os.replay.tasks.Day0LedgerBInitTask;
 import com.os.replay.tasks.Day1LedgerAAuthTask;
 import com.os.replay.tasks.Day1LedgerATask;
 import com.os.replay.tasks.Day1LedgerBAuthTask;
 import com.os.replay.tasks.Day1LedgerBTask;
-import com.os.replay.tasks.Day0LedgerAInitTask;
-import com.os.replay.tasks.Day0LedgerBInitTask;
 
 @Configuration
 public class ReplayJob {

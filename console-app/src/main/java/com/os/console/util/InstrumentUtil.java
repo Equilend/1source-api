@@ -1,9 +1,18 @@
 package com.os.console.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.os.client.model.CurrencyCd;
 import com.os.client.model.Instrument;
@@ -12,536 +21,112 @@ import com.os.client.model.PriceUnit;
 
 public class InstrumentUtil {
 
-	static Random r = new Random();
-	
-	public static Instrument getRandomInstrument() {
-		return instrumentList.get(r.nextInt(500));
+	private static final Logger logger = LoggerFactory.getLogger(InstrumentUtil.class);
+
+	Random r = new Random();
+	int cnt = 1;
+
+	private String instrumentsFile = "/instruments.csv";
+
+	private InstrumentUtil() {
+
+		BufferedReader reader = null;
+
+		try {
+			
+			InputStream in = this.getClass().getResourceAsStream(instrumentsFile);
+			
+			reader = new BufferedReader(new InputStreamReader(in));
+
+			String nextLine;
+			while ((nextLine = reader.readLine()) != null) {
+
+				String[] lineParts = nextLine.split(",");
+
+				Instrument instrument = createInstrument(lineParts);
+				instrumentList.add(instrument);
+				
+				instrumentMap.put(instrument.getIsin(), instrument);
+				instrumentMap.put(instrument.getSedol(), instrument);
+				instrumentMap.put(instrument.getCusip(), instrument);
+				instrumentMap.put(instrument.getTicker(), instrument);
+				instrumentMap.put(instrument.getFigi(), instrument);
+
+				cnt++;
+			}
+		} catch (Exception e) {
+			logger.error("Trouble loading instruments.", e);
+		} finally {
+			try {
+				reader.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+	private static InstrumentUtil _instrumentUtil;
+
+	public static InstrumentUtil getInstance() {
+
+		if (_instrumentUtil == null) {
+			_instrumentUtil = new InstrumentUtil();
+		}
+
+		return _instrumentUtil;
+	}
+
+	List<Instrument> instrumentList = new ArrayList<>();
+	Map<String, Instrument> instrumentMap = new HashMap<>();
+
+	public Instrument getRandomInstrument() {
+		return instrumentList.get(r.nextInt(cnt));
 	}
 	
-	static List<Instrument> instrumentList = new ArrayList<>();
-	
-	static {
-		instrumentList.add(createInstrument("RDW.WS", "75776W111", "US75776W1119", "BL5FDW9", null,  "BBG00YRXY5D0", "US", "REDWIRE CORP C/WTS (TO SUB FOR ORD)", 1.13, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SILA", "146280508", "US1462805086", "BSMR3P0", null,  "BBG005NB8NQ1", "US", "SILA REALTY TRUST INC COM", 20.95, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TCOA", "89301B104", "US89301B1044", "BP2DMH2", null,  "BBG00ZL7SJM7", "US", "ZALATORIS ACQUISITION CORP COM CLASS A", 11.1, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MPW", "58463J304", "US58463J3041", "B0JL5L9", null,  "BBG000BGRB25", "US", "MEDICAL PROPERTIES TRUST INC COM", 4.06, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TELL", "87968A104", "US87968A1043", "BD3DWD3", null,  "BBG000CS2ZS4", "US", "TELLURIAN INC", 0.6862, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("V", "92826C839", "US92826C8394", "B2PZN04", null,  "BBG000PSKYX7", "US", "VISA INC COM STK", 268.99, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DNA", "37611X100", "US37611X1000", "BN6KXF0", null,  "BBG00YPS1KY3", "US", "GINKGO BIOWORKS HOLDINGS INC COM CL A", 0.3755, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LUMN", "550241103", "US5502411037", "BMDH249", null,  "BBG000BGLRN3", "US", "LUMEN TECHNOLOGIES INC COM", 1.04, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CHPT", "15961R105", "US15961R1059", "BMC9RZ2", null,  "BBG00Q741Z16", "US", "CHARGEPOINT HOLDINGS INC COM CL A", 1.66, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("JOBY", "G65163100", "KYG651631007", "BMCRLL0", null,  "BBG00X2MYTC2", "US", "JOBY AVIATION INC COM", 5.15, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NYCB", "649445103", "US6494451031", "2711656", null,  "BBG000BVXPZ8", "US", "NEW YORK COMMUNITY BANCORP INC COM", 3.35, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ABR", "038923108", "US0389231087", "B00N2S0", null,  "BBG000KMVDV1", "US", "ARBOR REALTY TRUST INC COM", 14.7, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AMC", "00165C302", "US00165C3025", "BN4G703", null,  "BBG000TDCVT6", "US", "AMC ENTERTAINMENT HOLDINGS INC COM CL A (R/S)", 5.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ACHR", "03945R102", "US03945R1023", "BMHVDS8", null,  "BBG00XRTC910", "US", "ARCHER AVIATION INC COM CL A", 4.21, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("QS", "74767V109", "US74767V1098", "BMC73Z8", null,  "BBG00VJ17DS2", "US", "QUANTUMSCAPE CORPORATION COM CL A", 5.06, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("VFC", "918204108", "US9182041080", "2928683", null,  "BBG000BWCKB6", "US", "V F CORP COM NPV", 13.0, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BE", "093712107", "US0937121079", "BDD1BB8", null,  "BBG000N7KBZ3", "US", "BLOOM ENERGY CORPORATION COM CL A", 11.85, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AGL", "00857U107", "US00857U1079", "BLR4TK4", null,  "BBG00HCYVQQ4", "US", "AGILON HEALTH INC COM", 5.99, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("IONQ", "46222L108", "US46222L1089", "BP484B3", null,  "BBG00XZP0LB4", "US", "IONQ INC COM", 7.17, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SAVE", "848577102", "US8485771021", "B3ZG8F4", null,  "BBG000BF6RQ9", "US", "SPIRIT AIRLINES INC COM", 3.62, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KMI", "49456B101", "US49456B1017", "B3NQ4P8", null,  "BBG0019JZ882", "US", "KINDER MORGAN INC COM", 19.96, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HBI", "410345102", "US4103451021", "B1BJSL9", null,  "BBG000D2ZTS8", "US", "HANESBRANDS INC COM", 4.78, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MP", "553368101", "US5533681012", "BN15Y35", null,  "BBG00TJGL0F0", "US", "MP MATERIALS CORP COM CL A", 14.16, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EQT", "26884L109", "US26884L1098", "2319414", null,  "BBG000BHZ5J9", "US", "EQT CORPORATION COM NPV", 37.04, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("UEC", "916896103", "US9168961038", "B0VLLY2", null,  "BBG000LCK3Q2", "US", "URANIUM ENERGY CORP COM", 6.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SENS", "81727U105", "US81727U1051", "BYQNYR5", null,  "BBG00BR4Q8D7", "US", "SENSEONICS HOLDINGS INC COM", 0.3911, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CVX", "166764100", "US1667641005", "2838555", null,  "BBG000K4ND22", "US", "CHEVRON CORPORATION COM", 156.71, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LUV", "844741108", "US8447411088", "2831543", null,  "BBG000BNJHS8", "US", "SOUTHWEST AIRLINES CO COM", 28.58, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GME", "36467W109", "US36467W1099", "B0LLFT5", null,  "BBG000BB5BF6", "US", "GAMESTOP CORPORATION COM CLASS A", 24.37, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("STEM", "85859N102", "US85859N1028", "BNHTRL0", null,  "BBG00XP8NQN4", "US", "STEM INC COM", 1.14, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NOVA", "86745K104", "US86745K1043", "BJ9N563", null,  "BBG00PLQ1JR1", "US", "SUNNOVA ENERGY INTERNATIONAL INC COM", 5.56, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GSAT", "378973408", "US3789734080", "B1GHPM8", null,  "BBG000K008L5", "US", "GLOBALSTAR INC COM", 1.1, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KSS", "500255104", "US5002551043", "2496113", null,  "BBG000CS7CT9", "US", "KOHLS CORPORATION COM", 21.46, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MGY", "559663109", "US5596631094", "BF2GC59", null,  "BBG00GNC8DL2", "US", "MAGNOLIA OIL & GAS CORPORATION COM CLASS A", 25.99, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CLF", "185899101", "US1858991011", "BYVZ186", null,  "BBG000BFRF55", "US", "CLEVELAND CLIFFS INC COM", 15.95, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FUBO", "35953D104", "US35953D1046", "BMW4TN9", null,  "BBG002CV4Q74", "US", "FUBOTV INC COM", 1.31, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PATH", "90364P105", "US90364P1057", "BMD02L5", null,  "BBG00GKS1G03", "US", "UIPATH INC COM CL A", 12.96, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("IPG", "460690100", "US4606901001", "2466321", null,  "BBG000C90DH9", "US", "INTERPUBLIC GROUP COS INC COM", 28.77, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("IP", "460146103", "US4601461035", "2465254", null,  "BBG000BM5SR2", "US", "INTERNATIONAL PAPER CO COM", 43.54, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HR", "42226K105", "US42226K1051", "BPQWHP8", null,  "BBG000PRJCX9", "US", "HRTI LLC COM CL A", 16.73, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GPK", "388689101", "US3886891015", "B2Q8249", null,  "BBG000GQ7K93", "US", "GRAPHIC PACKAGING HOLDING COMPANY COM STK", 25.67, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("O", "756109104", "US7561091049", "2724193", null,  "BBG000DHPN63", "US", "REALTY INCOME CORP COM", 52.45, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("U", "91332U101", "US91332U1016", "BLFDXH8", null,  "BBG0056JW5G6", "US", "UNITY SOFTWARE INC COM", 15.73, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SMR", "67079K100", "US67079K1007", "BNXK803", null,  "BBG00YG48NM6", "US", "NUSCALE POWER CORPORATION COM", 11.59, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LLAP", "88105P103", "US88105P1030", "BMXLVM2", null,  "BBG00ZDR71C5", "US", "TERRAN ORBITAL CORPORATION COM", 0.84, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ADT", "00090Q103", "US00090Q1031", "BFWCP81", null,  "BBG000BP9WJ1", "US", "ADT INC COM", 7.4, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NEE", "65339F101", "US65339F1012", "2328915", null,  "BBG000BJSBJ0", "US", "NEXTERA ENERGY INC COM", 71.83, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CEI", "13200M607", "US13200M6075", "BM920Y4", null,  "BBG000D0NF14", "US", "CAMBER ENERGY INC COM (POST REV SPLT)", 0.118, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HAL", "406216101", "US4062161017", "2405302", null,  "BBG000BKTFN2", "US", "HALLIBURTON CO COM", 33.78, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BXMT", "09257W100", "US09257W1009", "B94QHZ0", null,  "BBG000BGKJ70", "US", "BLACKSTONE MORTGAGE TRUST INC COM CLS'A'", 17.28, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OWL", "09581B103", "US09581B1035", "BN7CQS9", null,  "BBG00XV417R8", "US", "BLUE OWL CAPITAL INC COM CL A", 17.7, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WOLF", "977852102", "US9778521024", "BMBVND9", null,  "BBG000BG14P4", "US", "WOLFSPEED INC COM", 23.64, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CRK", "205768302", "US2057683029", "BD82PS1", null,  "BBG000DNBK89", "US", "COMSTOCK RESOURCES INC COM", 10.92, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DAY", "15677J108", "US15677J1088", "BFX1V56", null,  "BBG005D7PF34", "US", "DAYFORCE INC COM", 51.26, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("COTY", "222070203", "US2220702037", "BBBSMJ2", null,  "BBG000F395V1", "US", "COTY INC COM CL 'A'", 9.73, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BBAI", "08975B109", "US08975B1098", "BM92RJ8", null,  "BBG00Z4HKRV4", "US", "BIGBEAR AI HOLDINGS INC COM", 1.48, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CNX", "12653C108", "US12653C1080", "BF3FTF4", null,  "BBG000CKVSG8", "US", "CNX RESOURCES CORPORATION COM", 24.81, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TOST", "888787108", "US8887871080", "BP6D7B7", null,  "BBG00BTJVK94", "US", "TOAST INC COM CLASS A", 25.31, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KVUE", "49177J102", "US49177J1025", "BQ84ZQ6", null,  "BBG01C79X561", "US", "KENVUE INC COM", 18.31, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OXY", "674599105", "US6745991058", "2655408", null,  "BBG000BQQ2S6", "US", "OCCIDENTAL PETROLEUM CORP COM", 62.32, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GM", "37045V100", "US37045V1008", "B665KZ5", null,  "BBG000NDYB67", "US", "GENERAL MOTORS CO COM", 46.71, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CPB", "134429109", "US1344291091", "2162845", null,  "BBG000BG4202", "US", "CAMPBELL SOUP CO CAP", 45.53, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("UA", "904311206", "US9043112062", "BDF9YM2", null,  "BBG009DTD8H2", "US", "UNDER ARMOUR INC COM STK CL C", 6.25, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("REXR", "76169C100", "US76169C1009", "BC9ZHL9", null,  "BBG004MB82R0", "US", "REXFORD INDUSTRIAL REALTY INC COM", 45.21, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MCW", "60646V105", "US60646V1052", "BNRRP65", null,  "BBG011FS2K38", "US", "MISTER CAR WASH INC COM", 6.85, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("IRT", "45378A106", "US45378A1060", "BCRYTK1", null,  "BBG004Q00KS7", "US", "INDEPENDENCE REALTY TRUST INC COM", 18.66, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ALB", "012653101", "US0126531013", "2046853", null,  "BBG000BJ26K7", "US", "ALBEMARLE CORP COM", 100.09, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KOS", "500688106", "US5006881065", "BHK15K6", null,  "BBG000L2Q7C4", "US", "KOSMOS ENERGY LTD (NA) COM", 5.84, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AI", "12468P104", "US12468P1049", "BMGNBJ2", null,  "BBG00Y6G6X31", "US", "C3.AI INC COM CLASS A", 28.56, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DEI", "25960P109", "US25960P1093", "B1G3M58", null,  "BBG000PN1SJ8", "US", "DOUGLAS EMMETT INC COM STK", 13.49, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CNK", "17243V102", "US17243V1026", "B1W7RQ0", null,  "BBG000QDVR53", "US", "CINEMARK HOLDINGS INC COM", 21.36, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HAYW", "421298100", "US4212981009", "BMFQC33", null,  "BBG00Z9CCRH5", "US", "HAYWARD HLDGS INC COM", 12.21, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DNB", "26484T106", "US26484T1060", "BLF9ZT2", null,  "BBG00VCZX9Z6", "US", "DUN & BRADSTREET HLDGS INC COM", 9.2, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("STWD", "85571B105", "US85571B1052", "B3PQ520", null,  "BBG000M1J270", "US", "STARWOOD PROPERTY TRUST INC COM", 18.93, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HASI", "41068X100", "US41068X1000", "B9HHD96", null,  "BBG0044K5DM4", "US", "HA SUSTAINABLE INFRSTRUCTUR CAP INCCOM", 29.0, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KKR", "48251W104", "US48251W1045", "BG1FRR1", null,  "BBG000BCQ6J8", "US", "KKR & CO INC COM", 106.06, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("IRM", "46284V101", "US46284V1017", "BVFTF03", null,  "BBG000KCZPC3", "US", "IRON MOUNTAIN INC COM", 91.78, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FND", "339750101", "US3397501012", "BYQHP96", null,  "BBG007GJ2F81", "US", "FLOOR & DECOR HOLDINGS INC COM CL A", 96.98, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KMX", "143130102", "US1431301027", "2983563", null,  "BBG000BLMZK6", "US", "CARMAX INC COM", 72.88, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NRGV", "29280W109", "US29280W1099", "BNYF0L2", null,  "BBG00YXTKKH0", "US", "ENERGY VAULT HOLDINGS INC COM", 1.0, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RES", "749660106", "US7496601060", "2719456", null,  "BBG000BS3047", "US", "RPC INC COM", 6.21, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FOUR", "82452J109", "US82452J1097", "BLF0L75", null,  "BBG00TX393L4", "US", "SHIFT4 PAYMENTS INC COM CLASS A", 72.85, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LCTX", "53566P109", "US53566P1093", "BJMSX83", null,  "BBG000G8RJY6", "US", "LINEAGE CELL THERAPEUTICS INC COM NPV", 0.9185, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PLTR", "69608A108", "US69608A1088", "BN78DQ4", null,  "BBG000N7QR55", "US", "PALANTIR TECH INC COM CLASS A", 25.85, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CNP", "15189T107", "US15189T1079", "2440637", null,  "BBG000FDBX90", "US", "CENTERPOINT ENERGY INC COM STK", 30.33, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LBRT", "53115L104", "US53115L1044", "BDCWFT8", null,  "BBG00GK839L8", "US", "LIBERTY ENERGY INC COM CL A", 20.9, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SO", "842587107", "US8425871071", "2829601", null,  "BBG000BT9DW0", "US", "SOUTHERN CO. COM", 77.72, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WMB", "969457100", "US9694571004", "2967181", null,  "BBG000BWVCP8", "US", "WILLIAMS COMPANIES INC COM", 42.8, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DAL", "247361702", "US2473617023", "B1W9D46", null,  "BBG000R7Z112", "US", "DELTA AIR LINES INC COM", 47.39, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("W", "94419L101", "US94419L1017", "BQXZP64", null,  "BBG001B17MV2", "US", "WAYFAIR INC COM A", 51.49, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("IR", "45687V106", "US45687V1061", "BL5GZ82", null,  "BBG002R1CW27", "US", "INGERSOLL RAND INC COM", 91.05, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DDD", "88554D205", "US88554D2053", "2889768", null,  "BBG000D42FJ0", "US", "3D SYSTEMS CORPORATION COM", 3.02, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RC", "75574U101", "US75574U1016", "BDFS3G6", null,  "BBG003TCRRN1", "US", "READY CAPITAL CORPORATION COM", 8.35, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HP", "423452101", "US4234521015", "2420101", null,  "BBG000BLCPY4", "US", "HELMERICH & PAYNE INC COM", 36.04, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LMND", "52567D107", "US52567D1072", "BMGNTQ5", null,  "BBG00BM5YC05", "US", "LEMONADE INC COM", 16.2, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("D", "25746U109", "US25746U1097", "2542049", null,  "BBG000BGVW60", "US", "DOMINION ENERGY INC COM STK NPV", 49.21, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("UAA", "904311107", "US9043111072", "B0PZN11", null,  "BBG000BXM6V2", "US", "UNDER ARMOUR INC COM STK CL A", 6.4, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MODG", "131193104", "US1311931042", "2173933", null,  "BBG000CPCVY1", "US", "TOPGOLF CALLAWAY BRANDS CORP COM", 15.0, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RF", "7591EP100", "US7591EP1005", "B01R311", null,  "BBG000Q3JN03", "US", "REGIONS FINANCIAL CORP COM STK", 19.89, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HPQ", "40434L105", "US40434L1052", "BYX4D52", null,  "BBG000KHWT55", "US", "HP INCORPORATION COM", 34.85, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PINS", "72352L106", "US72352L1061", "BJ2Z0H2", null,  "BBG002583CV8", "US", "PINTEREST INC COM CL A", 43.12, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("UWMC", "91823B109", "US91823B1098", "BMDJ3B9", null,  "BBG00R24YP60", "US", "UWM HLDGS CORP COM CL A", 6.91, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BLND", "09352U108", "US09352U1088", "BP8K987", null,  "BBG00D0YK7T7", "US", "BLEND LABS INC COM CL A", 2.43, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DOCS", "26622P107", "US26622P1075", "BMD22Y4", null,  "BBG0026ZJQX7", "US", "DOXIMITY INC COM CL A", 26.37, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BARK", "68622E104", "US68622E1047", "BNVVLD2", null,  "BBG00Y9ZTKK0", "US", "BARK INC COM", 1.69, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GLW", "219350105", "US2193501051", "2224701", null,  "BBG000BKFZM4", "US", "CORNING INC COM", 38.42, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("VYX", "62886E108", "US62886E1082", "2632650", null,  "BBG000BMXK89", "US", "NCR VOYIX CORP COM STK", 12.73, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RTX", "75513E101", "US75513E1010", "BM5M5Y3", null,  "BBG000BW8S60", "US", "RTX CORPORATION COM", 100.74, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PEB", "70509V100", "US70509V1008", "B4XBDV9", null,  "BBG000PNBZF5", "US", "PEBBLEBROOK HOTEL TRUST COM SBI", 13.06, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("F", "345370860", "US3453708600", "2615468", null,  "BBG000BQPC32", "US", "FORD MOTOR CO COM", 12.87, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GIS", "370334104", "US3703341046", "2367026", null,  "BBG000BKCFC2", "US", "GENERAL MILLS INC COM", 63.08, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NTST", "64119V303", "US64119V3033", "BMFLYL0", null,  "BBG00W5FQPV2", "US", "NETSTREIT CORP COM", 16.22, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("YUM", "988498101", "US9884981013", "2098876", null,  "BBG000BH3GZ2", "US", "YUM BRANDS INC COM NPV", 129.58, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WHD", "127203107", "US1272031071", "BF1GM16", null,  "BBG00JRH1P95", "US", "CACTUS INC COM CL A", 51.91, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BEN", "354613101", "US3546131018", "2350684", null,  "BBG000BD0TF8", "US", "FRANKLIN RESOURCES INC COM", 22.44, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CXM", "85208T107", "US85208T1079", "BNKCPP6", null,  "BBG0043NCD05", "US", "SPRINKLR INC COM CL A", 10.05, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BX", "09260D107", "US09260D1072", "BKF2SL7", null,  "BBG000BH0106", "US", "BLACKSTONE INC COM", 123.4, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("X", "912909108", "US9129091081", "2824770", null,  "BBG000BX3TD3", "US", "UNITED STATES STEEL CORP COM", 39.19, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("IBM", "459200101", "US4592001014", "2005973", null,  "BBG000BLNNH6", "US", "INTERNATIONAL BUS MACH CORP COM", 175.73, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WTRG", "29670G102", "US29670G1022", "BLCF3J9", null,  "BBG000BRMJN6", "US", "ESSENTIAL UTILITIES INC COM", 36.74, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TALO", "87484T108", "US87484T1088", "BDT56V9", null,  "BBG00JPH4HQ3", "US", "TALOS ENERGY INC COM", 11.89, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("JBI", "47103N106", "US47103N1063", "BKPG0T1", null,  "BBG0100SH2C0", "US", "JANUS INTERNATIONAL GROUP INC COM", 12.54, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DXC", "23355L106", "US23355L1061", "BYXD7B3", null,  "BBG00FN64XT9", "US", "DXC TECHNOLOGY COMPANY COM", 18.2, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AFL", "001055102", "US0010551028", "2026361", null,  "BBG000BBBNC6", "US", "AFLAC INC COM", 89.09, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KVYO", "49845K101", "US49845K1016", "BN4JNC6", null,  "BBG009WR3FL5", "US", "KLAVIYO INC COM CL A", 24.45, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KULR", "50125G109", "US50125G1094", "BG88XJ7", null,  "BBG00CS8TRT3", "US", "KULR TECHNOLOGY GROUP INC COM", 0.3916, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ATI", "01741R102", "US01741R1023", "2526117", null,  "BBG000LC1FS4", "US", "ATI INC COM", 57.43, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("VNO", "929042109", "US9290421091", "2933632", null,  "BBG000BWHD54", "US", "VORNADO REALTY TRUST COM SHS OF BEN INT", 26.2, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FREY", "35834F104", "US35834F1049", "BSKPBK7", null,  "BBG01KR6BS70", "US", "FREYR BATTERY INC COM NPV", 1.64, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("IOT", "79589L106", "US79589L1061", "BPK3058", null,  "BBG0099PW5P1", "US", "SAMSARA INC COM CL A", 35.67, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EPRT", "29670E107", "US29670E1073", "BFFK0X2", null,  "BBG00L17LGJ7", "US", "ESSENTIAL PROPERTIES REALTY TR INC", 27.85, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("QBTS", "26740W109", "US26740W1099", "BMCCXH5", null,  "BBG0192379V9", "US", "D-WAVE QUANTUM INC COM", 1.1, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NEEXU", "65339F713", "US65339F7134", "BQV3827", null,  "BBG019PD35Z0", "US", "NEXTERA ENERGY INC 6.926% CORP UNITS 01/09/25", 42.1899, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RKT", "77311W101", "US77311W1018", "BMD6Y84", null,  "BBG00VY1MYW7", "US", "ROCKET COMPANIES INC COM CL A", 13.85, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EAF", "384313508", "US3843135084", "BFZP4T1", null,  "BBG00KDYT8C4", "US", "GRAFTECH INTERNATIONAL LTD COM", 1.02, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NOG", "665531307", "US6655313079", "BN6RJM0", null,  "BBG000DRTDR6", "US", "NORTHERN OIL & GAS INC (NEV) COM (POST REV SPLT)", 38.86, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GETY", "374275105", "US3742751056", "BQ3R1Y0", null,  "BBG017RQJJG7", "US", "GETTY IMAGES HOLDINGS INC COM CLASS A", 3.21, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FSLY", "31188V100", "US31188V1008", "BJN4MY9", null,  "BBG004NLQHL0", "US", "FASTLY INC COM CL A", 7.4, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("UP", "96328L205", "US96328L2051", "BQB9YW7", null,  "BBG00XTV85L4", "US", "WHEELS UP EXPERIENCE INC COM CL A(PST REV)", 3.24, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EFC", "28852N109", "US28852N1090", "BJ7MB31", null,  "BBG000M1K955", "US", "ELLINGTON FINANCIAL INC COM NPV", 12.15, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DOW", "260557103", "US2605571031", "BHXCF84", null,  "BBG00BN96922", "US", "DOW INC COM", 52.88, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GNL", "379378201", "US3793782018", "BZCFW78", null,  "BBG004HXD0G8", "US", "GLOBAL NET LEASE INC COM", 7.4, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SYY", "871829107", "US8718291078", "2868165", null,  "BBG000BTVJ25", "US", "SYSCO CORP COM", 70.05, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PNW", "723484101", "US7234841010", "2048804", null,  "BBG000BRDSX5", "US", "PINNACLE WEST CAPITAL CORP COM NPV", 75.52, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RYAN", "78351F107", "US78351F1075", "BNXKSK3", null,  "BBG011K4W134", "US", "RYAN SPECIALTY HOLDINGS INC COM CL A", 57.46, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WTI", "92922P106", "US92922P1066", "B01Z7M4", null,  "BBG000FFFQR6", "US", "W & T OFFSHORE INC COM", 2.27, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HL", "422704106", "US4227041062", "2418601", null,  "BBG000BL5W86", "US", "HECLA MINING CO COM", 5.18, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BFLY", "124155102", "US1241551027", "BMHYQY4", null,  "BBG00TN65975", "US", "BUTTERFLY NETWORK INC COM CL A", 0.9933, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ARR", "042315705", "US0423157058", "BRJ8H91", null,  "BBG000PRZNN8", "US", "ARMOUR RESIDENTIAL REIT INC COM (POST REV SPLT)", 19.48, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FIGS", "30260D103", "US30260D1037", "BMXXBD9", null,  "BBG004SK5VL9", "US", "FIGS INC COM CL A", 5.6, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PL", "72703X106", "US72703X1063", "BM8JV32", null,  "BBG00ZCV3P74", "US", "PLANET LABS PBC COM CL A", 1.81, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HE", "419870100", "US4198701009", "2415204", null,  "BBG000BL0P40", "US", "HAWAIIAN ELECTRIC INDUSTRIES COM NPV", 8.49, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BAC", "060505104", "US0605051046", "2295677", null,  "BBG000BCTLF6", "US", "BANK OF AMERICA CORPORATION COM", 40.9, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ALIT", "01626W101", "US01626W1018", "BNG7BZ7", null,  "BBG00H00J2N1", "US", "ALIGHT INC COM CL A", 7.1, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SES", "78397Q109", "US78397Q1094", "BPW6T70", null,  "BBG00YMWPMT3", "US", "SES AI CORPORATION COM CL A", 1.09, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AESI", "642045108", "US6420451089", "BL6JGD2", null,  "BBG01JFZ96X4", "US", "ATLAS ENERGY SOLUTIONS INC COM CLASS A", 20.21, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TDOC", "87918A105", "US87918A1051", "BYQRFY1", null,  "BBG0019T5SG0", "US", "TELADOC HEALTH INC COM", 9.23, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NI", "65473P105", "US65473P1057", "2645409", null,  "BBG000BPZBB6", "US", "NISOURCE INC COM", 28.64, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AVTR", "05352A100", "US05352A1007", "BJLT387", null,  "BBG00G2HHYD7", "US", "AVANTOR INC COM", 21.01, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EVH", "30050B101", "US30050B1017", "BYLY8H1", null,  "BBG005CHLM96", "US", "EVOLENT HEALTH INC COM CLASS A", 19.74, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BA", "097023105", "US0970231058", "2108601", null,  "BBG000BCSST7", "US", "BOEING CO COM", 184.31, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("VSH", "928298108", "US9282981086", "2930149", null,  "BBG000BWKB81", "US", "VISHAY INTERTECHNOLOGY INC COM", 22.24, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OPTT", "674870506", "US6748705067", "BHS7YD2", null,  "BBG000RKMB42", "US", "OCEAN POWER TECHNOLOGIES INC COM (POST REV SPLT)", 0.3971, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CHWY", "16679L109", "US16679L1098", "BJLFHW7", null,  "BBG00P19DKZ6", "US", "CHEWY INC COM CL A", 24.1, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CDE", "192108504", "US1921085049", "2208136", null,  "BBG000BF8TF5", "US", "COEUR MINING INC COM", 5.96, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("REI", "76680V108", "US76680V1089", "B1TGYD6", null,  "BBG000GXN209", "US", "RING ENERGY INC COM STK", 1.73, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AEO", "02553E106", "US02553E1064", "2048592", null,  "BBG000BGXZB5", "US", "AMERICAN EAGLE OUTFITTERS INC COM", 19.3, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DOCN", "25402D102", "US25402D1028", "BNC23Q1", null,  "BBG00ZGF6SS3", "US", "DIGITALOCEAN HLDGS INC COM", 34.83, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ATUS", "02156K103", "US02156K1034", "BDRY7P9", null,  "BBG00GFMPRK0", "US", "ALTICE USA INC COM CL A", 2.06, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("VLO", "91913Y100", "US91913Y1001", "2041364", null,  "BBG000BBGGQ1", "US", "VALERO ENERGY CORP COM", 158.5, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OGN", "68622V106", "US68622V1061", "BLDC8J4", null,  "BBG00ZQRGW24", "US", "ORGANON & CO COM", 20.31, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SLG", "78440X887", "US78440X8873", "BPGKM57", null,  "BBG000BVP5P2", "US", "SL GREEN RLTY CORP COM (POST REV SPLT)", 56.43, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LW", "513272104", "US5132721045", "BDQZFJ3", null,  "BBG003CVMLQ2", "US", "LAMB WESTON HLDGS INC COM", 82.68, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ASXC", "04367G103", "US04367G1031", "BNVQ2J0", null,  "BBG000C1XKW7", "US", "ASENSUS SURGICAL INC COM", 0.3356, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RVLV", "76156B107", "US76156B1070", "BJ1FD74", null,  "BBG00M4RHBD0", "US", "REVOLVE GROUP INC COM CL A", 15.73, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GPS", "364760108", "US3647601083", "2360326", null,  "BBG000BKLH74", "US", "GAP INC COM", 23.88, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CVI", "12662P108", "US12662P1084", "B23PS12", null,  "BBG000QHV8S1", "US", "CVR ENERGY INC COM", 26.58, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CCO", "18453H106", "US18453H1068", "BJHVCH9", null,  "BBG000SSC5C9", "US", "CLEAR CHANNEL OUTDOOR HOLDINGS INC COM", 1.58, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NEM", "651639106", "US6516391066", "2636607", null,  "BBG000BPWXK1", "US", "NEWMONT CORPORATION COM", 43.45, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CPNG", "22266T109", "US22266T1097", "BNYHDF3", null,  "BBG00XMJRPQ8", "US", "COUPANG INC COM CL A", 20.91, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RXO", "74982T103", "US74982T1034", "BN6QSL9", null,  "BBG0160DYCH4", "US", "RXO INC COM", 26.79, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ARMK", "03852U106", "US03852U1060", "BH3XG17", null,  "BBG001KY4N87", "US", "ARAMARK COM", 33.25, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AMPS", "02217A102", "US02217A1025", "BPNXP05", null,  "BBG00Y48ZLF2", "US", "ALTUS POWER INC COM CL A", 3.98, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HPP", "444097109", "US4440971095", "B64B9P8", null,  "BBG000QC4T33", "US", "HUDSON PAC PPTYS INC COM", 5.06, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CLB", "21867A105", "US21867A1051", "BNKT9M2", null,  "BBG01GG28WR3", "US", "CORE LABORATORIES INC COM NPV", 20.48, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TFC", "89832Q109", "US89832Q1094", "BKP7287", null,  "BBG000BYYLS8", "US", "TRUIST FINANCIAL CORPORATION COM", 38.87, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SMRT", "83193G107", "US83193G1076", "BPCHD26", null,  "BBG00Z0H9PY2", "US", "SMARTRENT INC COM CL A", 2.37, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HRB", "093671105", "US0936711052", "2105505", null,  "BBG000BLDV98", "US", "BLOCK(H & R) INC COM NPV", 55.97, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CHH", "169905106", "US1699051066", "2106780", null,  "BBG000BPBTL2", "US", "CHOICE HOTELS INTERNATIONAL INC COM", 117.65, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OMC", "681919106", "US6819191064", "2279303", null,  "BBG000BS9489", "US", "OMNICOM GROUP INC COM", 89.23, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SVV", "80517M109", "US80517M1099", "BQLSDL6", null,  "BBG01F5T0KZ3", "US", "SAVERS VALUE VILLAGE INC COM", 12.24, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BKD", "112463104", "US1124631045", "B0PZN33", null,  "BBG000J4L211", "US", "BROOKDALE SENIOR LIVING INC COM", 7.36, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SCCO", "84265V105", "US84265V1052", "2823777", null,  "BBG000BSHH72", "US", "SOUTHERN COPPER CORPORATION COM", 116.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MAC", "554382101", "US5543821012", "2543967", null,  "BBG000BL9C59", "US", "MACERICH CO COM", 14.95, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SBH", "79546E104", "US79546E1047", "B1GZ005", null,  "BBG000LR8515", "US", "SALLY BEAUTY HOLDINGS INC COM STK", 11.09, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BOX", "10316T104", "US10316T1043", "BVB3BV2", null,  "BBG000PMSK08", "US", "BOX INC COM CL 'A'", 26.09, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GTLS", "16115Q308", "US16115Q3083", "B19HNF4", null,  "BBG000P1K2X6", "US", "CHART INDUSTRIES INC COM", 145.08, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LYV", "538034109", "US5380341090", "B0T7YX2", null,  "BBG000FQ7YR4", "US", "LIVE NATION ENTERTAINMENT INC COM", 94.79, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BJ", "05550J101", "US05550J1016", "BFZNZF8", null,  "BBG00FQ8T4G3", "US", "BJS WHSL CLUB HLDGS INC COM", 86.1, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HYLN", "449109107", "US4491091074", "BLF8447", null,  "BBG00N9MJTZ9", "US", "HYLIION HOLDINGS CORP COM CL A", 1.65, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CARR", "14448C104", "US14448C1045", "BK4N0D7", null,  "BBG00RP5HYS8", "US", "CARRIER GLOBAL CORPORATION COM", 63.46, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("IE", "46578C108", "US46578C1080", "BPF0KH6", null,  "BBG012WFRMG0", "US", "IVANHOE ELECTRIC INC COM", 10.07, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HIW", "431284108", "US4312841087", "2420640", null,  "BBG000C43744", "US", "HIGHWOODS PROPERTIES INC COM", 26.55, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MO", "02209S103", "US02209S1033", "2692632", null,  "BBG000BP6LJ8", "US", "ALTRIA GROUP INC COM", 45.95, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BOWL", "10258P102", "US10258P1021", "BPG5F19", null,  "BBG00Z6BJ689", "US", "BOWLERO CORP COM CL A", 14.13, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("JWN", "655664100", "US6556641008", "2641827", null,  "BBG000G8N9C6", "US", "NORDSTROM INC COM NPV", 21.6, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PR", "71424F105", "US71424F1057", "BQPCHB2", null,  "BBG00CNYBQ76", "US", "PERMIAN RESOURCES CORPORATION COM CLASS A", 16.79, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WU", "959802109", "US9598021098", "B1F76F9", null,  "BBG000BB5373", "US", "WESTERN UNION COMPANY (THE) COM STK", 12.25, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("APLE", "03784Y200", "US03784Y2000", "BXRTX56", null,  "BBG006473QX9", "US", "APPLE HOSPITALITY REIT INC COM NPV", 14.21, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DEA", "27616P103", "US27616P1030", "BVSS693", null,  "BBG007SV91V9", "US", "EASTERLY GOVERNMENT PROPERTIES INC COM", 12.34, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BANC", "05990K106", "US05990K1060", "BCD47X4", null,  "BBG000F7VKV4", "US", "BANC OF CALIFORNIA INC COM", 12.99, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FNB", "302520101", "US3025201019", "2041308", null,  "BBG000BJ9B29", "US", "F N B CORP COM", 13.57, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GCI", "36472T109", "US36472T1097", "BKPH157", null,  "BBG005C9FQQ3", "US", "GANNETT CO INC COM", 4.82, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SRE", "816851109", "US8168511090", "2138158", null,  "BBG000C2ZCH8", "US", "SEMPRA COM NPV", 75.17, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DBRG", "25401T603", "US25401T6038", "BPW6ZP0", null,  "BBG00D30HGP6", "US", "DIGITALBRIDGE GROUP INC COM CL A(POST R/S)", 13.37, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LTH", "53190C102", "US53190C1027", "BPH0546", null,  "BBG012J3H017", "US", "LIFE TIME GROUP HLDGS INC COM", 18.67, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NLY", "035710839", "US0357108390", "BPMQ7X2", null,  "BBG000BJFJ98", "US", "ANNALY CAPITAL MANAGEMENT INC COM (POST REV SPLT)", 18.95, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BBY", "086516101", "US0865161014", "2094670", null,  "BBG000BCWCG1", "US", "BEST BUY CO INC COM", 82.33, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ASAN", "04342Y104", "US04342Y1047", "BLFDQC4", null,  "BBG00WYHL732", "US", "ASANA INC COM CL A", 13.46, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NVST", "29415F104", "US29415F1049", "BK63SF3", null,  "BBG00LN4B5N0", "US", "ENVISTA HOLDINGS CORPORATION COM", 16.29, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SPR", "848574109", "US8485741099", "B1HMMS7", null,  "BBG000PRJ2Z9", "US", "SPIRIT AEROSYSTEMS HOLDINGS INC COM STK CLASS 'A'", 33.82, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MGM", "552953101", "US5529531015", "2547419", null,  "BBG000C2BXK4", "US", "MGM RESORTS INTERNATIONAL COM", 43.28, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NNN", "637417106", "US6374171063", "2211811", null,  "BBG000CLP0Y4", "US", "NNN REIT INC COM", 42.22, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RMD", "761152107", "US7611521078", "2732903", null,  "BBG000L4M7F1", "US", "RESMED INC COM", 189.4, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TUP", "899896104", "US8998961044", "2872069", null,  "BBG000GQ1G25", "US", "TUPPERWARE BRANDS CORPORATION COM", 1.4, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BDN", "105368203", "US1053682035", "2518954", null,  "BBG000CL6RJ3", "US", "BRANDYWINE REALTY TRUST / OPER PTNRSBI", 4.51, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KMT", "489170100", "US4891701009", "2488121", null,  "BBG000BMWKC5", "US", "KENNAMETAL INC CAP", 22.97, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WSM", "969904101", "US9699041011", "2967589", null,  "BBG000FSMWC3", "US", "WILLIAMS-SONOMA INC COM", 280.94, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ETWO", "29788T103", "US29788T1034", "BM9NG38", null,  "BBG00S91HBM9", "US", "E2OPEN PARENT HOLDINGS INC COM CL A", 4.58, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("COR", "03073E105", "US03073E1055", "2795393", null,  "BBG000MDCQC2", "US", "CENCORA INC COM", 222.5, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WT", "97717P104", "US97717P1049", "2476513", null,  "BBG000KLDTJ2", "US", "WISDOMTREE INC COM", 9.93, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DNMR", "236272100", "US2362721001", "BLFBYZ7", null,  "BBG00S4VMQT2", "US", "DANIMER SCIENTIFIC INC COM", 0.57, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WPC", "92936U109", "US92936U1097", "B826YT8", null,  "BBG000BCQM58", "US", "WP CAREY INC COM", 54.89, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ARI", "03762U105", "US03762U1051", "B4JTYX6", null,  "BBG000NFPF36", "US", "APOLLO COMMERCIAL RL ESTATE FIN INCCOM", 9.77, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("T", "00206R102", "US00206R1023", "2831811", null,  "BBG000BSJK37", "US", "AT&T INC COM", 18.68, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BTU", "704551100", "US7045511000", "BDVPZV0", null,  "BBG00GBV88T6", "US", "PEABODY ENERGY CO COM", 23.39, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SNAP", "83304A106", "US83304A1060", "BD8DJ71", null,  "BBG00441QMJ7", "US", "SNAP INC COM CL A", 15.75, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TRNO", "88146M101", "US88146M1018", "B3N4753", null,  "BBG000PV3J62", "US", "TERRENO REALTY CORP COM", 60.2, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SYF", "87165B103", "US87165B1035", "BP96PS6", null,  "BBG00658F3P3", "US", "SYNCHRONY FINANCIAL COM", 47.36, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ADC", "008492100", "US0084921008", "2062161", null,  "BBG000BC9DK0", "US", "AGREE REALTY CORP COM", 61.9, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EDR", "29260Y109", "US29260Y1091", "BJQ05Y5", null,  "BBG00P8TCHC8", "US", "ENDEAVOR GROUP HOLDINGS INC COM 0.00001 CL A", 27.2, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WNC", "929566107", "US9295661071", "2932048", null,  "BBG000CGM9H8", "US", "WABASH NATIONAL CORP COM", 21.76, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FE", "337932107", "US3379321074", "2100920", null,  "BBG000BB6M98", "US", "FIRSTENERGY CORP COM", 38.44, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("APO", "03769M106", "US03769M1062", "BN44JF6", null,  "BBG00ZNLTFK3", "US", "APOLLO GLOBAL MANAGEMENT INC COM", 119.8, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ADM", "039483102", "US0394831020", "2047317", null,  "BBG000BB6WG8", "US", "ARCHER-DANIELS-MIDLAND CO COM NPV", 62.69, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("M", "55616P104", "US55616P1049", "2345022", null,  "BBG000C46HM9", "US", "MACY'S INC COM", 17.93, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WWW", "978097103", "US9780971035", "2977500", null,  "BBG000BX2YN2", "US", "WOLVERINE WORLD WIDE INC COM", 12.98, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("YETI", "98585X104", "US98585X1046", "BGR7KH2", null,  "BBG00D8JC882", "US", "YETI HOLDINGS INC COM", 37.21, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PUMP", "74347M108", "US74347M1080", "BYXR9C0", null,  "BBG00FYCQ352", "US", "PROPETRO HOLDING CORP COM", 8.65, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HSY", "427866108", "US4278661081", "2422806", null,  "BBG000BLHRS2", "US", "HERSHEY COMPANY COM", 183.75, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NET", "18915M107", "US18915M1071", "BJXC5M2", null,  "BBG001WMKHH5", "US", "CLOUDFLARE INC COM CL A", 84.53, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("THO", "885160101", "US8851601018", "2889876", null,  "BBG000BV6R84", "US", "THOR INDUSTRIES COM", 93.48, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("YOU", "18467V109", "US18467V1098", "BLD30T1", null,  "BBG011C0FS40", "US", "CLEAR SECURE INC COM CL A", 18.94, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NAPA", "26414D106", "US26414D1063", "BLH3WV3", null,  "BBG00ZF3LG28", "US", "THE DUCKHORN PORTFOLIO INC COM", 7.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GBCI", "37637Q105", "US37637Q1058", "2370585", null,  "BBG000C3KB84", "US", "GLACIER BANCORP COM", 36.74, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BRCC", "05601U105", "US05601U1051", "BNBV240", null,  "BBG0157C6612", "US", "BRC INC COM CL A", 6.1, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GES", "401617105", "US4016171054", "2387109", null,  "BBG000BC26P7", "US", "GUESS INC COM", 20.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SM", "78454L100", "US78454L1008", "2764188", null,  "BBG000BFV115", "US", "SM ENERGY COMPANY COM", 45.32, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FIS", "31620M106", "US31620M1062", "2769796", null,  "BBG000BK2F42", "US", "FIDELITY NATL INFORMATION SERVICES COM", 75.81, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CNM", "21874C102", "US21874C1027", "BNXKS92", null,  "BBG01163K2X0", "US", "CORE & MAIN INC COM CL A", 48.89, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GWH", "26916J106", "US26916J1060", "BP5F673", null,  "BBG00Y4B6KS5", "US", "ESS TECH INC COM", 0.8095, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LVS", "517834107", "US5178341070", "B02T2J7", null,  "BBG000JWD753", "US", "LAS VEGAS SANDS CORP COM", 42.55, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RRC", "75281A109", "US75281A1097", "2523334", null,  "BBG000FVXD63", "US", "RANGE RESOURCES CORP COM", 34.43, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HOG", "412822108", "US4128221086", "2411053", null,  "BBG000BKZTP3", "US", "HARLEY DAVIDSON COM", 32.43, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TGNA", "87901J105", "US87901J1051", "BZ0P3Z5", null,  "BBG000BK5DP1", "US", "TEGNA INC COM", 14.0, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LAZ", "52110M109", "US52110M1099", "BRT46K3", null,  "BBG000BT4C39", "US", "LAZARD INC COM", 39.01, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RDDT", "75734B100", "US75734B1008", "BMVNLY2", null,  "BBG005K1D4S0", "US", "REDDIT INC COM CLASS A", 73.62, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DRH", "252784301", "US2527843013", "B090B96", null,  "BBG000JKHFP5", "US", "DIAMONDROCK HOSPITALITY CO COM", 8.25, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LEG", "524660107", "US5246601075", "2510682", null,  "BBG000BN53G7", "US", "LEGGETT & PLATT INC COM", 11.16, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NOTE", "337655104", "US3376551046", "BPXX914", null,  "BBG00XRJ9FF7", "US", "FISCALNOTE HOLDINGS INC COM CLASS A", 1.67, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EOG", "26875P101", "US26875P1012", "2318024", null,  "BBG000BZ9223", "US", "EOG RESOURCES INC COM", 126.77, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FMC", "302491303", "US3024913036", "2328603", null,  "BBG000BJP882", "US", "FMC CORP COM", 55.66, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("USB", "902973304", "US9029733048", "2736035", null,  "BBG000FFDM15", "US", "US BANCORP COM", 39.51, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PBI", "724479100", "US7244791007", "2690506", null,  "BBG000BQTMJ9", "US", "PITNEY BOWES INC COM", 6.26, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PCG", "69331C108", "US69331C1080", "2689560", null,  "BBG000BQWPC5", "US", "PG&E CORP COM NPV", 17.22, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CWAN", "185123106", "US1851231068", "BNZJHY5", null,  "BBG012C765L4", "US", "CLEARWATER ANALYTICS HLDGS INC COM CLASS A", 18.61, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PD", "69553P100", "US69553P1003", "BJ7JPH4", null,  "BBG0043BYPB8", "US", "PAGERDUTY INC COM", 22.07, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BGS", "05508R106", "US05508R1068", "B034L49", null,  "BBG000RKXRQ1", "US", "B & G FOODS INC COM", 7.84, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TAP", "60871R209", "US60871R2094", "B067BM3", null,  "BBG000BS7KS3", "US", "MOLSON COORS BEVERAGE COMPANY COM CLASS B", 50.63, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CVM", "150837607", "US1508376076", "BDFZC26", null,  "BBG000H5G6L5", "US", "CEL-SCI CORP COM", 1.1, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PSTG", "74624M102", "US74624M1027", "BYZ62T3", null,  "BBG00212PVZ5", "US", "PURE STORAGE INC COM CL A", 63.69, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AKR", "004239109", "US0042391096", "2566522", null,  "BBG000BJGD54", "US", "ACADIA REALTY TRUST SBI", 18.23, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("UGI", "902681105", "US9026811052", "2910118", null,  "BBG000BVYN55", "US", "UGI CORP COM NPV", 22.55, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("IVR", "46131B704", "US46131B7047", "BNBV530", null,  "BBG000GGLZZ7", "US", "INVESCO MORTGAGE CAPITAL INC COM (POST REV SPLIT)", 9.33, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DBI", "250565108", "US2505651081", "BJ9J282", null,  "BBG000CF8227", "US", "DESIGNER BRANDS INC COM NPV CL A", 6.67, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CRI", "146229109", "US1462291097", "2980939", null,  "BBG000CTM4J9", "US", "CARTERS INC COM", 61.74, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FCPT", "35086T109", "US35086T1097", "BZ16HK0", null,  "BBG009H33QM0", "US", "FOUR CORNERS PROPERTY TRUST INC COM", 24.66, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("UTZ", "918090101", "US9180901012", "BL989M6", null,  "BBG00M8652H1", "US", "UTZ BRANDS INC COM CL A", 16.39, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DRI", "237194105", "US2371941053", "2289874", null,  "BBG000BBNYF6", "US", "DARDEN RESTAURANTS INC COM NPV", 145.42, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FRGE", "34629L103", "US34629L1035", "BNHSZQ8", null,  "BBG00YDFZ7Q5", "US", "FORGE GLOBAL HOLDINGS INC COM", 1.45, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CE", "150870103", "US1508701034", "B05MZT4", null,  "BBG000JYP7L8", "US", "CELANESE CORP COM", 134.76, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BIG", "089302103", "US0893021032", "2218447", null,  "BBG000J0D904", "US", "BIG LOTS INC COM", 1.71, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CMTG", "18270D106", "US18270D1063", "BNTW041", null,  "BBG00PT33805", "US", "CLAROS MORTGAGE TRUST INC COM", 8.01, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("POR", "736508847", "US7365088472", "B125XQ6", null,  "BBG000BCRMW7", "US", "PORTLAND GENERAL ELECTRIC CO COM STK NPV", 42.44, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SPCE", "92766K403", "US92766K4031", "BSNTQK1", null,  "BBG00HTN2CQ3", "US", "VIRGIN GALACTIC HLDGS INC COM (POST REV SPLI", 7.87, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DLR", "253868103", "US2538681030", "B03GQS4", null,  "BBG000Q5ZRM7", "US", "DIGITAL REALTY TRUST INC COM STK", 151.71, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AMH", "02665T306", "US02665T3068", "BCF5RR9", null,  "BBG003NXJNH6", "US", "AMERICAN HOMES 4 RENT COM 'A'", 37.31, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("VZ", "92343V104", "US92343V1044", "2090571", null,  "BBG000HS77T5", "US", "VERIZON COMMUNICATIONS COM", 41.12, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SOLV", "83444M101", "US83444M1018", "BMTQB43", null,  "BBG018YZH6T3", "US", "SOLVENTUM CORP COM", 50.85, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ATO", "049560105", "US0495601058", "2315359", null,  "BBG000BRNGM2", "US", "ATMOS ENERGY CORP COM NPV", 115.16, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("COHR", "19247G107", "US19247G1076", "BNG8Z81", null,  "BBG000BLW102", "US", "COHERENT CORP COM NPV", 73.86, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SOC", "78574H104", "US78574H1041", "BNM6GH5", null,  "BBG00Z6F4C10", "US", "SABLE OFFSHORE CORP COM", 15.79, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RBRK", "781154109", "US7811541090", "BSLQK57", null,  "BBG008D32605", "US", "RUBRIK INC COM CL A", 29.93, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MTG", "552848103", "US5528481030", "2548616", null,  "BBG000CBMH27", "US", "MGIC INVESTMENT CORP COM", 21.65, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PAR", "698884103", "US6988841036", "2670036", null,  "BBG000BRP9K8", "US", "PAR TECHNOLOGY CORP COM", 46.49, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AMN", "001744101", "US0017441017", "2813552", null,  "BBG000BCT197", "US", "AMN HEALTHCARE SERVICES INC COM", 49.34, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GVA", "387328107", "US3873281071", "2381189", null,  "BBG000DVB833", "US", "GRANITE CONSTRUCTION COM", 61.69, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PK", "700517105", "US7005171050", "BYVMVV0", null,  "BBG00FGXCJX5", "US", "PARK HOTELS & RESORTS INC COM", 14.59, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ETR", "29364G103", "US29364G1031", "2317087", null,  "BBG000C1FQS9", "US", "ENTERGY CORP COM", 105.55, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OGS", "68235P108", "US68235P1084", "BJ0KXV4", null,  "BBG004WQKD07", "US", "ONE GAS INC COM", 63.76, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BXP", "101121101", "US1011211018", "2019479", null,  "BBG000BS5CM9", "US", "BXP INC COM", 61.48, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CRGY", "44952J104", "US44952J1043", "BNR4QY1", null,  "BBG013THLHZ4", "US", "CRESCENT ENERGY COMPANY COM CL A", 12.37, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ECVT", "27923Q109", "US27923Q1094", "BM8NHT2", null,  "BBG00GX8YK99", "US", "ECOVYST INC COM", 9.0, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NEP", "65341B106", "US65341B1061", "BNGY4Q0", null,  "BBG006JNW321", "US", "NEXTERA ENERGY PARTNERS LP COM UNIT LTD PARTNERSHIP IN", 26.68, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AL", "00912X302", "US00912X3026", "B3XS562", null,  "BBG000R3NPZ4", "US", "AIR LEASE CORP COM", 47.73, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EFX", "294429105", "US2944291051", "2319146", null,  "BBG000BHPL78", "US", "EQUIFAX INC COM", 240.41, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HPE", "42824C109", "US42824C1099", "BYVYWS0", null,  "BBG0078W3NQ3", "US", "HEWLETT PACKARD ENTERPRISE CO COM", 20.67, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BKSY", "09263B108", "US09263B1089", "BMG8V53", null,  "BBG00QRY6P33", "US", "BLACKSKY TECHNOLOGY INC COM CL A", 1.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CUBE", "229663109", "US2296631094", "B6SW913", null,  "BBG000HF28Q9", "US", "CUBESMART COM", 44.25, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CTOS", "23204X103", "US23204X1037", "BL66YS4", null,  "BBG00HLCWDF2", "US", "CUSTOM TRUCK ONE SOURCE INC COM", 4.22, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PMT", "70931T103", "US70931T1034", "B3V8JL7", null,  "BBG000DKDWS5", "US", "PENNYMAC MORTGAGE INVESTMENT TRUST COM", 13.75, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SMG", "810186106", "US8101861065", "2781518", null,  "BBG000BT5PG5", "US", "SCOTTS MIRACLE-GRO COMPANY CLASS'A'COM NPV", 63.51, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GBTG", "37890B100", "US37890B1008", "BPY03W3", null,  "BBG00Y52B8J5", "US", "GLOBAL BUSINESS TRAVEL GROUP INC COM CLASS A", 6.45, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RWT", "758075402", "US7580754023", "2730877", null,  "BBG000JNJPB0", "US", "REDWOOD TRUST INC COM STK", 6.45, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("YUMC", "98850P109", "US98850P1093", "BYW4289", null,  "BBG00B8N0HG1", "US", "YUM CHINA HOLDINGS INC COM", 31.33, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GOLF", "005098108", "US0050981085", "BD3WG50", null,  "BBG00D5L3SS4", "US", "ACUSHNET HOLDINGS CORP COM", 62.0, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NKE", "654106103", "US6541061031", "2640147", null,  "BBG000C5HS04", "US", "NIKE INC CLASS'B'COM NPV", 75.24, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MOD", "607828100", "US6078281002", "2598354", null,  "BBG000BP7CL4", "US", "MODINE MANUFACTURING CO COM", 107.97, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CXT", "224441105", "US2244411052", "BQ7W2W6", null,  "BBG017BXPZ85", "US", "CRANE NXT CO COM", 58.83, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CWH", "13462K109", "US13462K1097", "BDCBXH9", null,  "BBG00D2Z7X83", "US", "CAMPING WORLD HOLDINGS INC COM", 18.17, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RBLX", "771049103", "US7710491033", "BMWBC20", null,  "BBG001R1GCT0", "US", "ROBLOX CORPORATION COM CL A", 37.77, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ORA", "686688102", "US6866881021", "B03L311", null,  "BBG000Q5BQ63", "US", "ORMAT TECHNOLOGIES INC COM STK", 70.43, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NSA", "637870106", "US6378701063", "BWWCK85", null,  "BBG008417VN4", "US", "NATIONAL STORAGE AFFILIATES TRUST (BEN OF INT)", 40.74, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CNS", "19247A100", "US19247A1007", "B02H882", null,  "BBG000BB0WG4", "US", "COHEN & STEERS INC COM", 72.16, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("JBL", "466313103", "US4663131039", "2471789", null,  "BBG000BJNGN9", "US", "JABIL INC COM", 110.1, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OGE", "670837103", "US6708371033", "2657802", null,  "BBG000BQGLS5", "US", "OGE ENERGY CORP COM", 35.6, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SG", "87043Q108", "US87043Q1085", "BMQ89L5", null,  "BBG005NTTSP9", "US", "SWEETGREEN INC COM CL A", 28.39, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TTC", "891092108", "US8910921084", "2897040", null,  "BBG000BVQRY3", "US", "TORO CO COM", 90.02, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("COMP", "20464U100", "US20464U1007", "BN770G0", null,  "BBG00J5SXTH3", "US", "COMPASS INC COM CL A", 3.51, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MLI", "624756102", "US6247561029", "2609717", null,  "BBG000C6W444", "US", "MUELLER INDUSTRIES INC COM", 56.83, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AM", "03676B102", "US03676B1026", "BJBT0Q4", null,  "BBG00GBNZ4M0", "US", "ANTERO MIDSTREAM CORPORATION COM", 14.78, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("JPM", "46625H100", "US46625H1005", "2190385", null,  "BBG000DMBXR2", "US", "JPMORGAN CHASE & CO. COM", 208.69, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SWK", "854502101", "US8545021011", "B3Q2FJ4", null,  "BBG000BTQR96", "US", "STANLEY BLACK & DECKER INC COM", 79.88, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("STR", "82983N108", "US82983N1081", "BMF9G85", null,  "BBG01C36Y855", "US", "SITIO ROYALTIES CORP COM CLASS A", 24.31, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AMRC", "02361E108", "US02361E1082", "B3SWPT2", null,  "BBG000BD1QL6", "US", "AMERESCO INC COM CL 'A'", 27.14, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EXR", "30225T102", "US30225T1025", "B02HWR9", null,  "BBG000PV27K3", "US", "EXTRA SPACE STORAGE INC COM", 154.2, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("VVV", "92047W101", "US92047W1018", "BDG22J3", null,  "BBG003DNHV56", "US", "VALVOLINE INC", 42.97, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ATKR", "047649108", "US0476491081", "BDHF495", null,  "BBG000QTFDQ4", "US", "ATKORE INC COM", 132.37, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FNF", "31620R303", "US31620R3030", "BNBRDD4", null,  "BBG006N7S6K9", "US", "FIDELITY NATIONAL FINANCIAL FNF GROUP COM", 48.77, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SSTK", "825690100", "US8256901005", "B7ZR219", null,  "BBG002ZCK2V9", "US", "SHUTTERSTOCK INC COM", 35.64, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CADE", "12740C103", "US12740C1036", "BMCS168", null,  "BBG000D3MJP5", "US", "CADENCE BANK COM", 28.2, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LRN", "86333M108", "US86333M1080", "BLD5321", null,  "BBG000QSXPZ9", "US", "STRIDE INC COM", 68.79, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CNC", "15135B101", "US15135B1017", "2807061", null,  "BBG000BDXCJ5", "US", "CENTENE CORPORATION COM", 66.76, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("VZIO", "92858V101", "US92858V1017", "BNTB3N8", null,  "BBG00ZHDJVK4", "US", "VIZIO HLDG CORP COM CL A", 10.68, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HAE", "405024100", "US4050241003", "2401195", null,  "BBG000C7TF41", "US", "HAEMONETICS CORP COM", 84.13, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LPTV", "54352F206", "US54352F2065", "BQ0J9M3", null,  "BBG009YVP3P3", "US", "LOOP MEDIA INC COM(POST REV SPLT)", 0.1218, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ALK", "011659109", "US0116591092", "2012605", null,  "BBG000BBL0Y1", "US", "ALASKA AIR GROUP INC COM", 40.29, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CMP", "20451N101", "US20451N1019", "2202763", null,  "BBG000C42WS4", "US", "COMPASS MINERALS INTERNATIONAL INC COM", 10.45, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TKO", "87256C101", "US87256C1018", "BQBBFD1", null,  "BBG01G9JKWV5", "US", "TKO GROUP HLDGS INC COM CL A", 112.52, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OKLO", "02156V109", "US02156V1098", "BMD78K7", null,  "BBG0112CBLW3", "US", "OKLO INC COM CL A", 8.25, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DM", "25058X303", "US25058X3035", "BSWYNV7", null,  "BBG00P17H053", "US", "DESKTOP METAL INC COM CL A(PSTSPLT)", 5.24, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TEX", "880779103", "US8807791038", "2884224", null,  "BBG000C7B436", "US", "TEREX CORP COM", 54.2, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DG", "256677105", "US2566771059", "B5B1S13", null,  "BBG000NV1KK7", "US", "DOLLAR GENERAL CORP COM", 125.43, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SNV", "87161C501", "US87161C5013", "BMH4NJ8", null,  "BBG000BLNZL4", "US", "SYNOVUS FINANCIAL CORP COM", 40.34, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ITGR", "45826H109", "US45826H1095", "BD06LM7", null,  "BBG000BW6JV4", "US", "INTEGER HOLDINGS CORPORATION COM NPV", 115.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OTIS", "68902V107", "US68902V1070", "BK531S8", null,  "BBG00RP60KV0", "US", "OTIS WORLDWIDE CORP COM", 96.51, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WRB", "084423102", "US0844231029", "2093644", null,  "BBG000BD1HP2", "US", "BERKLEY(W.R.)CORP COM", 79.17, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BC", "117043109", "US1170431092", "2149309", null,  "BBG000BCWSS3", "US", "BRUNSWICK CORP COM", 69.61, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OSCR", "687793109", "US6877931096", "BKY83Q6", null,  "BBG00YMWFTZ2", "US", "OSCAR HEALTH INC COM CLS A", 17.07, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AAP", "00751Y106", "US00751Y1064", "2822019", null,  "BBG000F7RCJ1", "US", "ADVANCE AUTO PARTS INC COM", 59.86, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MIR", "60471A101", "US60471A1016", "BMG3PQ7", null,  "BBG00VHJ1K96", "US", "MIRION TECHNOLOGIES INC COM CL A", 10.73, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KODK", "277461406", "US2774614067", "BDZDSJ9", null,  "BBG0057GTG80", "US", "EASTMAN KODAK CO COM", 5.4, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ENOV", "194014502", "US1940145022", "BJLTMX5", null,  "BBG000C5Z443", "US", "ENOVIS CORPORATION COM", 44.44, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("JEF", "47233W109", "US47233W1099", "BG0Q4Z2", null,  "BBG000BNHSP9", "US", "JEFFERIES FINANCIAL GROUP INC COM", 51.05, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BMY", "110122108", "US1101221083", "2126335", null,  "BBG000DQLV23", "US", "BRISTOL-MYERS SQUIBB CO COM", 40.06, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AUB", "04911A107", "US04911A1079", "BFZ9DB8", null,  "BBG000BKS4S3", "US", "ATLANTIC UNION BANKSHARES CORP COM", 32.93, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MC", "60786M105", "US60786M1053", "BLG38Q1", null,  "BBG000RNBH63", "US", "MOELIS & COMPANY COM CL'A'", 57.26, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ORCL", "68389X105", "US68389X1054", "2661568", null,  "BBG000BQLTW7", "US", "ORACLE CORP COM", 144.38, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BYON", "690370101", "US6903701018", "2855930", null,  "BBG000BF7BV7", "US", "BEYOND INC COM", 12.49, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("VTLE", "516806205", "US5168062058", "BLBCYD2", null,  "BBG000DZCFX4", "US", "VITAL ENERGY INC (US) COM (POST REV SPLIT)", 45.94, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WMT", "931142103", "US9311421039", "2936921", null,  "BBG000BWXBC2", "US", "WALMART INC COM", 68.24, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WHR", "963320106", "US9633201069", "2960384", null,  "BBG000BWSV34", "US", "WHIRLPOOL CORP COM", 100.85, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ENV", "29404K106", "US29404K1060", "B474ZK7", null,  "BBG000Q4NZ54", "US", "ENVESTNET INC COM", 63.2, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SPHR", "55826T102", "US55826T1025", "BM8MM05", null,  "BBG00L9HLWV8", "US", "SPHERE ENTERTAINMENT CO COM CLASS A", 37.4, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LOW", "548661107", "US5486611073", "2536763", null,  "BBG000BNDN65", "US", "LOWE'S COMPANIES INC COM", 213.3, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("INFA", "45674M101", "US45674M1018", "BMG95P4", null,  "BBG012THM3Q6", "US", "INFORMATICA INC COM CLASS A", 30.44, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RITM", "64828T201", "US64828T2015", "BRJ9GW0", null,  "BBG003T1GM03", "US", "RITHM CAPITAL CORP COM NPV", 10.65, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HOMB", "436893200", "US4368932004", "B17MTL9", null,  "BBG000QJXDW9", "US", "HOME BANCSHARES INC. COM", 23.72, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RVTY", "714046109", "US7140461093", "2305844", null,  "BBG000FXW512", "US", "REVVITY INC COM", 102.56, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NUVB", "67080N101", "US67080N1019", "BLNB9R6", null,  "BBG00VHJ0CC1", "US", "NUVATION BIO INC COM CL A", 2.93, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KW", "489398107", "US4893981070", "B298495", null,  "BBG000CTY4J6", "US", "KENNEDY-WILSON HOLDINGS INC COM STK", 10.01, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NOV", "62955J103", "US62955J1034", "BN2RYW9", null,  "BBG000BJX8C8", "US", "NOV INC COM", 18.5, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PEG", "744573106", "US7445731067", "2707677", null,  "BBG000BQZMH4", "US", "PUBLIC SERVICE ENTERPRISE GROUP INCCOM NPV", 73.99, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PG", "742718109", "US7427181091", "2704407", null,  "BBG000BR2TH3", "US", "PROCTER & GAMBLE CO COM NPV", 163.83, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CRC", "13057Q305", "US13057Q3056", "BMBK002", null,  "BBG00Y04KP80", "US", "CALIFORNIA RESOURCES CORP COM", 52.92, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OHI", "681936100", "US6819361006", "2043274", null,  "BBG000BGBTC2", "US", "OMEGA HEALTHCARE INVESTORS COM STK", 33.79, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FL", "344849104", "US3448491049", "2980906", null,  "BBG000BX8DC4", "US", "FOOT LOCKER INC COM", 23.07, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PLNT", "72703H101", "US72703H1014", "BYSFJV8", null,  "BBG009H04M17", "US", "PLANET FITNESS INC COM A", 73.94, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ROK", "773903109", "US7739031091", "2754060", null,  "BBG000BBCDZ2", "US", "ROCKWELL AUTOMATION INC COM", 266.34, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WTTR", "81617J301", "US81617J3014", "BDHSLL5", null,  "BBG00G4Y2DC1", "US", "SELECT WATER SOLUTIONS INC COM CL A", 10.58, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("NRDY", "64081V109", "US64081V1098", "BNZJTJ4", null,  "BBG00XWZB4V9", "US", "NERDY INC COM CL A", 1.62, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OMI", "690732102", "US6907321029", "2665128", null,  "BBG000CTV5F0", "US", "OWENS & MINOR INC COM", 13.11, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ZTS", "98978V103", "US98978V1035", "B95WG16", null,  "BBG0039320N9", "US", "ZOETIS INC COM CL 'A'", 175.6, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MKC", "579780206", "US5797802064", "2550161", null,  "BBG000G6Y5W4", "US", "MCCORMICK & COMPANY INC COM NPV", 69.87, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GXO", "36262G101", "US36262G1013", "BNNTGF1", null,  "BBG00YDGX945", "US", "GXO LOGISTICS INCORPORATED COM", 49.39, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("VST", "92840M102", "US92840M1027", "BZ8VJQ8", null,  "BBG00DXDL6Q1", "US", "VISTRA CORP COM", 91.72, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OMF", "68268W103", "US68268W1036", "BYSZB89", null,  "BBG005497GZ3", "US", "ONEMAIN HLDGS INC", 48.74, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AES", "00130H105", "US00130H1059", "2002479", null,  "BBG000C23KJ3", "US", "AES CORP COM", 17.89, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CAT", "149123101", "US1491231015", "2180201", null,  "BBG000BF0K17", "US", "CATERPILLAR INC COM", 330.61, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WEC", "92939U106", "US92939U1060", "BYY8XK8", null,  "BBG000BWP7D9", "US", "WEC ENERGY GROUP INC COM", 77.68, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EW", "28176E108", "US28176E1082", "2567116", null,  "BBG000BRXP69", "US", "EDWARDS LIFESCIENCES CORP COM", 91.08, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WRBY", "93403J106", "US93403J1060", "BLGZN51", null,  "BBG005DWN8K8", "US", "WARBY PARKER INC COM CLASS A", 16.23, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KLG", "92942W107", "US92942W1071", "BNNJC42", null,  "BBG018CYVVW5", "US", "WK KELLOGG CO COM", 16.94, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RPM", "749685103", "US7496851038", "2756174", null,  "BBG000DCNK80", "US", "RPM INTERNATIONAL INC COM", 107.26, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SCI", "817565104", "US8175651046", "2797560", null,  "BBG000BTHH16", "US", "SERVICE CORPORATION INTERNATIONAL COM", 70.08, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DHR", "235851102", "US2358511028", "2250870", null,  "BBG000BH3JF8", "US", "DANAHER CORP COM", 240.0, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CVS", "126650100", "US1266501006", "2577609", null,  "BBG000BGRY34", "US", "CVS HEALTH CORPORATION COM", 56.7, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ARLO", "04206A101", "US04206A1016", "BYWPZY9", null,  "BBG00K88DTH3", "US", "ARLO TECHNOLOGIES INC COM", 13.5, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CAVA", "148929102", "US1489291021", "BRBD9F4", null,  "BBG00GBR8753", "US", "CAVA GROUP INC COM", 94.92, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ENR", "29272W109", "US29272W1099", "BYZFPN5", null,  "BBG006FCB019", "US", "ENERGIZER HOLDINGS INC COM", 29.55, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FNA", "69913P105", "US69913P1057", "BPK4YF9", null,  "BBG005914H31", "US", "PARAGON 28 INC COM", 6.53, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DOC", "42250P103", "US42250P1030", "BJBLRK3", null,  "BBG000BKYDP9", "US", "HEALTHPEAK PROPERTIES INC COM", 19.48, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SPIR", "848560306", "US8485603067", "BRC45W5", null,  "BBG00WCNHBW7", "US", "SPIRE GLOBAL INC COM CL A (R/S)", 10.52, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PRKS", "81282V100", "US81282V1008", "B84KWJ4", null,  "BBG003RY97K2", "US", "UNITED PARKS & RESORTS INC COM", 52.99, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DELL", "24703L202", "US24703L2025", "BHKD3S6", null,  "BBG00DW3SZS1", "US", "DELL TECHNOLOGIES INC COM CL C", 142.67, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("APAM", "04316A108", "US04316A1088", "B8FW545", null,  "BBG001M6CZY1", "US", "ARTISAN PARTNERS ASSET MGMT INC COM CL'A'", 40.58, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CAG", "205887102", "US2058871029", "2215460", null,  "BBG000BDXGP9", "US", "CONAGRA BRANDS INC COM", 28.13, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ASB", "045487105", "US0454871056", "2055718", null,  "BBG000BCFQC3", "US", "ASSOCIATED BANC-CORP COM", 20.56, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("S", "81730H109", "US81730H1095", "BP7L1B8", null,  "BBG00B6F2F09", "US", "SENTINELONE INC COM CL A", 20.15, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PSX", "718546104", "US7185461040", "B78C4Y8", null,  "BBG002VX6CM1", "US", "PHILLIPS 66 COM", 140.37, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KNX", "499049104", "US4990491049", "BF0LKD0", null,  "BBG000BFC848", "US", "KNIGHT SWIFT TRANSN HLDGS INC COM CLASS A", 50.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TDW", "88642R109", "US88642R1095", "BDFGDQ0", null,  "BBG00HBQ35R8", "US", "TIDEWATER INC NEW COM", 95.26, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AHR", "398182303", "US3981823038", "BQWNKQ4", null,  "BBG01L820CZ4", "US", "AMERICAN HEALTHCARE REIT INC COM", 15.22, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WSO", "942622200", "US9426222009", "2943039", null,  "BBG000DJN7L9", "US", "WATSCO INC COM", 480.56, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SAFE", "78646V107", "US78646V1070", "BMDBB99", null,  "BBG000H35J52", "US", "SAFEHOLD INC COM", 18.79, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WELL", "95040Q104", "US95040Q1040", "BYVYHH4", null,  "BBG000BKY1G5", "US", "WELLTOWER OP LLC COM", 105.35, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WKC", "981475106", "US9814751064", "2469450", null,  "BBG000BM3CJ8", "US", "WORLD KINECT CORPORATION COM", 25.74, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CIA", "174740100", "US1747401008", "2199478", null,  "BBG000DJ3D29", "US", "CITIZENS INC CLASS'A'COM NPV", 2.67, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HEI", "422806109", "US4228061093", "2419217", null,  "BBG000BL16Q7", "US", "HEICO CORP COM", 228.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GRNT", "387432107", "US3874321074", "BPJKCW1", null,  "BBG017RM8TN8", "US", "GRANITE RIDGE RESOURCES INC COM", 6.58, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CHGG", "163092109", "US1630921096", "BG6N6K6", null,  "BBG0014XR0N5", "US", "CHEGG INC COM", 2.88, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DE", "244199105", "US2441991054", "2261203", null,  "BBG000BH1NH9", "US", "DEERE & CO COM", 362.79, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SRG", "81752R100", "US81752R1005", "BZ0HC54", null,  "BBG008NVFMN8", "US", "SERITAGE GROWTH PPTYS COM CL A", 4.67, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CMG", "169656105", "US1696561059", "B0X7DZ3", null,  "BBG000QX74T1", "US", "CHIPOTLE MEXICAN GRILL COM", 61.58, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OKE", "682680103", "US6826801036", "2130109", null,  "BBG000BQHGR6", "US", "ONEOK INC COM", 82.8, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FUN", "83001C108", "US83001C1080", "BPBPD09", null,  "BBG01K8GRMX6", "US", "SIX FLAGS ENT CORP NEW COM", 56.75, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PRO", "74346Y103", "US74346Y1038", "B1YWQK0", null,  "BBG000R432V9", "US", "PROS HOLDINGS INC COM STK", 27.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TPX", "88023U101", "US88023U1016", "2216991", null,  "BBG000PXGT62", "US", "TEMPUR SEALY INTERNATIONAL INC COM", 46.77, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TWI", "88830M102", "US88830M1027", "2890265", null,  "BBG000BBNFG6", "US", "TITAN INTL INC COM NPV", 7.11, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ITW", "452308109", "US4523081093", "2457552", null,  "BBG000BMBL90", "US", "ILLINOIS TOOL WORKS INC COM", 235.99, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CVNA", "146869102", "US1468691027", "BYQHPG3", null,  "BBG00GCTWDJ3", "US", "CARVANA CO COM CL A", 127.84, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MPLN", "62548M100", "US62548M1009", "BKVDKY1", null,  "BBG00RLZ9M74", "US", "MULTIPLAN CORPORATION COM CL A", 0.2739, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DTC", "83425V104", "US83425V1044", "BP907S2", null,  "BBG012TKHKJ5", "US", "SOLO BRANDS INC COM CL A", 2.08, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("JXN", "46817M107", "US46817M1071", "BMFX6P4", null,  "BBG00922Y5Z6", "US", "JACKSON FINANCIAL INC COM CL A", 75.34, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OUST", "68989M202", "US68989M2026", "BMHVMY7", null,  "BBG00XRTSTR1", "US", "OUSTER INC COM (REV SPLT)", 9.7, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ORC", "68571X301", "US68571X3017", "BMYSHK2", null,  "BBG001P2KSC8", "US", "ORCHID ISLAND CAPITAL INC COM (POST REV SPLT)", 8.33, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LNC", "534187109", "US5341871094", "2516378", null,  "BBG000BNC3Y9", "US", "LINCOLN NATIONAL CORP COM NPV", 31.49, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("HI", "431571108", "US4315711089", "B2QGDP1", null,  "BBG000KT0GV3", "US", "HILLENBRAND INC COM STK NPV", 38.86, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("LEN", "526057104", "US5260571048", "2511920", null,  "BBG000BN5HF7", "US", "LENNAR CORP COM CLASS A", 143.28, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RJF", "754730109", "US7547301090", "2718992", null,  "BBG000BS73J1", "US", "RAYMOND JAMES FINANCIAL INC COM", 120.73, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("UBER", "90353T100", "US90353T1007", "BK6N347", null,  "BBG002B04MT8", "US", "UBER TECHNOLOGIES INC COM", 71.3, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AWK", "030420103", "US0304201033", "B2R3PV1", null,  "BBG000TRJ294", "US", "AMERICAN WATER WORKS COMPANY INC COM", 127.96, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DVA", "23918K108", "US23918K1088", "2898087", null,  "BBG000MQ1SN9", "US", "DAVITA INC COM", 137.95, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("TPR", "876030107", "US8760301072", "BF09HX3", null,  "BBG000BY29C7", "US", "TAPESTRY INC COM", 40.19, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OII", "675232102", "US6752321025", "2655583", null,  "BBG000CPBCL8", "US", "OCEANEERING INTERNATIONAL INC COM", 24.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SFBS", "81768T108", "US81768T1088", "BMH0MP5", null,  "BBG000FB8PF8", "US", "SERVISFIRST BANCSHARES INC COM", 61.73, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("AULT", "09175M507", "US09175M5076", "BSKPCD7", null,  "BBG00JMZD4P6", "US", "AULT ALLIANCE INC COM (R/S)", 0.2856, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BALL", "058498106", "US0584981064", "2073022", null,  "BBG000BDDNH5", "US", "BALL CORP COM NPV", 60.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ORI", "680223104", "US6802231042", "2659109", null,  "BBG000C4PLF7", "US", "OLD REPUBLIC INTERNATIONAL CORP COM", 30.37, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("OUT", "69007J106", "US69007J1060", "BSP6611", null,  "BBG004S69ZX4", "US", "OUTFRONT MEDIA INC COM NPV", 14.56, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CTRI", "155923105", "US1559231055", "BMDPVF7", null,  "BBG01M4ZP8Y6", "US", "CENTURI HOLDINGS INC COM", 19.99, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ED", "209115104", "US2091151041", "2216850", null,  "BBG000BHLYS1", "US", "CONSOLIDATED EDISON INC COM", 88.71, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EGY", "91851C201", "US91851C2017", "2933353", null,  "BBG000BTBH21", "US", "VAALCO ENERGY INC COM", 6.49, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WGO", "974637100", "US9746371007", "2972721", null,  "BBG000BWS3F3", "US", "WINNEBAGO INDUSTRIES INC COM", 53.26, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PII", "731068102", "US7310681025", "2692933", null,  "BBG000D5S4M0", "US", "POLARIS INC COM", 75.67, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GEO", "36162J106", "US36162J1060", "BNLYWQ1", null,  "BBG000GC0TZ3", "US", "GEO GROUP INC(THE) COM NEW", 14.99, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("GETR", "37427G101", "US37427G1013", "BPSMLW1", null,  "BBG0101Q45C0", "US", "GETAROUND INC COM", 0.1392, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FPI", "31154R109", "US31154R1095", "BKZH191", null,  "BBG005TNS0Q7", "US", "FARMLAND PARTNERS INC COM", 11.28, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("WAT", "941848103", "US9418481035", "2937689", null,  "BBG000FQRVM3", "US", "WATERS CORP COM", 287.5, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SSB", "840441109", "US8404411097", "BNFX071", null,  "BBG000BNPYN9", "US", "SOUTHSTATE CORP COM", 76.02, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ABBV", "00287Y109", "US00287Y1091", "B92SR70", null,  "BBG0025Y4RY4", "US", "ABBVIE INC COM", 163.84, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DUK", "26441C204", "US26441C2044", "B7VD3F2", null,  "BBG000BHGDH5", "US", "DUKE ENERGY CORP COM", 99.84, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("SNDR", "80689H102", "US80689H1023", "BYVN953", null,  "BBG000DR87M7", "US", "SCHNEIDER NATIONAL INC COM NPV CL B", 24.03, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("PWR", "74762E102", "US74762E1029", "2150204", null,  "BBG000BBL8V7", "US", "QUANTA SERVICES COM", 254.6, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BOH", "062540109", "US0625401098", "2074070", null,  "BBG000C8D8G9", "US", "BANK OF HAWAII CORPORATION COM", 57.04, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KIM", "49446R109", "US49446R1095", "2491594", null,  "BBG000CN3S73", "US", "KIMCO REALTY CORP COM", 19.27, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("YEXT", "98585N106", "US98585N1063", "BD8ZJW2", null,  "BBG001MKZGY7", "US", "YEXT INC COM", 5.16, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("KBH", "48666K109", "US48666K1097", "2485070", null,  "BBG000BMLWX8", "US", "KB HOME COM STK", 66.6, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("CUZ", "222795502", "US2227955026", "BJP0MF6", null,  "BBG000CW9BM7", "US", "COUSINS PROPERTIES INC COM (POST REV SPLIT)", 22.79, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ACRE", "04013V108", "US04013V1089", "B77PWP5", null,  "BBG0022MMQB0", "US", "ARES COMMERCIAL REAL ESTATE COM", 6.74, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("VSCO", "926400102", "US9264001028", "BNNTGH3", null,  "BBG01103B471", "US", "VICTORIAS SECRET AND CO COM", 15.95, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EVA", "29415B103", "US29415B1035", "BP830S3", null,  "BBG007FH8JX4", "US", "ENVIVA INC COM", 0.4461, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("DV", "25862V105", "US25862V1052", "BMDX9Z7", null,  "BBG00ZNRRJM2", "US", "DOUBLEVERIFY HLDGS INC COM", 20.07, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("FI", "337738108", "US3377381088", "2342034", null,  "BBG000BJKPG0", "US", "FISERV INC COM", 148.79, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("EIX", "281020107", "US2810201077", "2829515", null,  "BBG000D7RKJ5", "US", "EDISON INTERNATIONAL COM NPV", 71.82, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("MTNB", "576810105", "US5768101058", "BN65XQ6", null,  "BBG005WX2XG8", "US", "MATINAS BIOPHARMA HOLDINGS INC COM", 0.1602, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("ZWS", "98983L108", "US98983L1089", "BMV1ZD3", null,  "BBG000H8R0N8", "US", "ZURN ELKAY WATER SOLUTIONS CORPORTNCOM", 29.58, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BK", "064058100", "US0640581007", "B1Z77F6", null,  "BBG000BD8PN9", "US", "BANK OF NEW YORK MELLON CORP COM", 60.47, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("BERY", "08579W103", "US08579W1036", "B8BR3H3", null,  "BBG000Q1R1Y9", "US", "BERRY GLOBAL GROUP INC COM", 59.1, "USD", LocalDate.now()));
-		instrumentList.add(createInstrument("RCUS", "03969F109", "US03969F1093", "BDZT9Y9", null,  "BBG00DQD26W3", "US", "ARCUS BIOSCIENCES INC COM", 14.36, "USD", LocalDate.now()));
+	public Instrument getInstrument(String securityId) {
+		return instrumentMap.get(securityId);
 	}
-	
-	private static Instrument createInstrument(String ticker, String cusip, String isin, String sedol, String quick, String figi, String marketCd, String description, Double priceValue, String priceCurrency, LocalDate priceDate) {
-		
+
+	private Instrument createInstrument(String[] lineParts) {
+
 		Instrument instrument = new Instrument();
 		
-		instrument.setTicker(ticker);
-		instrument.setCusip(cusip);
-		instrument.setIsin(isin);
-		instrument.setSedol(sedol);
-		instrument.setQuick(quick);
-		instrument.setFigi(figi);
-		instrument.setMarketCd(marketCd);
-		instrument.setDescription(description);
+		int idx = 0;
+		instrument.setFigi(parseString(lineParts[idx++]));
+		instrument.setIsin(parseString(lineParts[idx++]));
+		instrument.setCusip(parseString(lineParts[idx++]));
+		instrument.setSedol(parseString(lineParts[idx++]));
+		instrument.setTicker(parseString(lineParts[idx++]));
+		instrument.setMarketCd(parseString(lineParts[idx++]));
+		instrument.setDescription(parseString(lineParts[idx++]));
 		
 		Price price = new Price();
-		price.setValue(priceValue);
-		price.setCurrency(CurrencyCd.fromValue(priceCurrency));
+		price.setValue(parseDouble(lineParts[idx++]));
+		price.setCurrency(CurrencyCd.valueOf(parseString(lineParts[idx++])));
+		price.setValueDate(LocalDate.now());
 		price.setUnit(PriceUnit.SHARE);
 		instrument.setPrice(price);
-		
+
 		return instrument;
 	}
+
+	private String parseString(String s) {
+		if (s == null || s.trim().length() == 0) {
+			return null;
+		}
+
+		s = s.replace("\"", "");
+		
+		return s;
+	}
+
+	private Double parseDouble(String s) {
+		if (s == null || s.trim().length() == 0) {
+			return null;
+		}
+
+		return Double.valueOf(s);
+	}
+
 }

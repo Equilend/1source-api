@@ -37,7 +37,7 @@ public class SearchReratesTask implements Runnable {
 					printHeader();
 				}
 				System.out.print(ConsoleOutputUtil.padSpaces(rerate.getRerateId(), 40));
-				System.out.print(ConsoleOutputUtil.padSpaces(rerate.getContractId(), 40));
+				System.out.print(ConsoleOutputUtil.padSpaces(rerate.getLoanId(), 40));
 				System.out.print(ConsoleOutputUtil.padSpaces(rerate.getStatus().toString(), 12));
 				System.out.print(ConsoleOutputUtil.padSpaces(rerate.getLastUpdateDatetime(), 30));
 				System.out.print(ConsoleOutputUtil.padSpaces(rerate.getDateProposed(), 15));
@@ -51,7 +51,7 @@ public class SearchReratesTask implements Runnable {
 	public void printHeader() {
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("Rerate Id", 40));
-		System.out.print(ConsoleOutputUtil.padSpaces("Contract Id", 40));
+		System.out.print(ConsoleOutputUtil.padSpaces("Loan Id", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("Status", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("Last Update DateTime", 30));
 		System.out.print(ConsoleOutputUtil.padSpaces("Date Proposed", 15));

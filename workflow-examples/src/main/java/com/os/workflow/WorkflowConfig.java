@@ -13,14 +13,14 @@ public class WorkflowConfig {
 	private final String auth_password;
 	private final String party_id;
 	private final String acting_as;
-	private final String contract_id;
+	private final String loan_id;
 	private final String rerate_id;
 	private final String return_id;
 	private final String recall_id;
 
 	@ConstructorBinding
 	public WorkflowConfig(String auth_grant_type, String auth_client_id, String auth_client_secret,
-			String auth_username, String auth_password, String party_id, String acting_as, String contract_id,
+			String auth_username, String auth_password, String party_id, String acting_as, String loan_id,
 			String rerate_id, String return_id, String recall_id) {
 		super();
 		this.auth_grant_type = auth_grant_type;
@@ -30,7 +30,7 @@ public class WorkflowConfig {
 		this.auth_password = auth_password;
 		this.party_id = party_id;
 		this.acting_as = acting_as;
-		this.contract_id = contract_id;
+		this.loan_id = loan_id;
 		this.rerate_id = rerate_id;
 		this.return_id = return_id;
 		this.recall_id = recall_id;
@@ -64,8 +64,8 @@ public class WorkflowConfig {
 		return acting_as;
 	}
 
-	public String getContract_id() {
-		return contract_id;
+	public String getLoan_id() {
+		return loan_id;
 	}
 
 	public String getRerate_id() {

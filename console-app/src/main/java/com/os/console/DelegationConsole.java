@@ -94,9 +94,11 @@ public class DelegationConsole extends AbstractConsole {
 		System.out.println("Delgation Menu");
 		System.out.println("-----------------------");
 		System.out.println("J             - Print JSON");
+		System.out.println();
 		System.out.println("A             - Approve");
 		System.out.println("C             - Cancel");
 		System.out.println("D             - Decline");
+		System.out.println();
 		System.out.println("X             - Go back");
 	}
 

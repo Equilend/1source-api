@@ -41,7 +41,7 @@ public class ReturnCancelNotificationTask implements Tasklet, StepExecutionListe
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
 
-		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts/" + workflowConfig.getContract_id() + "/returns/" + workflowConfig.getReturn_id() + "/cancel").contentType(MediaType.APPLICATION_JSON)
+		LedgerResponse ledgerResponse = restWebClient.post().uri("/loans/" + workflowConfig.getLoan_id() + "/returns/" + workflowConfig.getReturn_id() + "/cancel").contentType(MediaType.APPLICATION_JSON)
 				//.bodyValue(json)
 				.headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {

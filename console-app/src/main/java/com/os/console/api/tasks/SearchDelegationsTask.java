@@ -43,6 +43,12 @@ public class SearchDelegationsTask implements Runnable {
 				System.out.print(ConsoleOutputUtil.padSpaces(delegation.getDelegationId(), 40));
 				System.out.print(ConsoleOutputUtil.padSpaces(delegation.getDelegationStatus().toString(), 12));
 				
+				String venue = null;
+				if (delegation.getDelegationParty() != null) {
+					venue = delegation.getDelegationParty().getPartyId();
+				}
+				System.out.print(ConsoleOutputUtil.padSpaces(venue, 15));
+				
 				String authorization = null;
 				List<DelegationAuthorizationType> authorizations = delegation.getAuthorizations(); //there should only be 1
 				if (authorizations != null && authorizations.size() > 0) {
@@ -76,12 +82,14 @@ public class SearchDelegationsTask implements Runnable {
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("Delegation Id", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("Status", 12));
+		System.out.print(ConsoleOutputUtil.padSpaces("Venue", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Authorization", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Party 1", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Party 2", 15));
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("-------------", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("------", 12));
+		System.out.print(ConsoleOutputUtil.padSpaces("-----", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("-------------", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("-------", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("-------", 15));

@@ -2,6 +2,7 @@ package com.os.contractexport.config;
 
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,8 +19,8 @@ public class CSVExportConfig {
 			writer = new PrintWriter("contracts.csv");
 			
 			StringBuffer sb = new StringBuffer();
-			sb.append("contractId").append(",");
-			sb.append("contractStatus").append(",");
+			sb.append("loanId").append(",");
+			sb.append("loanStatus").append(",");
 			sb.append("lastUpdateDatetime").append(",");
 			
 			sb.append("figi").append(",");

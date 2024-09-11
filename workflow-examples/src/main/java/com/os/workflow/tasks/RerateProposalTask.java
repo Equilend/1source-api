@@ -21,13 +21,15 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.os.client.model.Contract;
+import com.os.client.model.Loan;
 import com.os.client.model.FeeRate;
 import com.os.client.model.FixedRate;
 import com.os.client.model.FloatingRate;
 import com.os.client.model.LedgerResponse;
 import com.os.client.model.RebateRate;
 import com.os.client.model.RerateProposal;
+import com.os.client.model.Venue;
+import com.os.client.model.VenueType;
 import com.os.workflow.AuthToken;
 import com.os.workflow.LocalDateTypeGsonAdapter;
 import com.os.workflow.OffsetDateTimeTypeGsonAdapter;
@@ -40,7 +42,7 @@ public class RerateProposalTask implements Tasklet, StepExecutionListener {
 	private static final Logger logger = LoggerFactory.getLogger(RerateProposalTask.class);
 
 	private AuthToken ledgerToken;
-	private Contract contract;
+	private Loan loan;
 
 	@Autowired
 	WebClient restWebClient;
@@ -51,7 +53,7 @@ public class RerateProposalTask implements Tasklet, StepExecutionListener {
 	@Override
 	public void beforeStep(StepExecution stepExecution) {
 		ledgerToken = (AuthToken) stepExecution.getJobExecution().getExecutionContext().get("ledgerToken");
-		contract = (Contract) stepExecution.getJobExecution().getExecutionContext().get("contract");
+		loan = (Loan) stepExecution.getJobExecution().getExecutionContext().get("loan");
 	}
 
 	@Override
@@ -59,51 +61,57 @@ public class RerateProposalTask implements Tasklet, StepExecutionListener {
 
 		RerateProposal rerateProposal = new RerateProposal();
 
+		Venue venue = new Venue();
+		venue.setType(VenueType.OFFPLATFORM);
+		venue.setVenueRefKey("CONSOLE" + System.currentTimeMillis());
+
+		rerateProposal.setExecutionVenue(venue);
+
 		LocalDate rerateDate = LocalDate.now(ZoneId.of("UTC"));
 		
 		Random random = new Random();
 		
-		if (contract.getTrade().getRate() instanceof FeeRate) {
+		if (loan.getTrade().getRate() instanceof FeeRate) {
 			
-			BigDecimal rate = BigDecimal.valueOf(((FeeRate) contract.getTrade().getRate()).getFee().getBaseRate());
+			BigDecimal rate = BigDecimal.valueOf(((FeeRate) loan.getTrade().getRate()).getFee().getBaseRate());
 			
 			BigDecimal rerate = rate.add(new BigDecimal(random.nextInt(8) + 1));
 			
-			((FeeRate) contract.getTrade().getRate()).getFee().setBaseRate(rerate.doubleValue());
-			((FeeRate) contract.getTrade().getRate()).getFee().setEffectiveDate(rerateDate);
+			((FeeRate) loan.getTrade().getRate()).getFee().setBaseRate(rerate.doubleValue());
+			((FeeRate) loan.getTrade().getRate()).getFee().setEffectiveDate(rerateDate);
 
-			rerateProposal.setRate(((FeeRate) contract.getTrade().getRate()));
+			rerateProposal.setRate(((FeeRate) loan.getTrade().getRate()));
 
 			logger.debug("Original Fee Rate: " + rate.toPlainString() + " Rerate: " + rerate.toPlainString());
 			
-		} else if (contract.getTrade().getRate() instanceof RebateRate) {
+		} else if (loan.getTrade().getRate() instanceof RebateRate) {
 			
-			if (((RebateRate) contract.getTrade().getRate()).getRebate() instanceof FixedRate) {
+			if (((RebateRate) loan.getTrade().getRate()).getRebate() instanceof FixedRate) {
 			
 				BigDecimal rate = BigDecimal
-						.valueOf(((FixedRate) (((RebateRate) contract.getTrade().getRate()).getRebate()))
+						.valueOf(((FixedRate) (((RebateRate) loan.getTrade().getRate()).getRebate()))
 								.getFixed().getBaseRate());
 				
 				BigDecimal rerate = rate.add(new BigDecimal(random.nextInt(8) + 1));
-				((FixedRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFixed().setBaseRate(rerate.doubleValue());
-				((FixedRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFixed().setEffectiveDate(rerateDate);
+				((FixedRate)((RebateRate) loan.getTrade().getRate()).getRebate()).getFixed().setBaseRate(rerate.doubleValue());
+				((FixedRate)((RebateRate) loan.getTrade().getRate()).getRebate()).getFixed().setEffectiveDate(rerateDate);
 				
-				rerateProposal.setRate(((RebateRate) contract.getTrade().getRate()));
+				rerateProposal.setRate(((RebateRate) loan.getTrade().getRate()));
 
 				logger.debug("Original Rebate Fixed Rate: " + rate.toPlainString() + " Rerate: " + rerate.toPlainString());
 
-			} else if (((RebateRate) contract.getTrade().getRate()).getRebate() instanceof FloatingRate) {
+			} else if (((RebateRate) loan.getTrade().getRate()).getRebate() instanceof FloatingRate) {
 				
 				BigDecimal rate = BigDecimal
-						.valueOf(((FloatingRate) (((RebateRate) contract.getTrade().getRate()).getRebate()))
+						.valueOf(((FloatingRate) (((RebateRate) loan.getTrade().getRate()).getRebate()))
 								.getFloating().getSpread());
 
 				BigDecimal rerate = rate.add(new BigDecimal(random.nextInt(8) + 1));
 
-				((FloatingRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFloating().setSpread(rerate.doubleValue());
-				((FloatingRate)((RebateRate) contract.getTrade().getRate()).getRebate()).getFloating().setEffectiveDate(rerateDate);
+				((FloatingRate)((RebateRate) loan.getTrade().getRate()).getRebate()).getFloating().setSpread(rerate.doubleValue());
+				((FloatingRate)((RebateRate) loan.getTrade().getRate()).getRebate()).getFloating().setEffectiveDate(rerateDate);
 
-				rerateProposal.setRate(((RebateRate) contract.getTrade().getRate()));
+				rerateProposal.setRate(((RebateRate) loan.getTrade().getRate()));
 
 				logger.debug("Original Rebate Floating Rate: " + rate.toPlainString() + " Rerate: " + rerate.toPlainString());
 			}
@@ -117,7 +125,7 @@ public class RerateProposalTask implements Tasklet, StepExecutionListener {
 		String json = gson.toJson(rerateProposal);
 		logger.debug(json);
 
-		LedgerResponse ledgerResponse = restWebClient.post().uri("/contracts/" + workflowConfig.getContract_id() + "/rerates").contentType(MediaType.APPLICATION_JSON)
+		LedgerResponse ledgerResponse = restWebClient.post().uri("/loans/" + workflowConfig.getLoan_id() + "/rerates").contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(json).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					return Mono.empty();

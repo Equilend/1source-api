@@ -7,17 +7,17 @@ import com.os.console.util.RESTUtil;
 public class CancelRecallTask implements Runnable {
 
 	private WebClient webClient;
-	private String contractId;
+	private String loanId;
 	private String recallId;
 
-	public CancelRecallTask(WebClient webClient, String contractId, String recallId) {
+	public CancelRecallTask(WebClient webClient, String loanId, String recallId) {
 		this.webClient = webClient;
-		this.contractId = contractId;
+		this.loanId = loanId;
 		this.recallId = recallId;
 	}
 
 	@Override
 	public void run() {
-		RESTUtil.postRequest(webClient, "/contracts/" + contractId + "/recalls/" + recallId + "/cancel");
+		RESTUtil.postRequest(webClient, "/loans/" + loanId + "/recalls/" + recallId + "/cancel");
 	}
 }
