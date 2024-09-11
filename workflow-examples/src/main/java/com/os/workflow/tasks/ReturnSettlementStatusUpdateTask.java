@@ -60,7 +60,7 @@ public class ReturnSettlementStatusUpdateTask implements Tasklet, StepExecutionL
 		String json = gson.toJson(update);
 		logger.debug(json);
 
-		LedgerResponse ledgerResponse = restWebClient.patch().uri("/contracts/" + workflowConfig.getContract_id() + "/returns/" + workflowConfig.getReturn_id()).contentType(MediaType.APPLICATION_JSON)
+		LedgerResponse ledgerResponse = restWebClient.patch().uri("/loans/" + workflowConfig.getLoan_id() + "/returns/" + workflowConfig.getReturn_id()).contentType(MediaType.APPLICATION_JSON)
 				.bodyValue(json).headers(h -> h.setBearerAuth(ledgerToken.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					return Mono.empty();

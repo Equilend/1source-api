@@ -2,7 +2,7 @@ package com.os.contractexport.tasks;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
 import org.slf4j.Logger;
@@ -17,20 +17,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import com.os.client.model.Collateral;
+import com.os.client.model.CollateralType;
+import com.os.client.model.CurrencyCd;
+import com.os.client.model.Instrument;
+import com.os.client.model.Loan;
+import com.os.client.model.LoanStatus;
+import com.os.client.model.Loans;
+import com.os.client.model.PartyRole;
+import com.os.client.model.RoundingMode;
+import com.os.client.model.SettlementType;
+import com.os.client.model.TradeAgreement;
+import com.os.client.model.TransactingParties;
+import com.os.client.model.TransactingParty;
 import com.os.contractexport.model.AuthToken;
-import io.swagger.client.model.Collateral;
-import io.swagger.client.model.CollateralType;
-import io.swagger.client.model.Contract;
-import io.swagger.client.model.ContractStatus;
-import io.swagger.client.model.Contracts;
-import io.swagger.client.model.CurrencyCd;
-import io.swagger.client.model.Instrument;
-import io.swagger.client.model.PartyRole;
-import io.swagger.client.model.RoundingMode;
-import io.swagger.client.model.SettlementType;
-import io.swagger.client.model.TradeAgreement;
-import io.swagger.client.model.TransactingParties;
-import io.swagger.client.model.TransactingParty;
 
 import reactor.core.publisher.Mono;
 
@@ -59,37 +59,37 @@ public class ContractCSVExportTask extends RecordReader implements Tasklet, Step
 
 		logger.info("Export complete for token: " + token.getAccess_token());
 
-		Contracts contracts = restWebClient.get().uri("/contracts")
+		Loans loans = restWebClient.get().uri("/loans")
 				.headers(h -> h.setBearerAuth(token.getAccess_token())).retrieve()
 				.onStatus(HttpStatusCode::is4xxClientError, response -> {
 					return Mono.empty();
-				}).bodyToMono(Contracts.class).block();
+				}).bodyToMono(Loans.class).block();
 
-		for (Contract contract : contracts) {
-			csvWriter.println(toCSV(contract));
+		for (Loan loan : loans) {
+			csvWriter.println(toCSV(loan));
 		}
 
 		return RepeatStatus.FINISHED;
 	}
 
-	private String toCSV(Contract contract) {
+	private String toCSV(Loan loan) {
 
 		StringBuffer sb = new StringBuffer();
 
-		sb.append(formatValue(contract.getContractId())).append(DELIMITER);
-		sb.append(formatValue(contract.getContractStatus())).append(DELIMITER);
-		sb.append(formatValue(contract.getLastUpdateDateTime())).append(DELIMITER);
+		sb.append(formatValue(loan.getLoanId())).append(DELIMITER);
+		sb.append(formatValue(loan.getLoanStatus())).append(DELIMITER);
+		sb.append(formatValue(loan.getLastUpdateDateTime())).append(DELIMITER);
 
-		if (contract.getTrade() != null && contract.getTrade().getInstrument() != null) {
+		if (loan.getTrade() != null && loan.getTrade().getInstrument() != null) {
 			
-			Instrument instrument = contract.getTrade().getInstrument();
+			Instrument instrument = loan.getTrade().getInstrument();
 			
 			sb.append(formatValue(instrument.getFigi())).append(DELIMITER);
 			sb.append(formatValue(instrument.getTicker())).append(DELIMITER);
 			sb.append(formatValue(instrument.getCusip())).append(DELIMITER);
 			sb.append(formatValue(instrument.getIsin())).append(DELIMITER);
 			sb.append(formatValue(instrument.getSedol())).append(DELIMITER);
-			sb.append(formatValue(instrument.getDescription())).append(DELIMITER);
+			sb.append("\"").append(formatValue(instrument.getDescription())).append("\"").append(DELIMITER);
 			sb.append(formatValue(instrument.getMarketCd())).append(DELIMITER);
 		} else {
 			sb.append(DELIMITER);
@@ -101,9 +101,9 @@ public class ContractCSVExportTask extends RecordReader implements Tasklet, Step
 			sb.append(DELIMITER);
 		}
 
-		if (contract.getTrade() != null) {
+		if (loan.getTrade() != null) {
 			
-			TradeAgreement trade = contract.getTrade();
+			TradeAgreement trade = loan.getTrade();
 
 			sb.append(formatValue(trade.getQuantity())).append(DELIMITER);
 			sb.append(formatValue(trade.getOpenQuantity())).append(DELIMITER);
@@ -122,9 +122,9 @@ public class ContractCSVExportTask extends RecordReader implements Tasklet, Step
 			sb.append(DELIMITER);
 		}
 
-		if (contract.getTrade() != null && contract.getTrade().getCollateral() != null) {
+		if (loan.getTrade() != null && loan.getTrade().getCollateral() != null) {
 			
-			Collateral collateral = contract.getTrade().getCollateral();
+			Collateral collateral = loan.getTrade().getCollateral();
 			
 			sb.append(formatValue(collateral.getType())).append(DELIMITER);
 			sb.append(formatValue(collateral.getContractPrice())).append(DELIMITER);
@@ -146,8 +146,8 @@ public class ContractCSVExportTask extends RecordReader implements Tasklet, Step
 		TransactingParty borrowerParty = null;
 		TransactingParty lenderParty = null;
 
-		if (contract.getTrade() != null) {
-			TransactingParties transactingParties = contract.getTrade().getTransactingParties();
+		if (loan.getTrade() != null) {
+			TransactingParties transactingParties = loan.getTrade().getTransactingParties();
 			for (TransactingParty transactingParty : transactingParties) {
 				if (PartyRole.BORROWER.equals(transactingParty.getPartyRole())) {
 					borrowerParty = transactingParty;
@@ -160,7 +160,7 @@ public class ContractCSVExportTask extends RecordReader implements Tasklet, Step
 		if (borrowerParty != null) {
 			if (borrowerParty.getParty() != null) {
 				sb.append(formatValue(borrowerParty.getParty().getPartyId())).append(DELIMITER);
-				sb.append(formatValue(borrowerParty.getParty().getPartyName())).append(DELIMITER);
+				sb.append("\"").append(formatValue(borrowerParty.getParty().getPartyName())).append("\"").append(DELIMITER);
 				sb.append(formatValue(borrowerParty.getParty().getGleifLei())).append(DELIMITER);
 			} else {
 				sb.append(DELIMITER);
@@ -169,8 +169,8 @@ public class ContractCSVExportTask extends RecordReader implements Tasklet, Step
 			}
 			if (borrowerParty.getInternalRef() != null) {
 				sb.append(formatValue(borrowerParty.getInternalRef().getBrokerCd())).append(DELIMITER);
-				sb.append(formatValue(borrowerParty.getInternalRef().getAccountId())).append(DELIMITER);
-				sb.append(formatValue(borrowerParty.getInternalRef().getInternalRefId())).append(DELIMITER);
+				sb.append("\"").append(formatValue(borrowerParty.getInternalRef().getAccountId())).append("\"").append(DELIMITER);
+				sb.append("\"").append(formatValue(borrowerParty.getInternalRef().getInternalRefId())).append("\"").append(DELIMITER);
 			} else {
 				sb.append(DELIMITER);
 				sb.append(DELIMITER);
@@ -189,7 +189,7 @@ public class ContractCSVExportTask extends RecordReader implements Tasklet, Step
 		if (lenderParty != null) {
 			if (lenderParty.getParty() != null) {
 				sb.append(formatValue(lenderParty.getParty().getPartyId())).append(DELIMITER);
-				sb.append(formatValue(lenderParty.getParty().getPartyName())).append(DELIMITER);
+				sb.append("\"").append(formatValue(lenderParty.getParty().getPartyName())).append("\"").append(DELIMITER);
 				sb.append(formatValue(lenderParty.getParty().getGleifLei())).append(DELIMITER);
 			} else {
 				sb.append(DELIMITER);
@@ -198,8 +198,8 @@ public class ContractCSVExportTask extends RecordReader implements Tasklet, Step
 			}
 			if (lenderParty.getInternalRef() != null) {
 				sb.append(formatValue(lenderParty.getInternalRef().getBrokerCd())).append(DELIMITER);
-				sb.append(formatValue(lenderParty.getInternalRef().getAccountId())).append(DELIMITER);
-				sb.append(formatValue(lenderParty.getInternalRef().getInternalRefId())).append(DELIMITER);
+				sb.append("\"").append(formatValue(lenderParty.getInternalRef().getAccountId())).append("\"").append(DELIMITER);
+				sb.append("\"").append(formatValue(lenderParty.getInternalRef().getInternalRefId())).append("\"").append(DELIMITER);
 			} else {
 				sb.append(DELIMITER);
 				sb.append(DELIMITER);
@@ -236,11 +236,11 @@ public class ContractCSVExportTask extends RecordReader implements Tasklet, Step
 		return b != null ? b.format(DateTimeFormatter.BASIC_ISO_DATE) : "";
 	}
 
-	private String formatValue(LocalDateTime b) {
+	private String formatValue(OffsetDateTime b) {
 		return b != null ? b.format(DateTimeFormatter.ISO_DATE_TIME) : "";
 	}
 
-	private String formatValue(ContractStatus b) {
+	private String formatValue(LoanStatus b) {
 		return b != null ? b.getValue() : "";
 	}
 	

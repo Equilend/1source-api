@@ -29,8 +29,8 @@ public class LedgerRecord {
 	String oneSourceCounterpartyId;
 	String oneSourceCounterpartyName;
 	String oneSourceCounterpartyGleifLei;
-	String oneSourceContractId;
-	String oneSourceContractStatus;
+	String oneSourceLoanId;
+	String oneSourceLoanStatus;
 
 	String ssiInternalAcctCd;
 	String ssiSettlementBic;
@@ -211,20 +211,20 @@ public class LedgerRecord {
 		this.oneSourceCounterpartyGleifLei = oneSourceCounterpartyGleifLei;
 	}
 
-	public String getOneSourceContractId() {
-		return oneSourceContractId;
+	public String getOneSourceLoanId() {
+		return oneSourceLoanId;
 	}
 
-	public void setOneSourceContractId(String oneSourceContractId) {
-		this.oneSourceContractId = oneSourceContractId;
+	public void setOneSourceLoanId(String oneSourceLoanId) {
+		this.oneSourceLoanId = oneSourceLoanId;
 	}
 
-	public String getOneSourceContractStatus() {
-		return oneSourceContractStatus;
+	public String getOneSourceLoanStatus() {
+		return oneSourceLoanStatus;
 	}
 
-	public void setOneSourceContractStatus(String oneSourceContractStatus) {
-		this.oneSourceContractStatus = oneSourceContractStatus;
+	public void setOneSourceLoanStatus(String oneSourceLoanStatus) {
+		this.oneSourceLoanStatus = oneSourceLoanStatus;
 	}
 
 	public String getSsiInternalAcctCd() {

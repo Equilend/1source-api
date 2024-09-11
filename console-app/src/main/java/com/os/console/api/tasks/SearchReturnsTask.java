@@ -37,7 +37,7 @@ public class SearchReturnsTask implements Runnable {
 					printHeader();
 				}
 				System.out.print(ConsoleOutputUtil.padSpaces(returnObj.getReturnId(), 40));
-				System.out.print(ConsoleOutputUtil.padSpaces(returnObj.getContractId(), 40));
+				System.out.print(ConsoleOutputUtil.padSpaces(returnObj.getLoanId(), 40));
 				System.out.print(ConsoleOutputUtil.padSpaces(returnObj.getStatus().toString(), 12));
 				System.out.print(ConsoleOutputUtil.padSpaces(returnObj.getLastUpdateDatetime(), 30));
 				System.out.print(ConsoleOutputUtil.padSpaces(returnObj.getReturnDate(), 15));
@@ -52,7 +52,7 @@ public class SearchReturnsTask implements Runnable {
 	public void printHeader() {
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("Return Id", 40));
-		System.out.print(ConsoleOutputUtil.padSpaces("Contract Id", 40));
+		System.out.print(ConsoleOutputUtil.padSpaces("Loan Id", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("Status", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("Last Update DateTime", 30));
 		System.out.print(ConsoleOutputUtil.padSpaces("Return Date", 15));

@@ -18,9 +18,9 @@ public class PartyAccessListConfig {
 	@Bean
 	public ArrayList<PartyAccess> partyAccessList() {
 		ArrayList<PartyAccess> partyAccessList = new ArrayList<>();
-		partyAccessList.add(new PartyAccess("user1", "password"));
-		partyAccessList.add(new PartyAccess("user2", "password"));
-		partyAccessList.add(new PartyAccess("user3", "password"));
+		partyAccessList.add(new PartyAccess("TestLender1User", "fjmxVeKzpzUDg3YJ"));
+		partyAccessList.add(new PartyAccess("TestBorrower1User", "FqnNQyUwaenQ8K3h"));
+		partyAccessList.add(new PartyAccess("bnystageuser1", "cz5pCWPTzajCG5tk"));
 
 		return partyAccessList;
 	}
