@@ -26,7 +26,7 @@ public class DelegationProposalConsole extends AbstractConsole {
 			return false;
 		}
 
-		System.out.print("/delegations/ proposal:" + counterParty.getPartyId() + " > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /delegations/ proposal:" + counterParty.getPartyId() + " > ");
 		
 		return true;
 	}

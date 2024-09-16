@@ -66,7 +66,7 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 		System.out.println("\"?\" or \"help\" to see menu");
 		System.out.println();
 		String command = null;
-		System.out.print("> ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " > ");
 
 		try {
 			while ((command = consoleIn.readLine()) != null) {
@@ -81,7 +81,7 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 				} else if (command.equalsIgnoreCase("r")) {
 					ReturnsConsole returnsConsole = new ReturnsConsole();
 					returnsConsole.execute(consoleIn, restWebClient);
-				} else if (command.equalsIgnoreCase("e")) {
+				} else if (command.equalsIgnoreCase("c")) {
 					RecallsConsole recallsConsole = new RecallsConsole();
 					recallsConsole.execute(consoleIn, restWebClient);
 				} else if (command.equalsIgnoreCase("t")) {
@@ -90,11 +90,14 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 				} else if (command.equalsIgnoreCase("d")) {
 					DelegationsConsole delegationsConsole = new DelegationsConsole();
 					delegationsConsole.execute(consoleIn, restWebClient);
+				} else if (command.equalsIgnoreCase("e")) {
+					EventsConsole eventsConsole = new EventsConsole();
+					eventsConsole.execute(consoleIn, restWebClient);
 				} else {
 					System.out.println("Unknown command");
 				}
 
-				System.out.print("> ");
+				System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " > ");
 			}
 		} catch (Exception e) {
 			logger.error("Exception with command: " + command);
@@ -108,9 +111,11 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 		System.out.println("-----------------------");
 		System.out.println("L - Loans");
 		System.out.println("R - Returns");
-		System.out.println("E - Recalls");
+		System.out.println("C - Recalls");
 		System.out.println("T - Rerates");
 		System.out.println("D - Delegations");
+		System.out.println("E - Events");
+		System.out.println();
 	}
 
 }

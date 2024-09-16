@@ -88,6 +88,7 @@ public class SearchLoanRateHistoryTask implements Runnable {
 
 			}
 		}
+		System.out.println();
 	}
 
 	class LoanRateHistory implements Comparable<LoanRateHistory> {

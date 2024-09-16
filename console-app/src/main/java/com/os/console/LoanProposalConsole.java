@@ -9,6 +9,7 @@ import com.os.client.model.Instrument;
 import com.os.client.model.LoanProposal;
 import com.os.client.model.Party;
 import com.os.client.model.PartyRole;
+import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.ProposeLoanTask;
 import com.os.console.util.ConsoleOutputUtil;
 import com.os.console.util.InstrumentUtil;
@@ -41,7 +42,7 @@ public class LoanProposalConsole extends AbstractConsole {
 			ConsoleOutputUtil.printObject(loanProposal);
 			firstPrompt = false;
 		}
-		System.out.print("/loans/ proposal > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /loans/ proposal > ");
 		return true;
 	}
 

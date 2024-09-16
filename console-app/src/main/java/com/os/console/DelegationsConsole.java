@@ -20,7 +20,7 @@ public class DelegationsConsole extends AbstractConsole {
 	private static final Logger logger = LoggerFactory.getLogger(DelegationsConsole.class);
 
 	protected boolean prompt() {
-		System.out.print("/delegations > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /delegations > ");
 		return true;
 	}
 
