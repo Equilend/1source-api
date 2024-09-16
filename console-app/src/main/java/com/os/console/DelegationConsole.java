@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Delegation;
+import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.ApproveDelegationTask;
 import com.os.console.api.tasks.CancelDelegationTask;
 import com.os.console.api.tasks.DeclineDelegationTask;
@@ -25,7 +26,7 @@ public class DelegationConsole extends AbstractConsole {
 			return false;
 		}
 		
-		System.out.print("/delegations/" + delegation.getDelegationId() + " > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /delegations/" + delegation.getDelegationId() + " > ");
 		return true;
 	}
 

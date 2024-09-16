@@ -25,7 +25,7 @@ public class LoansConsole extends AbstractConsole {
 	}
 
 	protected boolean prompt() {
-		System.out.print("/loans > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /loans > ");
 		return true;
 	}
 

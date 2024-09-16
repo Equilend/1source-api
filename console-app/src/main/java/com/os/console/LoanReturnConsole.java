@@ -40,7 +40,7 @@ public class LoanReturnConsole extends AbstractConsole {
 			return false;
 		}
 
-		System.out.print("/loans/" + loan.getLoanId() + "/returns/" + modelReturn.getReturnId() + " > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /loans/" + loan.getLoanId() + "/returns/" + modelReturn.getReturnId() + " > ");
 		
 		return true;
 	}

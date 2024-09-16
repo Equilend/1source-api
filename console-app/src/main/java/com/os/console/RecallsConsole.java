@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Recall;
+import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.CancelRecallTask;
 import com.os.console.api.tasks.SearchRecallTask;
 import com.os.console.api.tasks.SearchRecallsTask;
@@ -13,7 +14,7 @@ import com.os.console.api.tasks.SearchRecallsTask;
 public class RecallsConsole extends AbstractConsole {
 
 	protected boolean prompt() {
-		System.out.print("/recalls > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /recalls > ");
 		return true;
 	}
 

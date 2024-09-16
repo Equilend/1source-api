@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Rerate;
+import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.ApproveRerateTask;
 import com.os.console.api.tasks.CancelRerateTask;
 import com.os.console.api.tasks.DeclineRerateTask;
@@ -15,7 +16,7 @@ import com.os.console.api.tasks.SearchReratesTask;
 public class ReratesConsole extends AbstractConsole {
 
 	protected boolean prompt() {
-		System.out.print("/rerates > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /rerates > ");
 		return true;
 	}
 

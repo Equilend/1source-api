@@ -76,6 +76,7 @@ public class SearchDelegationsTask implements Runnable {
 				rows++;
 			}
 		}
+		System.out.println();
 	}
 
 	public void printHeader() {

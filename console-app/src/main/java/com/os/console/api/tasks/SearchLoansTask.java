@@ -75,12 +75,12 @@ public class SearchLoansTask implements Runnable {
 				System.out.print(ConsoleOutputUtil.padSpaces(loan.getLoanStatus().toString(), 12));
 
 				System.out.print(ConsoleOutputUtil.padSpaces(borrower, 15));
-				System.out.print(ConsoleOutputUtil.padSpaces(borrowerSettlement, 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(borrowerSettlement, 14));
 				System.out.print(ConsoleOutputUtil.padSpaces(lender, 15));
-				System.out.print(ConsoleOutputUtil.padSpaces(lenderSettlement, 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(lenderSettlement, 14));
 
 				System.out.print(ConsoleOutputUtil.padSpaces(loan.getTrade().getTradeDate(), 15));
-				System.out.print(ConsoleOutputUtil.padSpaces(loan.getTrade().getInstrument().getTicker(), 15));
+				System.out.print(ConsoleOutputUtil.padSpaces(loan.getTrade().getInstrument().getTicker(), 10));
 				System.out.print(ConsoleOutputUtil.padSpaces(loan.getTrade().getQuantity(), 15));
 				System.out.print(ConsoleOutputUtil.padSpaces(loan.getTrade().getOpenQuantity(), 15));
 				System.out.println();
@@ -88,6 +88,7 @@ public class SearchLoansTask implements Runnable {
 				rows++;
 			}
 		}
+		System.out.println();
 	}
 
 	public void printHeader() {
@@ -95,22 +96,22 @@ public class SearchLoansTask implements Runnable {
 		System.out.print(ConsoleOutputUtil.padSpaces("Loan Id", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("Status", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("Borrower", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("Settlement", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("Settlement", 14));
 		System.out.print(ConsoleOutputUtil.padSpaces("Lender", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("Settlement", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("Settlement", 14));
 		System.out.print(ConsoleOutputUtil.padSpaces("Trade Date", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("Ticker", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("Ticker", 10));
 		System.out.print(ConsoleOutputUtil.padSpaces("Orig Quantity", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Open Quantity", 15));
 		System.out.println();
 		System.out.print(ConsoleOutputUtil.padSpaces("-----------", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("------", 12));
 		System.out.print(ConsoleOutputUtil.padSpaces("--------", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("----------", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("----------", 14));
 		System.out.print(ConsoleOutputUtil.padSpaces("------", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("----------", 14));
 		System.out.print(ConsoleOutputUtil.padSpaces("----------", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("----------", 15));
-		System.out.print(ConsoleOutputUtil.padSpaces("------", 15));
+		System.out.print(ConsoleOutputUtil.padSpaces("------", 10));
 		System.out.print(ConsoleOutputUtil.padSpaces("-------------", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("-------------", 15));
 		System.out.println();

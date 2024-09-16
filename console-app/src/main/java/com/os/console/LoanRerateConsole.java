@@ -8,6 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Loan;
 import com.os.client.model.Rerate;
+import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.ApproveRerateTask;
 import com.os.console.api.tasks.CancelRerateTask;
 import com.os.console.api.tasks.DeclineRerateTask;
@@ -35,7 +36,7 @@ public class LoanRerateConsole extends AbstractConsole {
 			return false;
 		}
 
-		System.out.print("/loans/" + loan.getLoanId() + "/rerates/" + rerate.getRerateId() + " > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /loans/" + loan.getLoanId() + "/rerates/" + rerate.getRerateId() + " > ");
 
 		return true;
 	}

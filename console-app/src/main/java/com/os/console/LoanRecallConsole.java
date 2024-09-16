@@ -8,6 +8,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.Loan;
 import com.os.client.model.Recall;
+import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.CancelRecallTask;
 import com.os.console.api.tasks.SearchLoanRecallTask;
 import com.os.console.api.tasks.SearchLoanTask;
@@ -35,7 +36,7 @@ public class LoanRecallConsole extends AbstractConsole {
 			return false;
 		}
 
-		System.out.print("/loans/" + loan.getLoanId() + "/recalls/" + recall.getRecallId() + " > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /loans/" + loan.getLoanId() + "/recalls/" + recall.getRecallId() + " > ");
 		return true;
 	}
 

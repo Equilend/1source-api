@@ -95,6 +95,7 @@ public class SearchLoanHistoryTask implements Runnable {
 
 			}
 		}
+		System.out.println();
 	}
 
 	class LoanHistory implements Comparable<LoanHistory> {

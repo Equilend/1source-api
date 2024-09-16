@@ -35,7 +35,7 @@ public class ReturnConsole extends AbstractConsole {
 			return false;
 		}
 		
-		System.out.print("/returns/" + modelReturn.getReturnId() + " > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /returns/" + modelReturn.getReturnId() + " > ");
 		
 		return true;
 	}

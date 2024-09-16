@@ -30,7 +30,7 @@ public class LoanRecallsConsole extends AbstractConsole {
 			return false;
 		}
 		
-		System.out.print("/loans/" + loan.getLoanId() + "/recalls > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /loans/" + loan.getLoanId() + "/recalls > ");
 		return true;
 	}
 

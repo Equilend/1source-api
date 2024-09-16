@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import com.os.client.model.ModelReturn;
+import com.os.console.api.ConsoleConfig;
 import com.os.console.api.tasks.CancelReturnTask;
 import com.os.console.api.tasks.SearchReturnTask;
 import com.os.console.api.tasks.SearchReturnsTask;
@@ -13,7 +14,7 @@ import com.os.console.api.tasks.SearchReturnsTask;
 public class ReturnsConsole extends AbstractConsole {
 
 	protected boolean prompt() {
-		System.out.print("/returns > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /returns > ");
 		return true;
 	}
 

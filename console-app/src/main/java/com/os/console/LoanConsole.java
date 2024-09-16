@@ -35,7 +35,7 @@ public class LoanConsole extends AbstractConsole {
 			return false;
 		}
 		
-		System.out.print("/loans/" + loan.getLoanId() + " > ");
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " /loans/" + loan.getLoanId() + " > ");
 		
 		return true;
 	}

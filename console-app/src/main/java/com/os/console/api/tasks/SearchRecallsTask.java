@@ -39,7 +39,7 @@ public class SearchRecallsTask implements Runnable {
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getRecallId(), 40));
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getLoanId(), 40));
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getStatus().toString(), 12));
-				System.out.print(ConsoleOutputUtil.padSpaces(recall.getLastUpdateDatetime(), 30));
+				System.out.print(ConsoleOutputUtil.padSpaces(recall.getLastUpdateDatetime(), 26));
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getRecallDate(), 15));
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getRecallDueDate(), 18));
 				System.out.print(ConsoleOutputUtil.padSpaces(recall.getQuantity(), 15));
@@ -48,6 +48,7 @@ public class SearchRecallsTask implements Runnable {
 				rows++;
 			}
 		}
+		System.out.println();
 	}
 
 	public void printHeader() {
@@ -55,7 +56,7 @@ public class SearchRecallsTask implements Runnable {
 		System.out.print(ConsoleOutputUtil.padSpaces("Recall Id", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("Loan Id", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("Status", 12));
-		System.out.print(ConsoleOutputUtil.padSpaces("Last Update DateTime", 30));
+		System.out.print(ConsoleOutputUtil.padSpaces("Last Update DateTime", 26));
 		System.out.print(ConsoleOutputUtil.padSpaces("Recall Date", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("Recall Due Date", 18));
 		System.out.print(ConsoleOutputUtil.padSpaces("Quantity", 15));
@@ -63,7 +64,7 @@ public class SearchRecallsTask implements Runnable {
 		System.out.print(ConsoleOutputUtil.padSpaces("---------", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("-----------", 40));
 		System.out.print(ConsoleOutputUtil.padSpaces("------", 12));
-		System.out.print(ConsoleOutputUtil.padSpaces("--------------------", 30));
+		System.out.print(ConsoleOutputUtil.padSpaces("--------------------", 26));
 		System.out.print(ConsoleOutputUtil.padSpaces("-----------", 15));
 		System.out.print(ConsoleOutputUtil.padSpaces("---------------", 18));
 		System.out.print(ConsoleOutputUtil.padSpaces("--------", 15));
