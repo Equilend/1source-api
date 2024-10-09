@@ -52,6 +52,13 @@ public class ConsoleOutputUtil {
 		return ret.substring(0, maxLength);
 	}
 
+	public static String padSpaces(Long field, int maxLength) {
+		
+		String ret = (field == null ? "" : field.toString()) + spaces;
+		
+		return ret.substring(0, maxLength);
+	}
+
 	public static String padSpaces(LocalDate field, int maxLength) {
 		
 		String ret = (field == null ? "" : field.toString()) + spaces;
