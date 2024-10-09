@@ -20,7 +20,7 @@ import com.os.console.api.ConsoleConfig;
 @SpringBootApplication
 @EnableScheduling
 @ConfigurationPropertiesScan
-public class SpringBootConsoleApp implements CommandLineRunner {
+public class SpringBootConsoleApp extends AbstractConsole implements CommandLineRunner {
 
 	private static final Logger logger = LoggerFactory.getLogger(SpringBootConsoleApp.class);
 
@@ -46,12 +46,12 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 			logger.info("args[{}]: {}", i, args[i]);
 		}
 
-		Console console = System.console();
-		
-		if (console == null) {
-			logger.warn("No console available");
-			return;
-		}
+//		Console console = System.console();
+//		
+//		if (console == null) {
+//			logger.warn("No console available");
+//			return;
+//		}
 
 		BufferedReader consoleIn = new BufferedReader(new InputStreamReader(System.in));
 
@@ -65,48 +65,12 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 		System.out.println();
 		System.out.println("\"?\" or \"help\" to see menu");
 		System.out.println();
-		String command = null;
-		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " > ");
 
-		try {
-			while ((command = consoleIn.readLine()) != null) {
-				command = command.trim();
-				if (command.equals("?") || command.equalsIgnoreCase("help")) {
-					printMainHelp();
-				} else if (command.equalsIgnoreCase("quit") || command.equalsIgnoreCase("exit") || command.equalsIgnoreCase("q")) {
-					System.exit(0);
-				} else if (command.equalsIgnoreCase("l")) {
-					LoansConsole loansConsole = new LoansConsole();
-					loansConsole.execute(consoleIn, restWebClient);
-				} else if (command.equalsIgnoreCase("r")) {
-					ReturnsConsole returnsConsole = new ReturnsConsole();
-					returnsConsole.execute(consoleIn, restWebClient);
-				} else if (command.equalsIgnoreCase("c")) {
-					RecallsConsole recallsConsole = new RecallsConsole();
-					recallsConsole.execute(consoleIn, restWebClient);
-				} else if (command.equalsIgnoreCase("t")) {
-					ReratesConsole reratesConsole = new ReratesConsole();
-					reratesConsole.execute(consoleIn, restWebClient);
-				} else if (command.equalsIgnoreCase("d")) {
-					DelegationsConsole delegationsConsole = new DelegationsConsole();
-					delegationsConsole.execute(consoleIn, restWebClient);
-				} else if (command.equalsIgnoreCase("e")) {
-					EventsConsole eventsConsole = new EventsConsole();
-					eventsConsole.execute(consoleIn, restWebClient);
-				} else {
-					System.out.println("Unknown command");
-				}
-
-				System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " > ");
-			}
-		} catch (Exception e) {
-			logger.error("Exception with command: " + command);
-			e.printStackTrace();
-		}
+		execute(consoleIn, restWebClient);
 	}
 
-	private void printMainHelp() {
-		System.out.println();
+	@Override
+	protected void printMenu() {
 		System.out.println("Main Menu");
 		System.out.println("-----------------------");
 		System.out.println("L - Loans");
@@ -115,7 +79,38 @@ public class SpringBootConsoleApp implements CommandLineRunner {
 		System.out.println("T - Rerates");
 		System.out.println("D - Delegations");
 		System.out.println("E - Events");
-		System.out.println();
+	}
+
+	@Override
+	protected boolean prompt() {
+		System.out.print(ConsoleConfig.ACTING_PARTY.getPartyId() + " > ");
+		return true;
+	}
+
+	@Override
+	protected void handleArgs(String[] args, BufferedReader consoleIn, WebClient webClient) {
+		
+		if (args[0].equalsIgnoreCase("l")) {
+			LoansConsole loansConsole = new LoansConsole();
+			loansConsole.execute(consoleIn, restWebClient);
+		} else if (args[0].equalsIgnoreCase("r")) {
+			ReturnsConsole returnsConsole = new ReturnsConsole();
+			returnsConsole.execute(consoleIn, restWebClient);
+		} else if (args[0].equalsIgnoreCase("c")) {
+			RecallsConsole recallsConsole = new RecallsConsole();
+			recallsConsole.execute(consoleIn, restWebClient);
+		} else if (args[0].equalsIgnoreCase("t")) {
+			ReratesConsole reratesConsole = new ReratesConsole();
+			reratesConsole.execute(consoleIn, restWebClient);
+		} else if (args[0].equalsIgnoreCase("d")) {
+			DelegationsConsole delegationsConsole = new DelegationsConsole();
+			delegationsConsole.execute(consoleIn, restWebClient);
+		} else if (args[0].equalsIgnoreCase("e")) {
+			EventsConsole eventsConsole = new EventsConsole();
+			eventsConsole.execute(consoleIn, restWebClient);
+		} else {
+			System.out.println("Unknown command");
+		}		
 	}
 
 }
