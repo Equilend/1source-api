@@ -95,7 +95,7 @@ public class ConsoleConfig {
 	}
 
 	public String getSettlement_internalAcctCd() {
-		return settlement_internalAcctCd;
+		return isSet(settlement_internalAcctCd) ? settlement_internalAcctCd : null;
 	}
 
 	public void setSettlement_internalAcctCd(String settlement_internalAcctCd) {
@@ -103,7 +103,7 @@ public class ConsoleConfig {
 	}
 
 	public String getSettlement_settlementBic() {
-		return settlement_settlementBic;
+		return isSet(settlement_settlementBic) ? settlement_settlementBic : null;
 	}
 
 	public void setSettlement_settlementBic(String settlement_settlementBic) {
@@ -111,7 +111,7 @@ public class ConsoleConfig {
 	}
 
 	public String getSettlement_localAgentBic() {
-		return settlement_localAgentBic;
+		return isSet(settlement_localAgentBic) ? settlement_localAgentBic : null;
 	}
 
 	public void setSettlement_localAgentBic(String settlement_localAgentBic) {
@@ -119,7 +119,7 @@ public class ConsoleConfig {
 	}
 
 	public String getSettlement_localAgentName() {
-		return settlement_localAgentName;
+		return isSet(settlement_localAgentName) ? settlement_localAgentName : null;
 	}
 
 	public void setSettlement_localAgentName(String settlement_localAgentName) {
@@ -127,7 +127,7 @@ public class ConsoleConfig {
 	}
 
 	public String getSettlement_localAgentAcct() {
-		return settlement_localAgentAcct;
+		return isSet(settlement_localAgentAcct) ? settlement_localAgentAcct : null;
 	}
 
 	public void setSettlement_localAgentAcct(String settlement_localAgentAcct) {
@@ -135,7 +135,7 @@ public class ConsoleConfig {
 	}
 
 	public String getSettlement_dtcParticipantNumber() {
-		return settlement_dtcParticipantNumber;
+		return isSet(settlement_dtcParticipantNumber) ? settlement_dtcParticipantNumber : null;
 	}
 
 	public void setSettlement_dtcParticipantNumber(String settlement_dtcParticipantNumber) {
@@ -143,7 +143,7 @@ public class ConsoleConfig {
 	}
 
 	public String getSettlement_custodianName() {
-		return settlement_custodianName;
+		return isSet(settlement_custodianName) ? settlement_custodianName : null;
 	}
 
 	public void setSettlement_custodianName(String settlement_custodianName) {
@@ -151,7 +151,7 @@ public class ConsoleConfig {
 	}
 
 	public String getSettlement_custodianBic() {
-		return settlement_custodianBic;
+		return isSet(settlement_custodianBic) ? settlement_custodianBic : null;
 	}
 
 	public void setSettlement_custodianBic(String settlement_custodianBic) {
@@ -159,7 +159,7 @@ public class ConsoleConfig {
 	}
 
 	public String getSettlement_custodianAcct() {
-		return settlement_custodianAcct;
+		return isSet(settlement_custodianAcct) ? settlement_custodianAcct : null;
 	}
 
 	public void setSettlement_custodianAcct(String settlement_custodianAcct) {
@@ -167,19 +167,22 @@ public class ConsoleConfig {
 	}
 
 	public String getApi_uri() {
-		return api_uri;
+		return isSet(api_uri) ? api_uri : null;
 	}
 
 	public String getAuth_uri() {
-		return auth_uri;
+		return isSet(auth_uri) ? auth_uri : null;
 	}
 
 	public String getAuth_client_id() {
-		return auth_client_id;
+		return isSet(auth_client_id) ? auth_client_id : null;
 	}
 
 	public String getAuth_client_secret() {
-		return auth_client_secret;
+		return isSet(auth_client_secret) ? auth_client_secret : null;
 	}
 
+	private boolean isSet(String val) {
+		return val != null && val.trim().length() > 0;
+	}
 }
