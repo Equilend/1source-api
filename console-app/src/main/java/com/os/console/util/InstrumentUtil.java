@@ -33,9 +33,9 @@ public class InstrumentUtil {
 		BufferedReader reader = null;
 
 		try {
-			
+
 			InputStream in = this.getClass().getResourceAsStream(instrumentsFile);
-			
+
 			reader = new BufferedReader(new InputStreamReader(in));
 
 			String nextLine;
@@ -45,7 +45,7 @@ public class InstrumentUtil {
 
 				Instrument instrument = createInstrument(lineParts);
 				instrumentList.add(instrument);
-				
+
 				instrumentMap.put(instrument.getIsin(), instrument);
 				instrumentMap.put(instrument.getSedol(), instrument);
 				instrumentMap.put(instrument.getCusip(), instrument);
@@ -83,7 +83,7 @@ public class InstrumentUtil {
 	public Instrument getRandomInstrument() {
 		return instrumentList.get(r.nextInt(cnt));
 	}
-	
+
 	public Instrument getInstrument(String securityId) {
 		return instrumentMap.get(securityId);
 	}
@@ -91,7 +91,7 @@ public class InstrumentUtil {
 	private Instrument createInstrument(String[] lineParts) {
 
 		Instrument instrument = new Instrument();
-		
+
 		int idx = 0;
 		instrument.setFigi(parseString(lineParts[idx++]));
 		instrument.setIsin(parseString(lineParts[idx++]));
@@ -100,7 +100,7 @@ public class InstrumentUtil {
 		instrument.setTicker(parseString(lineParts[idx++]));
 		instrument.setMarketCd(parseString(lineParts[idx++]));
 		instrument.setDescription(parseString(lineParts[idx++]));
-		
+
 		Price price = new Price();
 		price.setValue(parseDouble(lineParts[idx++]));
 		price.setCurrency(CurrencyCd.valueOf(parseString(lineParts[idx++])));
@@ -111,13 +111,56 @@ public class InstrumentUtil {
 		return instrument;
 	}
 
+	public CurrencyCd getInstrumentCurrency(String marketCd) {
+
+		CurrencyCd currencyCd = CurrencyCd.USD;
+
+		switch (marketCd) {
+		case "HK":
+			currencyCd = CurrencyCd.HKD;
+			break;
+		case "JP":
+			currencyCd = CurrencyCd.JPY;
+			break;
+		case "NO":
+			currencyCd = CurrencyCd.NOK;
+			break;
+		case "SE":
+			currencyCd = CurrencyCd.SEK;
+			break;
+		case "SG":
+			currencyCd = CurrencyCd.SGD;
+			break;
+		case "AU":
+			currencyCd = CurrencyCd.AUD;
+			break;
+		case "CA":
+			currencyCd = CurrencyCd.CAD;
+			break;
+		case "CH":
+			currencyCd = CurrencyCd.CHF;
+			break;
+		case "DK":
+			currencyCd = CurrencyCd.DKK;
+			break;
+		case "EU":
+			currencyCd = CurrencyCd.EUR;
+			break;
+		case "GB":
+			currencyCd = CurrencyCd.GBP;
+			break;
+		}
+
+		return currencyCd;
+	}
+
 	private String parseString(String s) {
 		if (s == null || s.trim().length() == 0) {
 			return null;
 		}
 
 		s = s.replace("\"", "");
-		
+
 		return s;
 	}
 

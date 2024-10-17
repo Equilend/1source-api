@@ -51,6 +51,8 @@ public class PayloadUtil {
 
 		Random random = new Random();
 
+		InstrumentUtil instrumentUtil = InstrumentUtil.getInstance();
+		
 		LoanProposal loanProposal = new LoanProposal();
 
 		TradeAgreement trade = new TradeAgreement();
@@ -117,7 +119,7 @@ public class PayloadUtil {
 		trade.setRate(rebateRate);
 
 		trade.setQuantity(((((random.nextInt(100000 - 10000) + 10000)) + 99) / 100) * 100);
-		trade.setBillingCurrency(CurrencyCd.USD);
+		trade.setBillingCurrency(instrumentUtil.getInstrumentCurrency(instrument.getMarketCd()));
 		trade.setDividendRatePct(85d);
 		trade.setTradeDate(tradeDate);
 		trade.setTermType(TermType.OPEN);
@@ -139,7 +141,7 @@ public class PayloadUtil {
 		collateralValue = collateralValue.setScale(2, java.math.RoundingMode.HALF_UP);
 		collateral.setCollateralValue(collateralValue.doubleValue());
 
-		collateral.setCurrency(CurrencyCd.USD);
+		collateral.setCurrency(instrumentUtil.getInstrumentCurrency(instrument.getMarketCd()));
 		collateral.setType(collateralType);
 		collateral.setMargin(102d);
 
