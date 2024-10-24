@@ -4,11 +4,11 @@ var https = require('https');
 function getAuthToken() {
 
 	var post_data = querystring.stringify({
-		'client_id': 'IntegrationTestClient',
-		'client_secret': '9f452b99-2c14-4ec5-a92b-db6d9d52ee5f',
-		'grant_type': 'password',
-		'username': 'bnyuser1',
-		'password': 's5hsZZnPh0G9'
+		'client_id': 'client_id',
+		'client_secret': 'client_secret',
+		'grant_type': 'grant_type',
+		'username': 'username',
+		'password': 'password'
 	});
 
 	var post_options = {
